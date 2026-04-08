@@ -1,8 +1,9 @@
 import { ProjectGrid } from "@/components/ProjectGrid";
+import mainStyles from "./main.module.css";
 
 export default function HomePage() {
   return (
-    <main className="flex-1 px-2 pb-[52px] pt-2 md:px-[52px]">
+    <main className={mainStyles.main}>
       <ProjectGrid />
     </main>
   );

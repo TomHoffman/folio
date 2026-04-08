@@ -1,9 +1,7 @@
-@import "tailwindcss";
-
-@custom-variant dark (&:where(.dark, .dark *));
-
+/* Theming tokens + global base. No Tailwind. */
 :root {
-  --color-background: #ffffff;
+  --font-sans: var(--font-matter), ui-sans-serif, system-ui, sans-serif;
+  --color-background: #faf7f1;
   --color-foreground: #0a0a0a;
   --color-muted: #525252;
   --color-border: #e5e5e5;
@@ -14,7 +12,12 @@
   --color-masthead-subtle: #64748b;
 }
 
+html {
+  height: 100%;
+}
+
 html.dark {
+  color-scheme: dark;
   --color-background: #081f28;
   --background: #0a1f24;
   --color-foreground: #fafafa;
@@ -24,38 +27,53 @@ html.dark {
   --color-accent: #fafafa;
   --color-masthead: #ffffff;
   --color-masthead-dim: #90c9ff;
-  /* Low-contrast masthead when clipped (inner pages) */
   --color-masthead-subtle: #2f4f5e;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #081f28;
-    --background: #0a1f24;
-    --color-masthead: #ffffff;
-    --color-masthead-dim: #90c9ff;
-    --color-masthead-subtle: #2f4f5e;
-  }
-}
-
-@theme inline {
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
-  --color-surface: var(--color-surface);
-  --color-accent: var(--color-accent);
-  /* Matter Regular (400) is default; use font-light for Matter Light (300) */
-  --font-sans: var(--font-matter), ui-sans-serif, system-ui, sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: var(--color-background);
+  margin: 0;
   color: var(--color-foreground);
   font-family: var(--font-sans);
 }
 
-/* Project grid custom cursor: scale pulse when moving between cards */
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Visually hidden — used by Header, ProjectGrid status pill (mobile). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .sr-only-md-inline {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
 @keyframes project-cursor-cross {
   0% {
     transform: scale(1);

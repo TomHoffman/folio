@@ -1,0 +1,12 @@
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.5rem 52px;
+}
+
+@media (min-width: 48rem) {
+  .main {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+}

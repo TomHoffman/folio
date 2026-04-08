@@ -1,0 +1,88 @@
+/*
+ * Shared em context (fluid `rem` base → children use `em`).
+ * Title: 6.5em → 104px @ 16px base. Subtitle: 1.25em → 20px @ 16px base.
+ */
+.section {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.headCol {
+  display: flex;
+  min-height: 1px;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  font-style: normal;
+}
+
+.headingsEm {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25em;
+  font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
+}
+
+.title {
+  margin: 0;
+  width: 100%;
+  font-size: 6.5em;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+/* Matter Light (300) */
+.subtitle {
+  margin: 0;
+  width: 100%;
+  font-size: 1.25em;
+  font-weight: 300;
+  line-height: 1.42;
+  color: #6a8d9b;
+}
+
+.back {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 4px;
+}
+
+.back svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.back svg path {
+  fill: #ffffff;
+  transition: fill 0.25s ease-in-out;
+}
+
+.back:hover svg path,
+.back:focus-visible svg path {
+  fill: #a3ff58;
+}

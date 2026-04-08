@@ -1,0 +1,31 @@
+/*
+ * Page canvas — loaded after globals.css.
+ * !important so late-loaded CSS cannot paint over the themed backdrop.
+ */
+html:not(.dark),
+html:not(.dark) body {
+  min-height: 100dvh;
+  background-color: #faf7f1 !important;
+}
+
+html.dark,
+html.dark body {
+  min-height: 100dvh;
+  background-color: #081f28 !important;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    transition: background-color 320ms ease;
+  }
+
+  body {
+    transition:
+      background-color 320ms ease,
+      color 320ms ease;
+  }
+}

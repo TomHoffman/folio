@@ -1,3 +1,5 @@
+import styles from "./Nav.module.css";
+
 export function Nav() {
-  return <nav aria-label="Primary" />;
+  return <nav className={styles.nav} aria-label="Primary" />;
 }

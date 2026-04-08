@@ -1,0 +1,152 @@
+.grid {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+@media (min-width: 48rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gridCursorHide {
+  cursor: none;
+}
+
+.gridCursorHide a,
+.gridCursorHide img {
+  cursor: none;
+}
+
+.gridItem {
+  min-width: 0;
+}
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: #16343f;
+  outline-offset: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.cardOverlay {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 1.5rem;
+}
+
+@media (min-width: 48rem) {
+  .cardOverlay {
+    padding: 32px;
+  }
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.cardIndustry {
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #cde0e8;
+}
+
+.statusPill {
+  pointer-events: none;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1;
+  display: inline-flex;
+  height: 48px;
+  width: fit-content;
+  align-items: center;
+  gap: 0;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0 0.75rem;
+  font-size: 13px;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+@media (min-width: 48rem) {
+  .statusPill {
+    right: 32px;
+    bottom: 32px;
+    gap: 0.5rem;
+    padding-left: 16px;
+    padding-right: 19px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.statusIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.cursorWrap {
+  pointer-events: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 300ms ease-out;
+}
+
+.cursorBubble {
+  display: flex;
+  width: 120px;
+  height: 120px;
+  transform-origin: center;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: lowercase;
+  letter-spacing: 0.025em;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.cursorBubbleTextLight {
+  color: #ffffff;
+}
+
+.cursorLabel {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.12));
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
 import { projects } from "@/data/projects";
+import styles from "./ProjectGrid.module.css";
 
 /** Half of the 8px grid gap — expands hit areas so the cursor doesn’t drop in gutters. */
 const GUTTER_HIT_PAD = 4;
@@ -70,19 +71,25 @@ function findProjectUnderPointer(
   return best?.project ?? null;
 }
 
-function ProjectStatusPill({ label }: { label: string }) {
+function ProjectStatusPill({
+  label,
+  iconSrc = "/svg/lock.svg",
+}: {
+  label: string;
+  iconSrc?: string;
+}) {
   return (
-    <div className="pointer-events-none absolute right-6 bottom-6 z-[1] inline-flex h-[48px] w-fit items-center gap-0 rounded-full bg-[rgba(255,255,255,0.2)] px-3 text-[13px] font-normal text-white md:right-[32px] md:bottom-[32px] md:gap-2 md:px-0 md:pl-[16px] md:pr-[19px]">
+    <div className={styles.statusPill}>
       {/* eslint-disable-next-line @next/next/no-img-element -- static SVG asset from public */}
       <img
-        src="/svg/lock.svg"
+        src={iconSrc}
         alt=""
         width={24}
         height={24}
-        className="size-6 shrink-0"
+        className={styles.statusIcon}
         aria-hidden
       />
-      <span className="sr-only md:not-sr-only">{label}</span>
+      <span className="sr-only sr-only-md-inline">{label}</span>
     </div>
   );
 }
@@ -91,25 +98,21 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       href={`/work/${project.slug}`}
-      className="group/card relative block aspect-square w-full overflow-hidden rounded-[24px] bg-[#16343F] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-masthead-dim)]"
+      className={styles.card}
     >
       {project.image ? (
         <Image
           src={project.image}
           alt=""
           fill
-          className="object-cover"
+          className={styles.cardImage}
           sizes="(max-width: 767px) 100vw, 50vw"
         />
       ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] p-6 md:p-[32px]">
-        <h2 className="text-2xl font-normal leading-tight text-white">
-          {project.title}
-        </h2>
-        <p className="mt-0.5 text-base font-normal text-[#CDE0E8]">
-          {project.industry}
-        </p>
+      <div className={styles.cardOverlay}>
+        <h2 className={styles.cardTitle}>{project.title}</h2>
+        <p className={styles.cardIndustry}>{project.industry}</p>
       </div>
 
       {project.status === "protected" ? (
@@ -117,7 +120,7 @@ function ProjectCard({ project }: { project: Project }) {
       ) : null}
 
       {project.status === "coming-soon" ? (
-        <ProjectStatusPill label="Coming soon" />
+        <ProjectStatusPill label="Coming soon" iconSrc="/svg/calendar.svg" />
       ) : null}
     </Link>
   );
@@ -125,55 +128,93 @@ function ProjectCard({ project }: { project: Project }) {
 
 export function ProjectGrid() {
   const gridRef = useRef<HTMLUListElement>(null);
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const cursorWrapRef = useRef<HTMLDivElement>(null);
+  const lastPointerRef = useRef({ x: 0, y: 0 });
+  const rafRef = useRef<number | null>(null);
+
   const [pointerProject, setPointerProject] = useState<Project | null>(null);
-  const prevProjectSlugRef = useRef<string | null>(null);
+  const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
 
-  useEffect(() => {
-    const slug = pointerProject?.slug ?? null;
-    const prev = prevProjectSlugRef.current;
-    if (prev !== null && slug !== null && prev !== slug) {
-      setCursorCrossGeneration((g) => g + 1);
-    }
-    prevProjectSlugRef.current = slug;
-  }, [pointerProject?.slug]);
+  useEffect(
+    () => () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
 
-  const onGridMouseMove = (e: React.MouseEvent<HTMLUListElement>) => {
-    setPointer({ x: e.clientX, y: e.clientY });
+  const flushPointerFrame = () => {
+    rafRef.current = null;
+    const { x, y } = lastPointerRef.current;
+    const wrap = cursorWrapRef.current;
+    if (wrap) {
+      wrap.style.left = `${x}px`;
+      wrap.style.top = `${y}px`;
+    }
     const grid = gridRef.current;
     if (!grid) return;
-    setPointerProject(findProjectUnderPointer(grid, e.clientX, e.clientY));
+    const project = findProjectUnderPointer(grid, x, y);
+    const nextSlug = project?.slug ?? null;
+    const prevTracked = pointerSlugRef.current;
+    if (
+      prevTracked !== null &&
+      nextSlug !== null &&
+      prevTracked !== nextSlug
+    ) {
+      setCursorCrossGeneration((g) => g + 1);
+    }
+    pointerSlugRef.current = nextSlug;
+    setPointerProject((prev) => {
+      const prevSlug = prev?.slug ?? null;
+      if (prevSlug === nextSlug) return prev;
+      return project;
+    });
+  };
+
+  const onGridMouseMove = (e: React.MouseEvent<HTMLUListElement>) => {
+    lastPointerRef.current = { x: e.clientX, y: e.clientY };
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(flushPointerFrame);
+    }
   };
 
   const onGridMouseLeave = () => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    pointerSlugRef.current = null;
     setPointerProject(null);
   };
+
+  const gridClass = [
+    styles.grid,
+    pointerProject ? styles.gridCursorHide : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <>
       <ul
         ref={gridRef}
-        className={`grid list-none grid-cols-1 gap-2 md:grid-cols-2 ${
-          pointerProject
-            ? "cursor-none [&_a]:cursor-none [&_img]:cursor-none"
-            : ""
-        }`}
+        className={gridClass}
         onMouseMove={onGridMouseMove}
         onMouseLeave={onGridMouseLeave}
       >
         {projects.map((project) => (
-          <li key={project.slug} className="min-w-0">
+          <li key={project.slug} className={styles.gridItem}>
             <ProjectCard project={project} />
           </li>
         ))}
       </ul>
 
       <div
-        className="pointer-events-none fixed z-[100] transition-opacity duration-300 ease-out"
+        ref={cursorWrapRef}
+        className={styles.cursorWrap}
         style={{
-          left: pointer.x,
-          top: pointer.y,
+          left: 0,
+          top: 0,
           transform: "translate(-50%, -50%)",
           opacity: pointerProject ? 1 : 0,
         }}
@@ -182,19 +223,28 @@ export function ProjectGrid() {
         {pointerProject ? (
           <div
             key={cursorCrossGeneration}
-            className="flex h-[120px] w-[120px] origin-center items-center justify-center rounded-full text-sm font-medium lowercase tracking-wide text-white shadow-lg"
+            className={`${styles.cursorBubble} ${
+              pointerProject.cursorTextColor ? "" : styles.cursorBubbleTextLight
+            }`}
             style={{
               backgroundColor: hexToRgba(
                 pointerProject.cursorColor,
                 CURSOR_BG_ALPHA,
               ),
+              color: pointerProject.cursorTextColor ?? undefined,
               animation:
                 cursorCrossGeneration > 0
                   ? "project-cursor-cross 0.5s ease-in-out"
                   : "none",
             }}
           >
-            <span className="drop-shadow-sm">view</span>
+            <span
+              className={
+                pointerProject.cursorTextColor ? "" : styles.cursorLabel
+              }
+            >
+              view
+            </span>
           </div>
         ) : null}
       </div>

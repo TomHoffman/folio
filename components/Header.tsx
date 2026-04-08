@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
+import styles from "./Header.module.css";
 
 function MastheadSvg({
   className,
@@ -96,25 +97,38 @@ export function Header() {
     transition: `padding-bottom ${transitionMs}ms ${transitionEase}`,
   };
 
+  const wordmarkSvg = (
+    <MastheadSvg
+      className={styles.wordmarkSvg}
+      pathFill={
+        isHome ? "var(--color-masthead)" : "var(--color-masthead-dim)"
+      }
+      svgStyle={isHome ? undefined : { opacity: 0.1 }}
+    />
+  );
+
   const mastheadMarkup = (
-    <div className="w-full">
-      <div
-        className="relative h-0 w-full overflow-hidden"
-        style={mastheadBoxStyle}
-      >
-        <div className="absolute inset-0 flex items-end overflow-hidden">
-          <div className="w-full">
-            <div className="w-full shrink-0">
-              <div className={`px-[10px] ${isHome ? "opacity-100" : ""}`}>
-                <MastheadSvg
-                  className="block h-auto w-full"
-                  pathFill={
-                    isHome
-                      ? "var(--color-masthead)"
-                      : "var(--color-masthead-dim)"
-                  }
-                  svgStyle={isHome ? undefined : { opacity: 0.1 }}
-                />
+    <div className={styles.masthead}>
+      <div className={styles.mastheadRatio} style={mastheadBoxStyle}>
+        <div
+          className={`${styles.mastheadLayer} ${isHome ? styles.mastheadLayerHome : styles.mastheadLayerInner}`}
+        >
+          <div className={styles.mastheadInner}>
+            <div className={styles.mastheadRowOuter}>
+              <div className={styles.mastheadRow}>
+                {isHome ? (
+                  <div className={styles.wordmarkWrap}>{wordmarkSvg}</div>
+                ) : (
+                  <Link
+                    href="/"
+                    aria-label="Tom Hoffman, home"
+                    className={`${styles.wordmarkLink} ${styles.wordmarkLinkInner}`}
+                  >
+                    <span className={styles.wordmarkClipInner}>
+                      {wordmarkSvg}
+                    </span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -125,29 +139,18 @@ export function Header() {
 
   return (
     <header
-      className={`mx-2 mb-[52px] pb-[320px] transition-[margin-top] md:mx-[52px] ${
-        isHome ? "mt-[52px]" : "mt-0 md:mt-[52px]"
-      }`}
+      className={styles.header}
       style={{
+        marginTop: isHome ? 76 : 0,
         transitionProperty: "margin-top",
         transitionDuration: `${transitionMs}ms`,
         transitionTimingFunction: transitionEase,
       }}
     >
-      {isHome ? (
-        <div className="block w-full">
-          <span className="sr-only">Tom Hoffman</span>
-          {mastheadMarkup}
-        </div>
-      ) : (
-        <Link
-          href="/"
-          aria-label="Tom Hoffman, home"
-          className="block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-masthead-dim)]"
-        >
-          {mastheadMarkup}
-        </Link>
-      )}
+      <div className={styles.inner}>
+        {isHome ? <span className="sr-only">Tom Hoffman</span> : null}
+        {mastheadMarkup}
+      </div>
     </header>
   );
 }
