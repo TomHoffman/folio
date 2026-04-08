@@ -70,9 +70,9 @@ function MastheadSvg({
   );
 }
 
-/** ~Figma “Gentle” spring feel: slower, soft decel, slight settle overshoot (y₂ > 1). */
-const MASTHEAD_EASE = "cubic-bezier(0.22, 0.95, 0.26, 1.035)";
-const MASTHEAD_MS = 720;
+/** Same easing as project page enter (ProjectPageEnter.module.css). */
+const MASTHEAD_EASE = "cubic-bezier(0.22, 1, 0.32, 1)";
+const MASTHEAD_MS = 880;
 
 export function Header() {
   const pathname = usePathname();
@@ -141,7 +141,8 @@ export function Header() {
     <header
       className={styles.header}
       style={{
-        marginTop: isHome ? 76 : 0,
+        marginTop: isHome ? 52 : 0,
+        paddingBottom: 180,
         transitionProperty: "margin-top",
         transitionDuration: `${transitionMs}ms`,
         transitionTimingFunction: transitionEase,

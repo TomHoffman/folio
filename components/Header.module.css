@@ -2,14 +2,13 @@
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   margin-bottom: 52px;
-  padding-bottom: 320px;
   transition-property: margin-top;
 }
 
 @media (min-width: 48rem) {
   .header {
-    margin-left: 52px;
-    margin-right: 52px;
+    margin-left: 3%;
+    margin-right: 3%;
   }
 }
 

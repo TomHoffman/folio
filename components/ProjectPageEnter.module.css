@@ -1,0 +1,37 @@
+@keyframes projectFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Soft ease-out: quick start, long gentle settle */
+.enterTitle {
+  animation: projectFadeInUp 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
+  animation-delay: 0.08s;
+}
+
+.enterRow2 {
+  animation: projectFadeInUp 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
+  animation-delay: 0.24s;
+}
+
+.enterMedia {
+  animation: projectFadeInUp 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enterTitle,
+  .enterRow2,
+  .enterMedia {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

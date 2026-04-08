@@ -1,0 +1,8 @@
+/* Matches ProjectGrid .card background; sits inside project content shell */
+.stage {
+  width: 100%;
+  min-height: 940px;
+  margin-top: 40px;
+  border-radius: 24px;
+  background-color: #16343f;
+}

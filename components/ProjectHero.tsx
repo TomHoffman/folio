@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Project } from "@/data/projects";
+import enterStyles from "./ProjectPageEnter.module.css";
 import styles from "./ProjectHero.module.css";
 
 /**
- * Project title row — matches Figma “title-section” (Website-2026, node 3328:90468):
- * large uppercase title, muted subheading, 24×24 back control, `items-end` + `justify-between`.
+ * Project title row — title + subtitle stack; back control aligned to bottom of that block.
  */
 export function ProjectHero({ project }: { project: Project }) {
   return (
@@ -12,14 +12,18 @@ export function ProjectHero({ project }: { project: Project }) {
       <div className={styles.row}>
         <div className={styles.headCol}>
           <div className={styles.headingsEm}>
-            <h1 className={styles.title}>{project.title}</h1>
-            <p className={styles.subtitle}>{project.industry}</p>
+            <h1 className={`${styles.title} ${enterStyles.enterTitle}`}>
+              {project.title}
+            </h1>
+            <p className={`${styles.subtitle} ${enterStyles.enterRow2}`}>
+              {project.industry}
+            </p>
           </div>
         </div>
 
         <Link
           href="/"
-          className={styles.back}
+          className={`${styles.back} ${enterStyles.enterRow2}`}
           aria-label="Back to home"
         >
           <svg

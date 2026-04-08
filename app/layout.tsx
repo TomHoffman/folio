@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import { cookies } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { MastheadThemeButton } from "@/components/MastheadThemeButton";
 import { Nav } from "@/components/Nav";
 import { ThemePreferenceSync } from "@/components/ThemePreferenceSync";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
@@ -55,7 +54,6 @@ export default async function RootLayout({
   return (
     <html lang="en" className={htmlClass} suppressHydrationWarning>
       <body className={layoutStyles.body}>
-        <MastheadThemeButton />
         <ThemePreferenceSync />
         <Header />
         <Nav />
