@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
 import { projects } from "@/data/projects";
 import styles from "./ProjectGrid.module.css";
@@ -11,6 +11,10 @@ import styles from "./ProjectGrid.module.css";
 const GUTTER_HIT_PAD = 4;
 
 const CURSOR_BG_ALPHA = 0.9;
+
+/** Nudge the bubble slightly from the hotspot; hit-testing still uses the real pointer. */
+const CURSOR_VISUAL_OFFSET_X = 6;
+const CURSOR_VISUAL_OFFSET_Y = 6;
 
 function hexToRgba(hex: string, alpha: number): string {
   let h = hex.trim().replace("#", "");
@@ -110,6 +114,16 @@ function ProjectCard({ project }: { project: Project }) {
         />
       ) : null}
 
+      <div
+        className={styles.cardGradient}
+        style={
+          project.cardBottomGradient
+            ? { background: project.cardBottomGradient }
+            : undefined
+        }
+        aria-hidden
+      />
+
       <div className={styles.cardOverlay}>
         <h2 className={styles.cardTitle}>{project.title}</h2>
         <p className={styles.cardIndustry}>{project.industry}</p>
@@ -130,30 +144,22 @@ export function ProjectGrid() {
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
   const lastPointerRef = useRef({ x: 0, y: 0 });
-  const rafRef = useRef<number | null>(null);
+  const pointerInGridRef = useRef(false);
 
   const [pointerProject, setPointerProject] = useState<Project | null>(null);
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
 
-  useEffect(
-    () => () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    },
-    [],
-  );
-
-  const flushPointerFrame = () => {
-    rafRef.current = null;
-    const { x, y } = lastPointerRef.current;
+  const commitPointerUpdate = useCallback((clientX: number, clientY: number) => {
+    lastPointerRef.current = { x: clientX, y: clientY };
     const wrap = cursorWrapRef.current;
     if (wrap) {
-      wrap.style.left = `${x}px`;
-      wrap.style.top = `${y}px`;
+      wrap.style.left = `${clientX + CURSOR_VISUAL_OFFSET_X}px`;
+      wrap.style.top = `${clientY + CURSOR_VISUAL_OFFSET_Y}px`;
     }
     const grid = gridRef.current;
     if (!grid) return;
-    const project = findProjectUnderPointer(grid, x, y);
+    const project = findProjectUnderPointer(grid, clientX, clientY);
     const nextSlug = project?.slug ?? null;
     const prevTracked = pointerSlugRef.current;
     if (
@@ -169,20 +175,28 @@ export function ProjectGrid() {
       if (prevSlug === nextSlug) return prev;
       return project;
     });
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!pointerInGridRef.current) return;
+      const { x, y } = lastPointerRef.current;
+      commitPointerUpdate(x, y);
+    };
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    return () => window.removeEventListener("scroll", onScroll, { capture: true });
+  }, [commitPointerUpdate]);
+
+  const onGridMouseEnter = () => {
+    pointerInGridRef.current = true;
   };
 
   const onGridMouseMove = (e: React.MouseEvent<HTMLUListElement>) => {
-    lastPointerRef.current = { x: e.clientX, y: e.clientY };
-    if (rafRef.current == null) {
-      rafRef.current = requestAnimationFrame(flushPointerFrame);
-    }
+    commitPointerUpdate(e.clientX, e.clientY);
   };
 
   const onGridMouseLeave = () => {
-    if (rafRef.current != null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+    pointerInGridRef.current = false;
     pointerSlugRef.current = null;
     setPointerProject(null);
   };
@@ -199,6 +213,7 @@ export function ProjectGrid() {
       <ul
         ref={gridRef}
         className={gridClass}
+        onMouseEnter={onGridMouseEnter}
         onMouseMove={onGridMouseMove}
         onMouseLeave={onGridMouseLeave}
       >

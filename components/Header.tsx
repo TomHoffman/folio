@@ -147,7 +147,9 @@ export function Header() {
     <header
       className={styles.header}
       style={{
-        marginTop: isHome ? 52 : 0,
+        marginTop: isHome ? 76 : 0,
+        paddingLeft: isHome ? 5 : undefined,
+        paddingRight: isHome ? 10 : undefined,
         transitionProperty: "margin-top",
         transitionDuration: `${transitionMs}ms`,
         transitionTimingFunction: transitionEase,

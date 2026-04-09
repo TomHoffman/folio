@@ -33,7 +33,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
       <div className={mainStyles.mainProjectInner}>
         <ScrollToTopOnMount />
         <ProjectHero project={project} />
-        <ProjectImageContainer />
+        <ProjectImageContainer project={project} />
       </div>
     </main>
   );

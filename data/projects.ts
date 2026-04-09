@@ -10,6 +10,10 @@ export type Project = {
   cursorColor: string;
   /** Optional hex for “view” label (default white) */
   cursorTextColor?: string;
+  /** Grid card bottom fade: full CSS `background` (usually linear-gradient). Omit for default teal fade. */
+  cardBottomGradient?: string;
+  /** Full-width media in ProjectImageContainer (e.g. hero SVG) */
+  heroImage?: string;
   /** Intro paragraph on the project page */
   description?: string;
   role?: string;
@@ -22,7 +26,8 @@ export const projects: Project[] = [
     slug: "licel",
     title: "Licel",
     industry: "Cyber security",
-    image: null,
+    image: "/images/licel-thumb.svg",
+    heroImage: "/images/licel-hero.svg",
     status: "active",
     cursorColor: "#3454E1",
   },
@@ -30,7 +35,8 @@ export const projects: Project[] = [
     slug: "x-shore-1",
     title: "X Shore 1",
     industry: "Electric boating + mobility",
-    image: null,
+    image: "/images/xshore-thumb.jpg",
+    heroImage: "/images/xshore-hero.jpg",
     status: "protected",
     cursorColor: "#615E56",
     description:
@@ -43,15 +49,19 @@ export const projects: Project[] = [
     slug: "british-heart-foundation",
     title: "British Heart Foundation",
     industry: "Healthcare",
-    image: null,
+    image: "/images/bhf-thumb.jpg",
+    heroImage: "/images/bhf-hero.jpg",
     status: "active",
     cursorColor: "#A52241",
+    cardBottomGradient:
+      "linear-gradient(360deg, #2D2D1E 0%, rgba(165, 158, 129, 0) 100%)",
   },
   {
     slug: "volta-zero",
     title: "Volta Zero",
     industry: "Electric mobility",
-    image: null,
+    image: "/images/volta-thumb.jpg",
+    heroImage: "/images/volta-hero.jpg",
     status: "active",
     cursorColor: "#0C0C0C",
   },
@@ -59,19 +69,25 @@ export const projects: Project[] = [
     slug: "zeppelin-rental",
     title: "Zeppelin Rental",
     industry: "Construction",
-    image: null,
+    image: "/images/zeppelin-thumb.jpg",
+    heroImage: "/images/zeppelin-hero.jpg",
     status: "active",
     cursorColor: "#FFB134",
     cursorTextColor: "#000000",
+    cardBottomGradient:
+      "linear-gradient(360deg, #282828 0%, rgba(41, 41, 41, 0) 100%)",
   },
   {
     slug: "jobhelp",
     title: "JobHelp",
     industry: "Government",
-    image: null,
+    image: "/images/jobhelp-thumb.jpg",
+    heroImage: "/images/jobhelp-hero.jpg",
     status: "coming-soon",
     cursorColor: "#AADDD1",
     cursorTextColor: "#000000",
+    cardBottomGradient:
+      "linear-gradient(360deg, #273B46 0%, rgba(80, 99, 108, 0) 100%)",
   },
 ];
 

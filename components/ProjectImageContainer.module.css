@@ -1,13 +1,25 @@
 /*
  * Matches ProjectGrid .card background & radius.
- * Mobile (<48rem): same 1:1 square as grid cards. Larger screens: 16:9.
+ * Mobile (<48rem): same 1:1 square as grid cards. Larger screens: 16:8 (2:1).
  */
 .stage {
+  position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 8;
   margin-top: 40px;
   border-radius: 24px;
+  overflow: hidden;
   background-color: #16343f;
+}
+
+.heroImage {
+  object-fit: cover;
+  object-position: center;
+  /* Match card image Safari rounding */
+  border-radius: 24px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  clip-path: inset(0 round 24px);
 }
 
 @media (max-width: 47.99rem) {
