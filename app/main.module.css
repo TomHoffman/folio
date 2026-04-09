@@ -1,11 +1,57 @@
+/*
+ * Do not use flex-grow on <main> — it fills the viewport and leaves a huge empty band above the first child.
+ * Sticky footer: Footer.module.css uses margin-top: auto instead.
+ * Hero → image spacing: margin on ProjectImageContainer .stage, not gap here.
+ */
 .main {
-  flex: 1;
+  position: relative;
+  z-index: 0;
+  flex: 0 1 auto;
   min-width: 0;
-  padding: 0.5rem 0.5rem 52px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  margin-top: 250px;
+  padding: 0 0.5rem 52px;
+  gap: 0;
 }
 
 @media (min-width: 48rem) {
   .main {
+    padding-left: 3%;
+    padding-right: 3%;
+  }
+}
+
+/*
+ * Project detail only: <main> generates no box (display:contents). The inner stack is the flex item
+ * directly under <header> in <body> — removes the “empty main” band above the project title.
+ */
+.mainProject {
+  display: contents;
+}
+
+.mainProjectInner {
+  position: relative;
+  z-index: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  margin-top: 250px;
+  padding: 0 0.5rem 52px;
+  gap: 0;
+}
+
+@media (min-width: 48rem) {
+  .mainProjectInner {
     padding-left: 3%;
     padding-right: 3%;
   }

@@ -90,47 +90,53 @@ export function Header() {
   const transitionMs = enteringHomeFromInner ? MASTHEAD_MS : 0;
   const transitionEase = enteringHomeFromInner ? MASTHEAD_EASE : "linear";
 
-  /* Home: full wordmark. Project: half band — bottom of SVG aligned to bottom of box (top half clipped). */
-  const mastheadAspectPercent = isHome ? (182 / 1790) * 100 : (91 / 1790) * 100;
+  /* Home: padding-bottom % + absolute layer (unchanged). Inner: in-flow only — .wordmarkClipInner aspect-ratio sets height; avoids a tall empty band above the project title. */
   const mastheadBoxStyle = {
-    paddingBottom: `${mastheadAspectPercent}%`,
+    paddingBottom: `${(182 / 1790) * 100}%`,
     transition: `padding-bottom ${transitionMs}ms ${transitionEase}`,
   };
 
-  const wordmarkSvg = (
+  const wordmarkHome = (
     <MastheadSvg
       className={styles.wordmarkSvg}
-      pathFill={
-        isHome ? "var(--color-masthead)" : "var(--color-masthead-dim)"
-      }
-      svgStyle={isHome ? undefined : { opacity: 0.1 }}
+      pathFill="var(--color-masthead)"
     />
   );
 
-  const mastheadMarkup = (
+  const wordmarkInner = (
+    <MastheadSvg
+      className={styles.wordmarkSvg}
+      pathFill="var(--color-masthead-dim)"
+      svgStyle={{ opacity: 0.1 }}
+    />
+  );
+
+  const mastheadMarkup = isHome ? (
     <div className={styles.masthead}>
       <div className={styles.mastheadRatio} style={mastheadBoxStyle}>
-        <div
-          className={`${styles.mastheadLayer} ${isHome ? styles.mastheadLayerHome : styles.mastheadLayerInner}`}
-        >
+        <div className={`${styles.mastheadLayer} ${styles.mastheadLayerHome}`}>
           <div className={styles.mastheadInner}>
             <div className={styles.mastheadRowOuter}>
               <div className={styles.mastheadRow}>
-                {isHome ? (
-                  <div className={styles.wordmarkWrap}>{wordmarkSvg}</div>
-                ) : (
-                  <Link
-                    href="/"
-                    aria-label="Tom Hoffman, home"
-                    className={`${styles.wordmarkLink} ${styles.wordmarkLinkInner}`}
-                  >
-                    <span className={styles.wordmarkClipInner}>
-                      {wordmarkSvg}
-                    </span>
-                  </Link>
-                )}
+                <div className={styles.wordmarkWrap}>{wordmarkHome}</div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className={styles.masthead}>
+      <div className={styles.mastheadInnerRoute}>
+        <div className={styles.mastheadRowOuter}>
+          <div className={styles.mastheadRow}>
+            <Link
+              href="/"
+              aria-label="Tom Hoffman, home"
+              className={`${styles.wordmarkLink} ${styles.wordmarkLinkInner}`}
+            >
+              <span className={styles.wordmarkClipInner}>{wordmarkInner}</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -142,7 +148,6 @@ export function Header() {
       className={styles.header}
       style={{
         marginTop: isHome ? 52 : 0,
-        paddingBottom: 180,
         transitionProperty: "margin-top",
         transitionDuration: `${transitionMs}ms`,
         transitionTimingFunction: transitionEase,

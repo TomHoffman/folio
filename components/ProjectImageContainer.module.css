@@ -1,8 +1,17 @@
-/* Matches ProjectGrid .card background; sits inside project content shell */
+/*
+ * Matches ProjectGrid .card background & radius.
+ * Mobile (<48rem): same 1:1 square as grid cards. Larger screens: 16:9.
+ */
 .stage {
   width: 100%;
-  min-height: 940px;
+  aspect-ratio: 16 / 9;
   margin-top: 40px;
   border-radius: 24px;
   background-color: #16343f;
+}
+
+@media (max-width: 47.99rem) {
+  .stage {
+    aspect-ratio: 1 / 1;
+  }
 }

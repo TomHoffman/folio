@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
+import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 import { getProjectBySlug } from "@/data/projects";
 import mainStyles from "../../main.module.css";
 
@@ -28,9 +29,12 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
   }
 
   return (
-    <main className={mainStyles.main}>
-      <ProjectHero project={project} />
-      <ProjectImageContainer />
+    <main className={`${mainStyles.main} ${mainStyles.mainProject}`}>
+      <div className={mainStyles.mainProjectInner}>
+        <ScrollToTopOnMount />
+        <ProjectHero project={project} />
+        <ProjectImageContainer />
+      </div>
     </main>
   );
 }
