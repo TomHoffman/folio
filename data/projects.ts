@@ -14,12 +14,25 @@ export type Project = {
   cardBottomGradient?: string;
   /** Full-width media in ProjectImageContainer (e.g. hero SVG) */
   heroImage?: string;
+  /** Grid card image: translateY on small viewports only (px, negative = up) */
+  cardImageMobileOffsetY?: number;
   /** Intro paragraph on the project page */
   description?: string;
   role?: string;
   deliverables?: string;
   year?: string;
+  /** Omit from home grid; `/work/[slug]` returns 404 */
+  hidden?: boolean;
+  /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
+  assetVersion?: string;
 };
+
+/** Stable `?v=` for public assets (avoids stale `/_next/image` when the filename is unchanged). */
+export function projectAssetSrc(path: string, assetVersion?: string): string {
+  if (!assetVersion) return path;
+  const sep = path.includes("?") ? "&" : "?";
+  return `${path}${sep}v=${encodeURIComponent(assetVersion)}`;
+}
 
 export const projects: Project[] = [
   {
@@ -28,6 +41,7 @@ export const projects: Project[] = [
     industry: "Cyber security",
     image: "/images/licel-thumb.svg",
     heroImage: "/images/licel-hero.svg",
+    cardImageMobileOffsetY: -20,
     status: "active",
     cursorColor: "#3454E1",
   },
@@ -37,7 +51,7 @@ export const projects: Project[] = [
     industry: "Electric boating + mobility",
     image: "/images/xshore-thumb.jpg",
     heroImage: "/images/xshore-hero.jpg",
-    status: "protected",
+    status: "active",
     cursorColor: "#615E56",
     description:
       "Placeholder intro for X Shore: a connected electric boat platform where clarity of range, charging, and drive modes mattered as much as the physical helm. This case study outlines how we structured information and interaction patterns for skippers moving between harbour, open water, and assisted docking contexts.",
@@ -46,24 +60,14 @@ export const projects: Project[] = [
     year: "2022",
   },
   {
-    slug: "british-heart-foundation",
-    title: "British Heart Foundation",
-    industry: "Healthcare",
-    image: "/images/bhf-thumb.jpg",
-    heroImage: "/images/bhf-hero.jpg",
-    status: "active",
-    cursorColor: "#A52241",
-    cardBottomGradient:
-      "linear-gradient(360deg, #2D2D1E 0%, rgba(165, 158, 129, 0) 100%)",
-  },
-  {
-    slug: "volta-zero",
-    title: "Volta Zero",
-    industry: "Electric mobility",
-    image: "/images/volta-thumb.jpg",
-    heroImage: "/images/volta-hero.jpg",
-    status: "active",
-    cursorColor: "#0C0C0C",
+    slug: "allied-irish-bank",
+    title: "Allied Irish Bank",
+    industry: "Finance",
+    image: "/images/aib-thumb.jpg",
+    heroImage: "/images/aib-hero.jpg",
+    status: "protected",
+    cursorColor: "#811C81",
+    assetVersion: "2",
   },
   {
     slug: "zeppelin-rental",
@@ -71,11 +75,20 @@ export const projects: Project[] = [
     industry: "Construction",
     image: "/images/zeppelin-thumb.jpg",
     heroImage: "/images/zeppelin-hero.jpg",
-    status: "active",
+    status: "coming-soon",
     cursorColor: "#FFB134",
     cursorTextColor: "#000000",
     cardBottomGradient:
       "linear-gradient(360deg, #282828 0%, rgba(41, 41, 41, 0) 100%)",
+  },
+  {
+    slug: "volta-zero",
+    title: "Volta Zero",
+    industry: "Electric mobility",
+    image: "/images/volta-thumb.jpg",
+    heroImage: "/images/volta-hero.jpg",
+    status: "coming-soon",
+    cursorColor: "#0C0C0C",
   },
   {
     slug: "jobhelp",
@@ -89,8 +102,25 @@ export const projects: Project[] = [
     cardBottomGradient:
       "linear-gradient(360deg, #273B46 0%, rgba(80, 99, 108, 0) 100%)",
   },
+  {
+    slug: "british-heart-foundation",
+    title: "British Heart Foundation",
+    industry: "Healthcare",
+    image: "/images/bhf-thumb.jpg",
+    heroImage: "/images/bhf-hero.jpg",
+    status: "active",
+    cursorColor: "#A52241",
+    cardBottomGradient:
+      "linear-gradient(360deg, #2D2D1E 0%, rgba(165, 158, 129, 0) 100%)",
+    hidden: true,
+  },
 ];
 
+/** Projects shown on the home grid (excludes `hidden`). */
+export const visibleProjects = projects.filter((p) => !p.hidden);
+
 export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
+  const p = projects.find((pr) => pr.slug === slug);
+  if (!p || p.hidden) return undefined;
+  return p;
 }

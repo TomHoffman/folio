@@ -1,14 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { cookies } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Nav } from "@/components/Nav";
-import { ThemePreferenceSync } from "@/components/ThemePreferenceSync";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
 import layoutStyles from "./layout.module.css";
 import "./globals.css";
-import "./surface.css";
 
 const matterSans = localFont({
   src: [
@@ -39,22 +35,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jar = await cookies();
-  const themePref = jar.get(THEME_STORAGE_KEY)?.value;
-  const isDark = themePref !== "light";
-  const htmlClass = [isDark && "dark", matterSans.variable]
-    .filter(Boolean)
-    .join(" ");
+  const htmlClass = [matterSans.variable, "dark"].filter(Boolean).join(" ");
 
   return (
     <html lang="en" className={htmlClass} suppressHydrationWarning>
       <body className={layoutStyles.body}>
-        <ThemePreferenceSync />
         <Header />
         <Nav />
         {children}

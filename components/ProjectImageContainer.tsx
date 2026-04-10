@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Project } from "@/data/projects";
+import { projectAssetSrc, type Project } from "@/data/projects";
 import enterStyles from "./ProjectPageEnter.module.css";
 import styles from "./ProjectImageContainer.module.css";
 
@@ -11,7 +11,7 @@ export function ProjectImageContainer({ project }: { project: Project }) {
     >
       {project.heroImage ? (
         <Image
-          src={project.heroImage}
+          src={projectAssetSrc(project.heroImage, project.assetVersion)}
           alt=""
           fill
           className={styles.heroImage}

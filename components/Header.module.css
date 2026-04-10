@@ -1,20 +1,37 @@
 .header {
   position: relative;
   z-index: 2;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-top: 0;
+  margin-left: 0;
+  margin-right: 0;
   margin-bottom: 0;
   transition-property: margin-top;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   .header {
     margin-left: 3%;
     margin-right: 3%;
   }
 }
 
+/* Home only: horizontal inset from tablet up; tighter top offset on small screens */
+.headerHome {
+  margin-top: 26px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (min-width: 768px) {
+  .headerHome {
+    margin-top: 76px;
+    padding-left: 5px;
+    padding-right: 10px;
+  }
+}
+
 .inner {
+  position: relative;
   display: block;
   width: 100%;
 }
@@ -60,8 +77,15 @@
 
 .mastheadRow {
   width: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 768px) {
+  .mastheadRow {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .wordmarkWrap {

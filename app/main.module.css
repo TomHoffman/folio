@@ -13,13 +13,14 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  margin-top: 250px;
+  margin-top: 80px;
   padding: 0 0.5rem 52px;
   gap: 0;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   .main {
+    margin-top: 250px;
     padding-left: 3%;
     padding-right: 3%;
   }
@@ -45,13 +46,14 @@
   min-width: 0;
   min-height: 0;
   width: 100%;
-  margin-top: 250px;
+  margin-top: 80px;
   padding: 0 0.5rem 52px;
   gap: 0;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   .mainProjectInner {
+    margin-top: 250px;
     padding-left: 3%;
     padding-right: 3%;
   }

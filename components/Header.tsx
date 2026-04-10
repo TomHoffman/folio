@@ -145,11 +145,10 @@ export function Header() {
 
   return (
     <header
-      className={styles.header}
+      className={[styles.header, isHome ? styles.headerHome : ""]
+        .filter(Boolean)
+        .join(" ")}
       style={{
-        marginTop: isHome ? 76 : 0,
-        paddingLeft: isHome ? 5 : undefined,
-        paddingRight: isHome ? 10 : undefined,
         transitionProperty: "margin-top",
         transitionDuration: `${transitionMs}ms`,
         transitionTimingFunction: transitionEase,

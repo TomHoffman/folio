@@ -1,0 +1,196 @@
+/* Match ProjectPageEnter .enterMedia: image container entrance */
+@keyframes projectModalFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes projectModalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--color-background) 98%, transparent);
+  animation: projectModalBackdropFadeIn 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
+}
+
+.modalPanel {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  width: 96%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  border-radius: 24px;
+  background-color: #faf7f1;
+  padding: 2rem 1.5rem;
+  color: var(--color-foreground);
+  box-shadow:
+    0 25px 50px -12px rgb(0 0 0 / 0.15),
+    0 0 0 1px rgb(0 0 0 / 0.04);
+  animation: projectModalFadeInUp 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
+}
+
+@media (min-width: 768px) {
+  .modalPanel {
+    padding: 2.5rem 2.5rem;
+  }
+}
+
+.modalHeading {
+  margin: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.modalProtectedInner {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.modalProtectedInner .modalHeading {
+  color: #0f0f0f;
+}
+
+@keyframes protectedPinShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  12% {
+    transform: translateX(-10px);
+  }
+
+  24% {
+    transform: translateX(10px);
+  }
+
+  36% {
+    transform: translateX(-8px);
+  }
+
+  48% {
+    transform: translateX(8px);
+  }
+
+  60% {
+    transform: translateX(-5px);
+  }
+
+  72% {
+    transform: translateX(5px);
+  }
+}
+
+.protectedPinShakeGroup {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.protectedPinShakePlay {
+  animation: protectedPinShake 0.55s cubic-bezier(0.22, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .protectedPinShakePlay {
+    animation: none;
+  }
+}
+
+.pinForm {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.pinRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 480px) {
+  .pinRow {
+    gap: 0.75rem;
+  }
+}
+
+.pinCircle {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid rgb(15 15 15 / 0.14);
+  background-color: #f6f6f6;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  color: #0f0f0f;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+  .pinCircle {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+.pinCircleActive {
+  border-color: #0f0f0f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalBackdrop,
+  .modalPanel {
+    animation: none;
+    opacity: 1;
+  }
+
+  .modalPanel {
+    transform: none;
+  }
+}

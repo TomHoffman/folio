@@ -2,10 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { Project } from "@/data/projects";
-import { projects } from "@/data/projects";
+import { projectAssetSrc, visibleProjects } from "@/data/projects";
+import { ProjectAccessModal } from "@/components/ProjectAccessModal";
 import styles from "./ProjectGrid.module.css";
+
+type ProjectModalState = {
+  project: Project;
+  kind: "protected" | "coming-soon";
+};
 
 /** Half of the 8px grid gap — expands hit areas so the cursor doesn’t drop in gutters. */
 const GUTTER_HIT_PAD = 4;
@@ -45,13 +58,13 @@ function findProjectUnderPointer(
   let best: { project: Project; dist: number } | null = null;
 
   for (const li of grid.querySelectorAll(":scope > li")) {
-    const link = li.querySelector("a[href^='/work/']");
-    if (!(link instanceof HTMLAnchorElement)) continue;
-    const slug = link.getAttribute("href")?.replace("/work/", "");
-    const project = projects.find((p) => p.slug === slug);
+    const hit = li.querySelector("[data-project-slug]");
+    if (!(hit instanceof HTMLElement)) continue;
+    const slug = hit.dataset.projectSlug;
+    const project = visibleProjects.find((p) => p.slug === slug);
     if (!project) continue;
 
-    const r = link.getBoundingClientRect();
+    const r = hit.getBoundingClientRect();
     const left = r.left - GUTTER_HIT_PAD;
     const right = r.right + GUTTER_HIT_PAD;
     const top = r.top - GUTTER_HIT_PAD;
@@ -98,18 +111,34 @@ function ProjectStatusPill({
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
-  return (
-    <Link
-      href={`/work/${project.slug}`}
-      className={styles.card}
-    >
+function ProjectCard({
+  project,
+  modalOpenSlug,
+  onOpenModal,
+}: {
+  project: Project;
+  modalOpenSlug: string | null;
+  onOpenModal: (project: Project) => void;
+}) {
+  const cardInner = (
+    <>
       {project.image ? (
         <Image
-          src={project.image}
+          src={projectAssetSrc(project.image, project.assetVersion)}
           alt=""
           fill
-          className={styles.cardImage}
+          className={
+            project.cardImageMobileOffsetY != null
+              ? `${styles.cardImage} ${styles.cardImageMobileOffset}`
+              : styles.cardImage
+          }
+          style={
+            project.cardImageMobileOffsetY != null
+              ? ({
+                  ["--card-img-offset-y" as string]: `${project.cardImageMobileOffsetY}px`,
+                } as CSSProperties)
+              : undefined
+          }
           sizes="(max-width: 767px) 100vw, 50vw"
         />
       ) : null}
@@ -136,11 +165,37 @@ function ProjectCard({ project }: { project: Project }) {
       {project.status === "coming-soon" ? (
         <ProjectStatusPill label="Coming soon" iconSrc="/svg/calendar.svg" />
       ) : null}
+    </>
+  );
+
+  if (project.status === "protected" || project.status === "coming-soon") {
+    return (
+      <button
+        type="button"
+        className={styles.card}
+        data-project-slug={project.slug}
+        aria-haspopup="dialog"
+        aria-expanded={modalOpenSlug === project.slug}
+        onClick={() => onOpenModal(project)}
+      >
+        {cardInner}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href={`/work/${project.slug}`}
+      className={styles.card}
+      data-project-slug={project.slug}
+    >
+      {cardInner}
     </Link>
   );
 }
 
 export function ProjectGrid() {
+  const router = useRouter();
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
   const lastPointerRef = useRef({ x: 0, y: 0 });
@@ -149,6 +204,20 @@ export function ProjectGrid() {
   const [pointerProject, setPointerProject] = useState<Project | null>(null);
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
+
+  const [modal, setModal] = useState<ProjectModalState | null>(null);
+
+  const closeModal = useCallback(() => setModal(null), []);
+
+  const openModalForProject = useCallback((project: Project) => {
+    if (project.status === "protected") {
+      setModal({ project, kind: "protected" });
+      return;
+    }
+    if (project.status === "coming-soon") {
+      setModal({ project, kind: "coming-soon" });
+    }
+  }, []);
 
   const commitPointerUpdate = useCallback((clientX: number, clientY: number) => {
     lastPointerRef.current = { x: clientX, y: clientY };
@@ -217,9 +286,13 @@ export function ProjectGrid() {
         onMouseMove={onGridMouseMove}
         onMouseLeave={onGridMouseLeave}
       >
-        {projects.map((project) => (
+        {visibleProjects.map((project) => (
           <li key={project.slug} className={styles.gridItem}>
-            <ProjectCard project={project} />
+            <ProjectCard
+              project={project}
+              modalOpenSlug={modal?.project.slug ?? null}
+              onOpenModal={openModalForProject}
+            />
           </li>
         ))}
       </ul>
@@ -263,6 +336,24 @@ export function ProjectGrid() {
           </div>
         ) : null}
       </div>
+
+      {modal ? (
+        <ProjectAccessModal
+          isOpen
+          variant={modal.kind}
+          projectSlug={modal.project.slug}
+          pinInputId="protected-project-pin-grid"
+          onDismiss={closeModal}
+          onProtectedSuccess={
+            modal.kind === "protected"
+              ? () => {
+                  closeModal();
+                  router.push(`/work/${modal.project.slug}`);
+                }
+              : undefined
+          }
+        />
+      ) : null}
     </>
   );
 }
