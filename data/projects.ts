@@ -16,6 +16,10 @@ export type Project = {
   heroImage?: string;
   /** Grid card image: translateY on small viewports only (px, negative = up) */
   cardImageMobileOffsetY?: number;
+  /** Grid card image: uniform scale on small viewports only (e.g. 0.95 = 5% smaller) */
+  cardImageMobileScale?: number;
+  /** Grid card image: uniform scale from tablet/desktop breakpoint up */
+  cardImageDesktopScale?: number;
   /** Intro paragraph on the project page */
   description?: string;
   role?: string;
@@ -41,7 +45,9 @@ export const projects: Project[] = [
     industry: "Cyber security",
     image: "/images/licel-thumb.svg",
     heroImage: "/images/licel-hero.svg",
-    cardImageMobileOffsetY: -20,
+    cardImageMobileOffsetY: -30,
+    cardImageMobileScale: 0.95,
+    cardImageDesktopScale: 0.95,
     status: "active",
     cursorColor: "#3454E1",
   },
@@ -65,7 +71,7 @@ export const projects: Project[] = [
     industry: "Finance",
     image: "/images/aib-thumb.jpg",
     heroImage: "/images/aib-hero.jpg",
-    status: "protected",
+    status: "active",
     cursorColor: "#811C81",
     assetVersion: "2",
   },
@@ -75,7 +81,7 @@ export const projects: Project[] = [
     industry: "Construction",
     image: "/images/zeppelin-thumb.jpg",
     heroImage: "/images/zeppelin-hero.jpg",
-    status: "coming-soon",
+    status: "active",
     cursorColor: "#FFB134",
     cursorTextColor: "#000000",
     cardBottomGradient:
@@ -87,7 +93,7 @@ export const projects: Project[] = [
     industry: "Electric mobility",
     image: "/images/volta-thumb.jpg",
     heroImage: "/images/volta-hero.jpg",
-    status: "coming-soon",
+    status: "active",
     cursorColor: "#0C0C0C",
   },
   {
@@ -96,7 +102,7 @@ export const projects: Project[] = [
     industry: "Government",
     image: "/images/jobhelp-thumb.jpg",
     heroImage: "/images/jobhelp-hero.jpg",
-    status: "coming-soon",
+    status: "active",
     cursorColor: "#AADDD1",
     cursorTextColor: "#000000",
     cardBottomGradient:

@@ -10,6 +10,8 @@
   --color-masthead: var(--color-foreground);
   --color-masthead-dim: #90c9ff;
   --color-masthead-subtle: #64748b;
+  --color-text-primary: var(--color-foreground);
+  --color-text-secondary: var(--color-muted);
 }
 
 html {
@@ -30,6 +32,8 @@ html.dark {
   --color-masthead: #ffffff;
   --color-masthead-dim: #90c9ff;
   --color-masthead-subtle: #2f4f5e;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #6a8d9b;
 }
 
 *,

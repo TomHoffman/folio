@@ -1,6 +1,6 @@
 /*
- * Shared em context (fluid `rem` base → children use `em`).
- * Title: 6.5em → 104px @ 16px base. Subtitle: 1.25em → 20px @ 16px base.
+ * Shared em context (fluid `rem` base on .row → children use `em`).
+ * Title: 4.5em below 1024px; 6.5em from 1024px up. Subtitle: 1.75em below 768px; 1.25em from 768px up.
  */
 .section {
   width: 100%;
@@ -15,9 +15,16 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  padding-left: 3em;
-  padding-right: 3em;
+  padding-left: 1em;
+  padding-right: 1em;
   font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
+}
+
+@media (min-width: 1024px) {
+  .row {
+    padding-left: 3em;
+    padding-right: 3em;
+  }
 }
 
 .headCol {
@@ -41,21 +48,33 @@
 .title {
   margin: 0;
   width: 100%;
-  font-size: 6.5em;
+  font-size: 4.5em;
   font-weight: 400;
   line-height: 1;
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 1024px) {
+  .title {
+    font-size: 6.5em;
+  }
 }
 
 /* Matter Light (300) */
 .subtitle {
   margin: 0;
   width: 100%;
-  font-size: 1.25em;
+  font-size: 1.75em;
   font-weight: 300;
   line-height: 1.42;
-  color: #6a8d9b;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .subtitle {
+    font-size: 1.25em;
+  }
 }
 
 .back {
@@ -69,6 +88,18 @@
   justify-content: center;
   color: inherit;
   text-decoration: none;
+}
+
+/*
+ * Viewport-fixed below desktop (max-width 1023px); in-flow in the hero row from 1024px up.
+ */
+@media (max-width: 1023px) {
+  .back {
+    position: fixed;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 30;
+  }
 }
 
 .back:focus-visible {

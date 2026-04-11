@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { CSSProperties } from "react";
 import styles from "./Header.module.css";
 
@@ -74,6 +74,22 @@ function MastheadSvg({
 const MASTHEAD_EASE = "cubic-bezier(0.22, 1, 0.32, 1)";
 const MASTHEAD_MS = 880;
 
+const narrowMastheadQuery = "(max-width: 1023px)";
+
+function subscribeNarrowMasthead(onChange: () => void) {
+  const mq = window.matchMedia(narrowMastheadQuery);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getNarrowMastheadSnapshot() {
+  return window.matchMedia(narrowMastheadQuery).matches;
+}
+
+function getNarrowMastheadServerSnapshot() {
+  return false;
+}
+
 export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -87,7 +103,19 @@ export function Header() {
     prevPathRef.current = pathname;
   }, [pathname]);
 
-  const transitionMs = enteringHomeFromInner ? MASTHEAD_MS : 0;
+  const isNarrowMasthead = useSyncExternalStore(
+    subscribeNarrowMasthead,
+    getNarrowMastheadSnapshot,
+    getNarrowMastheadServerSnapshot,
+  );
+
+  /*
+   * Home vs inner use different DOM (full mastheadRatio vs clipped in-flow wordmark), so
+   * padding-bottom never interpolates on the same node. margin-top delta is also small below desktop
+   * (0→26px) vs desktop (0→76px). Below 1024px width: skip tween.
+   */
+  const transitionMs =
+    enteringHomeFromInner && !isNarrowMasthead ? MASTHEAD_MS : 0;
   const transitionEase = enteringHomeFromInner ? MASTHEAD_EASE : "linear";
 
   /* Home: padding-bottom % + absolute layer (unchanged). Inner: in-flow only — .wordmarkClipInner aspect-ratio sets height; avoids a tall empty band above the project title. */
@@ -112,7 +140,7 @@ export function Header() {
   );
 
   const mastheadMarkup = isHome ? (
-    <div className={styles.masthead}>
+    <div className={`${styles.masthead} ${styles.mastheadHomeDesktopOnly}`}>
       <div className={styles.mastheadRatio} style={mastheadBoxStyle}>
         <div className={`${styles.mastheadLayer} ${styles.mastheadLayerHome}`}>
           <div className={styles.mastheadInner}>

@@ -1,3 +1,26 @@
+/*
+ * Horizontal inset (formerly on <main>) so full-bleed sections can sit flush with the viewport.
+ */
+.pageInset {
+  box-sizing: border-box;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .pageInset {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pageInset {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
 .grid {
   display: grid;
   list-style: none;
@@ -18,21 +41,8 @@
 }
 
 .gridCursorHide a,
-.gridCursorHide button,
 .gridCursorHide img {
   cursor: none;
-}
-
-button.card {
-  margin: 0;
-  padding: 0;
-  border: none;
-  font: inherit;
-  color: inherit;
-  text-align: inherit;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
 }
 
 .gridItem {
@@ -51,10 +61,16 @@ button.card {
   outline-offset: 2px;
   color: inherit;
   text-decoration: none;
+  touch-action: manipulation;
 }
 
 .card:focus-visible {
   outline: 2px solid var(--color-masthead-dim);
+}
+
+/* pointer-events is not inherited — nested <img> must be explicit or taps reach the <a>. */
+.card img {
+  pointer-events: none;
 }
 
 .cardImage {
@@ -63,6 +79,7 @@ button.card {
   object-fit: cover;
   opacity: 1;
   transition: opacity 0.25s ease;
+  pointer-events: none;
   /* Safari: tighter clip + own layer to reduce corner hairlines on rounded cards */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -71,12 +88,13 @@ button.card {
 }
 
 .cardImageMobileOffset {
-  transform: translateZ(0) translateY(var(--card-img-offset-y, 0px));
+  transform: translateZ(0) translateY(var(--card-img-offset-y, 0px))
+    scale(var(--card-img-scale-mobile, 1));
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .cardImageMobileOffset {
-    transform: translateZ(0);
+    transform: translateZ(0) scale(var(--card-img-scale-desktop, 1));
   }
 }
 
@@ -114,10 +132,10 @@ button.card {
   right: 0;
   bottom: 0;
   z-index: 2;
-  padding: 1.5em;
+  padding: 1.2em;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .cardOverlay {
     padding: 32px;
   }
@@ -142,8 +160,8 @@ button.card {
 .statusPill {
   pointer-events: none;
   position: absolute;
-  right: 1.5em;
-  bottom: 1.5em;
+  right: 1.3rem;
+  bottom: 1.7em;
   z-index: 2;
   display: inline-flex;
   height: 48px;
@@ -158,10 +176,10 @@ button.card {
   color: #ffffff;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .statusPill {
-    right: 32px;
-    bottom: 32px;
+    right: 36px;
+    bottom: 36px;
     gap: 0.5rem;
     padding-left: 16px;
     padding-right: 19px;

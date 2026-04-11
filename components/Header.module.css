@@ -10,8 +10,15 @@
 
 @media (min-width: 768px) {
   .header {
-    margin-left: 3%;
-    margin-right: 3%;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header {
+    margin-left: 3rem;
+    margin-right: 3rem;
   }
 }
 
@@ -25,6 +32,13 @@
 @media (min-width: 768px) {
   .headerHome {
     margin-top: 76px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .headerHome {
     padding-left: 5px;
     padding-right: 10px;
   }
@@ -40,10 +54,28 @@
   width: 100%;
 }
 
+/* Home full wordmark + home header offset: desktop only. */
+@media (max-width: 1023px) {
+  .mastheadHomeDesktopOnly {
+    display: none;
+  }
+
+  .headerHome {
+    margin-top: 0;
+  }
+}
+
 /* Inner routes: in-flow wordmark only — no extra padding under it before <main>. */
 .mastheadInnerRoute {
   width: 100%;
   padding-bottom: 0;
+}
+
+/* No smooth handoff to home masthead below desktop (different DOM + tiny margin delta). */
+@media (max-width: 1023px) {
+  .mastheadInnerRoute {
+    display: none;
+  }
 }
 
 /* height:0 + bottom padding % = reserved height; do not swap for aspect-ratio while .mastheadLayer is position:absolute-only. */

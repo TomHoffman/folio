@@ -1,0 +1,165 @@
+.logoSection {
+  --logo-grid-panel: #172e37;
+  --logo-grid-cell: #0b222c;
+  --logo-grid-gap: 8px;
+  --logo-grid-pad: 8px;
+  --logo-grid-radius-outer: 24px;
+  --logo-grid-radius-cell: 14px;
+  --ticker-group-gap: 8px;
+  /* Keep in sync with ProjectGrid .pageInset horizontal padding at 1024px+ */
+  --logo-section-inline-margin: 3rem;
+
+  width: 100%;
+  margin-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+/* Mobile: section is flush; each tickertape unit carries the panel (see .tickerGroupPanel). */
+@media (max-width: 1023px) {
+  .logoSection {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .logoSection {
+    margin-bottom: 2.5rem;
+  }
+}
+
+/*
+ * Desktop: side margins align the panel with ProjectGrid (.pageInset), not full-bleed past projects.
+ */
+@media (min-width: 1024px) {
+  .logoSection {
+    margin-bottom: 120px;
+    margin-left: var(--logo-section-inline-margin);
+    margin-right: var(--logo-section-inline-margin);
+    width: auto;
+    padding: var(--logo-grid-pad);
+    border-radius: var(--logo-grid-radius-outer);
+    background-color: var(--logo-grid-panel);
+  }
+}
+
+/* —— Desktop: static 6 × 3 —— */
+.gridDesktop {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--logo-grid-gap);
+}
+
+.cell {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--logo-grid-radius-cell);
+  background-color: var(--logo-grid-cell);
+  overflow: hidden;
+}
+
+.cellDesktop {
+  aspect-ratio: 298 / 238;
+}
+
+.cellInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.logoImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* —— Mobile: full-bleed tickertape; each unit matches desktop panel + 2×2 —— */
+.tickerViewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.tickerTrack {
+  display: flex;
+  width: max-content;
+  gap: var(--ticker-group-gap);
+  animation: logo-ticker-marquee 65s linear infinite;
+  will-change: transform;
+}
+
+@keyframes logo-ticker-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Outer shell: same visual language as desktop logo panel (no border) */
+.tickerGroupPanel {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: min(88vw, 360px);
+  padding: var(--logo-grid-pad);
+  border-radius: var(--logo-grid-radius-outer);
+  background-color: var(--logo-grid-panel);
+}
+
+.tickerClusterGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.tickerGroupCell {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--logo-grid-radius-cell);
+  background-color: var(--logo-grid-cell);
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+}
+
+.tickerGroupCellInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.logoImgTicker {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transform: scale(1.2);
+  transform-origin: center center;
+}
+
+.tickerStatic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ticker-group-gap);
+}

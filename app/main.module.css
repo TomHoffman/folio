@@ -14,15 +14,19 @@
   align-items: stretch;
   justify-content: flex-start;
   margin-top: 80px;
-  padding: 0 0.5rem 52px;
+  padding: 0 0 52px;
   gap: 0;
 }
 
 @media (min-width: 768px) {
   .main {
+    margin-top: 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
     margin-top: 250px;
-    padding-left: 3%;
-    padding-right: 3%;
   }
 }
 
@@ -51,10 +55,38 @@
   gap: 0;
 }
 
+@media (max-width: 767px) {
+  .main {
+    margin-top: 130px; /* 80px base + 50px */
+  }
+}
+
+/* Home masthead hidden below 1024px — match inner-route top rhythm */
+@media (max-width: 1023px) {
+  .main.mainHome {
+    margin-top: 98px;
+  }
+}
+
 @media (min-width: 768px) {
   .mainProjectInner {
+    margin-top: 200px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Inner masthead hidden below 1024px — compact top until desktop */
+@media (max-width: 1023px) {
+  .mainProjectInner {
+    margin-top: 98px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mainProjectInner {
     margin-top: 250px;
-    padding-left: 3%;
-    padding-right: 3%;
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }

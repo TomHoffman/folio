@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ComingSoonWorkShell } from "@/components/ComingSoonWorkShell";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
+import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
-import { ProjectWorkAccessGate } from "@/components/ProjectWorkAccessGate";
 import { getProjectBySlug } from "@/data/projects";
 import mainStyles from "../../main.module.css";
 
@@ -29,15 +30,23 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
     notFound();
   }
 
-  return (
-    <ProjectWorkAccessGate status={project.status} slug={project.slug}>
-      <main className={`${mainStyles.main} ${mainStyles.mainProject}`}>
-        <div className={mainStyles.mainProjectInner}>
-          <ScrollToTopOnMount />
-          <ProjectHero project={project} />
-          <ProjectImageContainer project={project} />
-        </div>
-      </main>
-    </ProjectWorkAccessGate>
+  if (project.status === "coming-soon") {
+    return <ComingSoonWorkShell />;
+  }
+
+  const main = (
+    <main className={`${mainStyles.main} ${mainStyles.mainProject}`}>
+      <div className={mainStyles.mainProjectInner}>
+        <ScrollToTopOnMount />
+        <ProjectHero project={project} />
+        <ProjectImageContainer project={project} />
+      </div>
+    </main>
   );
+
+  if (project.status === "protected") {
+    return <ProtectedWorkShell slug={project.slug}>{main}</ProtectedWorkShell>;
+  }
+
+  return main;
 }

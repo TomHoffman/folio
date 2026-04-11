@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -12,13 +11,7 @@ import {
 } from "react";
 import type { Project } from "@/data/projects";
 import { projectAssetSrc, visibleProjects } from "@/data/projects";
-import { ProjectAccessModal } from "@/components/ProjectAccessModal";
 import styles from "./ProjectGrid.module.css";
-
-type ProjectModalState = {
-  project: Project;
-  kind: "protected" | "coming-soon";
-};
 
 /** Half of the 8px grid gap — expands hit areas so the cursor doesn’t drop in gutters. */
 const GUTTER_HIT_PAD = 4;
@@ -111,15 +104,7 @@ function ProjectStatusPill({
   );
 }
 
-function ProjectCard({
-  project,
-  modalOpenSlug,
-  onOpenModal,
-}: {
-  project: Project;
-  modalOpenSlug: string | null;
-  onOpenModal: (project: Project) => void;
-}) {
+function ProjectCard({ project }: { project: Project }) {
   const cardInner = (
     <>
       {project.image ? (
@@ -128,14 +113,36 @@ function ProjectCard({
           alt=""
           fill
           className={
-            project.cardImageMobileOffsetY != null
+            project.cardImageMobileOffsetY != null ||
+            project.cardImageMobileScale != null ||
+            project.cardImageDesktopScale != null
               ? `${styles.cardImage} ${styles.cardImageMobileOffset}`
               : styles.cardImage
           }
           style={
-            project.cardImageMobileOffsetY != null
+            project.cardImageMobileOffsetY != null ||
+            project.cardImageMobileScale != null ||
+            project.cardImageDesktopScale != null
               ? ({
-                  ["--card-img-offset-y" as string]: `${project.cardImageMobileOffsetY}px`,
+                  ...(project.cardImageMobileOffsetY != null
+                    ? {
+                        ["--card-img-offset-y" as string]: `${project.cardImageMobileOffsetY}px`,
+                      }
+                    : {}),
+                  ...(project.cardImageMobileScale != null
+                    ? {
+                        ["--card-img-scale-mobile" as string]: String(
+                          project.cardImageMobileScale,
+                        ),
+                      }
+                    : {}),
+                  ...(project.cardImageDesktopScale != null
+                    ? {
+                        ["--card-img-scale-desktop" as string]: String(
+                          project.cardImageDesktopScale,
+                        ),
+                      }
+                    : {}),
                 } as CSSProperties)
               : undefined
           }
@@ -168,26 +175,23 @@ function ProjectCard({
     </>
   );
 
-  if (project.status === "protected" || project.status === "coming-soon") {
-    return (
-      <button
-        type="button"
-        className={styles.card}
-        data-project-slug={project.slug}
-        aria-haspopup="dialog"
-        aria-expanded={modalOpenSlug === project.slug}
-        onClick={() => onOpenModal(project)}
-      >
-        {cardInner}
-      </button>
-    );
-  }
+  const href =
+    project.status === "protected"
+      ? `/work/${project.slug}/access`
+      : `/work/${project.slug}`;
+  const ariaLabel =
+    project.status === "protected"
+      ? `${project.title} — password protected`
+      : project.status === "coming-soon"
+        ? `${project.title} — coming soon`
+        : undefined;
 
   return (
     <Link
-      href={`/work/${project.slug}`}
+      href={href}
       className={styles.card}
       data-project-slug={project.slug}
+      aria-label={ariaLabel}
     >
       {cardInner}
     </Link>
@@ -195,7 +199,6 @@ function ProjectCard({
 }
 
 export function ProjectGrid() {
-  const router = useRouter();
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
   const lastPointerRef = useRef({ x: 0, y: 0 });
@@ -204,20 +207,6 @@ export function ProjectGrid() {
   const [pointerProject, setPointerProject] = useState<Project | null>(null);
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
-
-  const [modal, setModal] = useState<ProjectModalState | null>(null);
-
-  const closeModal = useCallback(() => setModal(null), []);
-
-  const openModalForProject = useCallback((project: Project) => {
-    if (project.status === "protected") {
-      setModal({ project, kind: "protected" });
-      return;
-    }
-    if (project.status === "coming-soon") {
-      setModal({ project, kind: "coming-soon" });
-    }
-  }, []);
 
   const commitPointerUpdate = useCallback((clientX: number, clientY: number) => {
     lastPointerRef.current = { x: clientX, y: clientY };
@@ -278,7 +267,7 @@ export function ProjectGrid() {
     .join(" ");
 
   return (
-    <>
+    <div className={styles.pageInset}>
       <ul
         ref={gridRef}
         className={gridClass}
@@ -288,11 +277,7 @@ export function ProjectGrid() {
       >
         {visibleProjects.map((project) => (
           <li key={project.slug} className={styles.gridItem}>
-            <ProjectCard
-              project={project}
-              modalOpenSlug={modal?.project.slug ?? null}
-              onOpenModal={openModalForProject}
-            />
+            <ProjectCard project={project} />
           </li>
         ))}
       </ul>
@@ -336,24 +321,6 @@ export function ProjectGrid() {
           </div>
         ) : null}
       </div>
-
-      {modal ? (
-        <ProjectAccessModal
-          isOpen
-          variant={modal.kind}
-          projectSlug={modal.project.slug}
-          pinInputId="protected-project-pin-grid"
-          onDismiss={closeModal}
-          onProtectedSuccess={
-            modal.kind === "protected"
-              ? () => {
-                  closeModal();
-                  router.push(`/work/${modal.project.slug}`);
-                }
-              : undefined
-          }
-        />
-      ) : null}
-    </>
+    </div>
   );
 }

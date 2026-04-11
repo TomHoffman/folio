@@ -13,15 +13,19 @@ import styles from "./ProjectAccessModal.module.css";
 export function ProtectedPinForm({
   projectSlug,
   inputId,
+  headingId = "project-modal-protected-heading",
   onSuccess,
 }: {
   projectSlug: string;
   inputId: string;
+  /** Distinct id when multiple PIN UIs could exist in the document tree history */
+  headingId?: string;
   onSuccess: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [pin, setPin] = useState("");
   const [shakeGeneration, setShakeGeneration] = useState(0);
+  const [showTryAgain, setShowTryAgain] = useState(false);
 
   useEffect(() => {
     const id = window.setTimeout(() => inputRef.current?.focus(), 0);
@@ -38,6 +42,7 @@ export function ProtectedPinForm({
       }
       setPin("");
       setShakeGeneration((g) => g + 1);
+      setShowTryAgain(true);
       return;
     }
     setPin(next);
@@ -48,7 +53,7 @@ export function ProtectedPinForm({
   return (
     <div className={styles.modalProtectedInner}>
       <form
-        className={styles.pinForm}
+        className={styles.pinFormProtected}
         onSubmit={(e) => e.preventDefault()}
       >
         <label htmlFor={inputId} className="sr-only">
@@ -72,17 +77,26 @@ export function ProtectedPinForm({
             shakeGeneration > 0 ? styles.protectedPinShakePlay : ""
           }`}
         >
-          <h2
-            id="project-modal-protected-heading"
-            className={styles.modalHeading}
-          >
-            Password protected
-          </h2>
+          <div className={styles.protectedHeader}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static SVG from public */}
+            <img
+              src="/svg/lock.svg"
+              alt=""
+              width={24}
+              height={24}
+              className={styles.protectedLock}
+            />
+            <h2 id={headingId} className={styles.protectedTitle}>
+              This project is password protected
+            </h2>
+          </div>
           <div
             className={styles.pinRow}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            onPointerDown={(e) => {
               focusInput();
+              if (e.pointerType === "mouse") {
+                e.preventDefault();
+              }
             }}
             role="presentation"
           >
@@ -99,6 +113,15 @@ export function ProtectedPinForm({
             ))}
           </div>
         </div>
+        <p
+          className={`${styles.tryAgain} ${
+            showTryAgain ? "" : styles.tryAgainHidden
+          }`}
+          role={showTryAgain ? "status" : undefined}
+          aria-hidden={!showTryAgain}
+        >
+          {showTryAgain ? "Try again" : "\u00a0"}
+        </p>
       </form>
     </div>
   );
