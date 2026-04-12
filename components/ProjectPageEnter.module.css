@@ -10,9 +10,25 @@
   }
 }
 
+@keyframes projectFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* Soft ease-out: quick start, long gentle settle */
 .enterTitle {
   animation: projectFadeInUp 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
+  animation-delay: 0.08s;
+}
+
+/* Header back — opacity only, same duration / easing / delay as .enterTitle */
+.enterBack {
+  animation: projectFadeIn 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
   animation-delay: 0.08s;
 }
 
@@ -26,10 +42,18 @@
   animation-delay: 0.4s;
 }
 
+/* Opacity only; same delay, duration, and easing as `.enterMedia` */
+.enterOverviewIntro {
+  animation: projectFadeIn 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
+  animation-delay: 0.4s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .enterTitle,
   .enterRow2,
-  .enterMedia {
+  .enterMedia,
+  .enterBack,
+  .enterOverviewIntro {
     animation: none;
     opacity: 1;
     transform: none;

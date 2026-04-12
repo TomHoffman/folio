@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-import { Nav } from "@/components/Nav";
+import { HeaderMinimal } from "@/components/HeaderMinimal";
+import { ThemeDocumentSync } from "@/components/ThemeDocumentSync";
 import layoutStyles from "./layout.module.css";
 import "./globals.css";
 
@@ -40,13 +41,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const htmlClass = [matterSans.variable, "dark"].filter(Boolean).join(" ");
+  /* Theme `dark` class is not set here — React would overwrite classList on reconcile. */
+  const htmlClass = matterSans.variable;
 
   return (
     <html lang="en" className={htmlClass} suppressHydrationWarning>
       <body className={layoutStyles.body}>
-        <Header />
-        <Nav />
+        <Script
+          id="folio-color-scheme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('folio-color-scheme');var d=document.documentElement;if(s==='light')d.classList.remove('dark');else d.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
+        <ThemeDocumentSync />
+        <HeaderMinimal />
         {children}
         <Footer />
       </body>

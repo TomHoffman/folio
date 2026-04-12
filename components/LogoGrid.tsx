@@ -1,14 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   defaultLogoGridItems,
   type LogoGridItem,
 } from "@/data/logoGridItems";
+import {
+  type SectionHeadingIndicatorColor,
+  sectionHeadingIndicatorStyle,
+} from "@/lib/sectionHeadingIndicator";
+import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./LogoGrid.module.css";
 
-const DESKTOP_MQ = "(min-width: 1024px)";
 const REDUCED_MOTION_MQ = "(prefers-reduced-motion: reduce)";
+
+/** WebKit: `addListener` when `addEventListener` missing on MediaQueryList. */
+function mqSubscribe(mq: MediaQueryList, cb: () => void): () => void {
+  if (typeof mq.addEventListener === "function") {
+    mq.addEventListener("change", cb);
+    return () => mq.removeEventListener("change", cb);
+  }
+  mq.addListener(cb);
+  return () => mq.removeListener(cb);
+}
 
 /** Desktop shows at most this many logos (6×3). */
 const DESKTOP_LOGO_MAX = 18;
@@ -25,34 +39,6 @@ function chunkIntoGroupsOfFour(items: LogoGridItem[]): LogoGridItem[][] {
     }
   }
   return groups;
-}
-
-function subscribeDesktop(cb: () => void) {
-  const mq = window.matchMedia(DESKTOP_MQ);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-}
-
-function getDesktopSnapshot() {
-  return window.matchMedia(DESKTOP_MQ).matches;
-}
-
-function getDesktopServerSnapshot() {
-  return false;
-}
-
-function subscribeReducedMotion(cb: () => void) {
-  const mq = window.matchMedia(REDUCED_MOTION_MQ);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-}
-
-function getReducedMotionSnapshot() {
-  return window.matchMedia(REDUCED_MOTION_MQ).matches;
-}
-
-function getReducedMotionServerSnapshot() {
-  return false;
 }
 
 function LogoMark({
@@ -153,22 +139,30 @@ function MobileTicker({
 export type LogoGridProps = {
   items?: LogoGridItem[];
   className?: string;
+  /** Shown above the grid; not part of the mobile tickertape. Hidden when empty or `showTitle` is `false`. */
+  title?: string;
+  /** Set `false` to hide the visible title while keeping `title` for future use. Default `true`. */
+  showTitle?: boolean;
+  /** Dot before the title; token from `globals.css` (`orange`, `yellow`, …). Default `orange`. */
+  indicatorColor?: SectionHeadingIndicatorColor;
 };
 
 export function LogoGrid({
-  items = defaultLogoGridItems,
+  items: itemsProp,
   className,
+  title,
+  showTitle = true,
+  indicatorColor = "orange",
 }: LogoGridProps) {
-  const isDesktop = useSyncExternalStore(
-    subscribeDesktop,
-    getDesktopSnapshot,
-    getDesktopServerSnapshot,
-  );
-  const reducedMotion = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
-  );
+  const items = itemsProp ?? defaultLogoGridItems;
+
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(REDUCED_MOTION_MQ);
+    setReducedMotion(mq.matches);
+    return mqSubscribe(mq, () => setReducedMotion(mq.matches));
+  }, []);
 
   const desktopItems = useMemo(
     () => items.slice(0, DESKTOP_LOGO_MAX),
@@ -176,6 +170,8 @@ export function LogoGrid({
   );
 
   const sectionClass = [styles.logoSection, className].filter(Boolean).join(" ");
+  const visibleTitle =
+    showTitle && Boolean(title?.trim());
 
   useEffect(() => {
     if (items.length < DESKTOP_LOGO_MAX) {
@@ -187,14 +183,33 @@ export function LogoGrid({
 
   return (
     <section className={sectionClass} aria-labelledby="logo-grid-title">
-      <h2 id="logo-grid-title" className="sr-only">
-        Selected client logos
-      </h2>
-      {isDesktop ? (
-        <DesktopGrid items={desktopItems} />
+      {visibleTitle ? (
+        <div className={sectionHeadingStyles.headingGutter}>
+          <h2
+            id="logo-grid-title"
+            className={sectionHeadingStyles.heading}
+            style={sectionHeadingIndicatorStyle(indicatorColor)}
+          >
+            {title?.trim()}
+          </h2>
+        </div>
       ) : (
-        <MobileTicker items={items} reducedMotion={reducedMotion} />
+        <h2 id="logo-grid-title" className="sr-only">
+          Selected client logos
+        </h2>
       )}
+      {/*
+       * Tickertape vs static grid is CSS-only (`.staticGridRoot` / `.tickerRoot`).
+       * Breakpoint 1024px: iPad portrait & phones get ticker; iPad landscape+ get static grid.
+       */}
+      <div className={styles.staticGridRoot}>
+        <div className={styles.gridWrap}>
+          <DesktopGrid items={desktopItems} />
+        </div>
+      </div>
+      <div className={styles.tickerRoot}>
+        <MobileTicker items={items} reducedMotion={reducedMotion} />
+      </div>
     </section>
   );
 }

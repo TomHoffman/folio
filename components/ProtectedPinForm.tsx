@@ -33,7 +33,8 @@ export function ProtectedPinForm({
   }, [projectSlug]);
 
   const onPinChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const next = e.target.value.replace(/\D/g, "").slice(0, 6);
+    const raw = e.target.value ?? "";
+    const next = raw.replace(/\D/g, "").slice(0, 6);
     if (next.length === 6) {
       if (next === PROTECTED_PROJECT_ACCESS_CODE) {
         markProjectProtectedUnlocked(projectSlug);

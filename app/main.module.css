@@ -1,7 +1,7 @@
 /*
  * Do not use flex-grow on <main> — it fills the viewport and leaves a huge empty band above the first child.
  * Sticky footer: Footer.module.css uses margin-top: auto instead.
- * Hero → image spacing: margin on ProjectImageContainer .stage, not gap here.
+ * Project detail stack (`.mainProjectInner`): vertical spacing between hero, image, overview via `gap` only.
  */
 .main {
   position: relative;
@@ -52,7 +52,7 @@
   width: 100%;
   margin-top: 80px;
   padding: 0 0.5rem 52px;
-  gap: 0;
+  gap: 16px;
 }
 
 @media (max-width: 767px) {
@@ -71,8 +71,14 @@
 @media (min-width: 768px) {
   .mainProjectInner {
     margin-top: 200px;
-    padding-left: 1rem;
-    padding-right: 1rem;
+  }
+}
+
+/* Tablet + small laptop: fixed em inset; 3% only from 1280px. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .mainProjectInner {
+    padding-left: 2em;
+    padding-right: 2em;
   }
 }
 
@@ -83,10 +89,19 @@
   }
 }
 
-@media (min-width: 1024px) {
+/* Project detail: tablet landscape / small laptop — lighter than full desktop */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .mainProjectInner {
+    margin-top: 200px;
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1280px) {
   .mainProjectInner {
     margin-top: 250px;
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding-left: 3%;
+    padding-right: 3%;
+    gap: 24px;
   }
 }

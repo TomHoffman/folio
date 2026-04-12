@@ -2,16 +2,29 @@
 :root {
   --font-sans: var(--font-matter), ui-sans-serif, system-ui, sans-serif;
   --color-background: #faf7f1;
-  --color-foreground: #0a0a0a;
-  --color-muted: #525252;
+  --color-foreground: #161616;
+  --color-muted: #2b3b42;
   --color-border: #e5e5e5;
+  --color-divider: #516978;
   --color-surface: #fafafa;
-  --color-accent: #0a0a0a;
+  --color-accent: #161616;
   --color-masthead: var(--color-foreground);
   --color-masthead-dim: #90c9ff;
   --color-masthead-subtle: #64748b;
   --color-text-primary: var(--color-foreground);
   --color-text-secondary: var(--color-muted);
+  --color-nav-inactive: #516f7c;
+  --color-orange: #ff6923;
+  --color-lime: #a3ff58;
+  /* Section title dots (LogoGrid / ProjectGrid) — use via `indicatorColor` prop */
+  --color-section-indicator-orange: var(--color-orange);
+  --color-section-indicator-yellow: #d4a017;
+  --color-section-indicator-green: #2f9d5c;
+  --color-section-indicator-lime: var(--color-lime);
+  --color-section-indicator-blue: #2b7fff;
+  --color-section-indicator-purple: #8b5cf6;
+  --color-section-indicator-pink: #db2777;
+  --color-section-indicator-red: #e11d48;
 }
 
 html {
@@ -34,6 +47,17 @@ html.dark {
   --color-masthead-subtle: #2f4f5e;
   --color-text-primary: #ffffff;
   --color-text-secondary: #6a8d9b;
+  --color-nav-inactive: #668a98;
+  --color-orange: #ff6923;
+  --color-lime: #a3ff58;
+  --color-section-indicator-orange: var(--color-orange);
+  --color-section-indicator-yellow: #f0c14a;
+  --color-section-indicator-green: #4ade80;
+  --color-section-indicator-lime: var(--color-lime);
+  --color-section-indicator-blue: #60a5fa;
+  --color-section-indicator-purple: #c084fc;
+  --color-section-indicator-pink: #f472b6;
+  --color-section-indicator-red: #fb7185;
 }
 
 *,
@@ -57,7 +81,7 @@ video {
   height: auto;
 }
 
-/* Visually hidden — used by Header, ProjectGrid status pill (mobile). */
+/* Visually hidden — e.g. ProjectGrid status pill (mobile). */
 .sr-only {
   position: absolute;
   width: 1px;

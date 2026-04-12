@@ -7,14 +7,15 @@
   padding-right: 0.5rem;
 }
 
-@media (min-width: 768px) {
+/* Tablet portrait + landscape: same horizontal inset; wide gutters only from 1280px. */
+@media (min-width: 768px) and (max-width: 1279px) {
   .pageInset {
     padding-left: 1rem;
     padding-right: 1rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .pageInset {
     padding-left: 3rem;
     padding-right: 3rem;

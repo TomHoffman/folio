@@ -5,8 +5,12 @@ import mainStyles from "./main.module.css";
 export default function HomePage() {
   return (
     <main className={`${mainStyles.main} ${mainStyles.mainHome}`}>
-      <LogoGrid />
-      <ProjectGrid />
+      <LogoGrid title="Selected clients" indicatorColor="secondary" />
+      <ProjectGrid
+        title="Projects"
+        showTitle={true}
+        indicatorColor="secondary"
+      />
     </main>
   );
 }

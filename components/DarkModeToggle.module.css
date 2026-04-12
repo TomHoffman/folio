@@ -1,0 +1,63 @@
+/* Circle top-left; +2px top nudge. Reserved for future toggle — not mounted in header. */
+.themeToggle {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 2px 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.themeToggle:focus-visible .themeToggleMark {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 4px;
+}
+
+.themeToggleMark {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid #081f28; /* light UI: dark ring */
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+}
+
+:global(html.dark) .themeToggleMark {
+  border-color: #f3f0e0; /* dark UI: light ring */
+}
+
+.themeToggleMarkFill {
+  position: absolute;
+  display: block;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #081f28; /* same as light-mode ring */
+  transform: rotate(180deg);
+  transform-origin: left center;
+  transition:
+    transform 0.55s ease,
+    background-color 0.55s ease;
+}
+
+:global(html.dark) .themeToggleMarkFill {
+  background-color: #f3f0e0; /* same as dark-mode ring */
+  transform: rotate(0deg);
+}

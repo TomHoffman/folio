@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ComingSoonWorkShell } from "@/components/ComingSoonWorkShell";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
+import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 import { getProjectBySlug } from "@/data/projects";
@@ -40,6 +41,9 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
         <ScrollToTopOnMount />
         <ProjectHero project={project} />
         <ProjectImageContainer project={project} />
+        {project.overview ? (
+          <ProjectOverview overview={project.overview} />
+        ) : null}
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 /*
  * Shared em context (fluid `rem` base on .row → children use `em`).
- * Title: 4.5em below 1024px; 6.5em from 1024px up. Subtitle: 1.75em below 768px; 1.25em from 768px up.
+ * Title: 4.5em below 1024px; 5.25em tablet landscape (1024–1279); 6.5em from 1280px up.
+ * Subtitle: 1.3em (scales with `.row`).
  */
 .section {
   width: 100%;
@@ -12,19 +13,12 @@
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  /* Matches LogoGrid / ProjectGrid `.heading`: 1em small, 1.5em from 1024px. */
   padding-left: 1em;
   padding-right: 1em;
   font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
-}
-
-@media (min-width: 1024px) {
-  .row {
-    padding-left: 3em;
-    padding-right: 3em;
-  }
 }
 
 .headCol {
@@ -55,70 +49,34 @@
   color: var(--color-text-primary);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .row {
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+  }
+
+  .title {
+    font-size: 5.25em;
+  }
+}
+
+@media (min-width: 1280px) {
+  .row {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+  }
+
   .title {
     font-size: 6.5em;
   }
 }
 
-/* Matter Light (300) */
-.subtitle {
+/* Scoped under .headingsEm so typography beats .enterRow2 (same element, equal single-class specificity). */
+.headingsEm .subtitle {
   margin: 0;
   width: 100%;
-  font-size: 1.75em;
-  font-weight: 300;
+  font-size: 1.3em;
+  font-weight: 400; /* Matter Regular — light and dark */
   line-height: 1.42;
   color: var(--color-text-secondary);
-}
-
-@media (min-width: 768px) {
-  .subtitle {
-    font-size: 1.25em;
-  }
-}
-
-.back {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  width: 1.5rem;
-  height: 1.5rem;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  color: inherit;
-  text-decoration: none;
-}
-
-/*
- * Viewport-fixed below desktop (max-width 1023px); in-flow in the hero row from 1024px up.
- */
-@media (max-width: 1023px) {
-  .back {
-    position: fixed;
-    top: max(16px, env(safe-area-inset-top));
-    right: max(16px, env(safe-area-inset-right));
-    z-index: 30;
-  }
-}
-
-.back:focus-visible {
-  outline: 2px solid var(--color-masthead-dim);
-  outline-offset: 4px;
-}
-
-.back svg {
-  display: block;
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.back svg path {
-  fill: #ffffff;
-  transition: fill 0.25s ease-in-out;
-}
-
-.back:hover svg path,
-.back:focus-visible svg path {
-  fill: #a3ff58;
 }

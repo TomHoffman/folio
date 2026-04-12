@@ -11,7 +11,20 @@ import {
 } from "react";
 import type { Project } from "@/data/projects";
 import { projectAssetSrc, visibleProjects } from "@/data/projects";
+import {
+  type SectionHeadingIndicatorColor,
+  sectionHeadingIndicatorStyle,
+} from "@/lib/sectionHeadingIndicator";
+import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ProjectGrid.module.css";
+
+/** Custom “view” bubble — only real mouse/trackpad UIs; never on touch-first devices. */
+function shouldEnableCustomCursor(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(pointer: coarse)").matches) return false;
+  if (window.matchMedia("(hover: none)").matches) return false;
+  return window.matchMedia("(pointer: fine)").matches;
+}
 
 /** Half of the 8px grid gap — expands hit areas so the cursor doesn’t drop in gutters. */
 const GUTTER_HIT_PAD = 4;
@@ -198,7 +211,22 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-export function ProjectGrid() {
+export type ProjectGridProps = {
+  /** Shown above the project cards when `showTitle` is true and this is non-empty. */
+  title?: string;
+  /** Set `false` to hide the visible title. Default `true`. */
+  showTitle?: boolean;
+  /** Dot before the title; token from `globals.css`. Default `orange`. */
+  indicatorColor?: SectionHeadingIndicatorColor;
+};
+
+export function ProjectGrid({
+  title,
+  showTitle = true,
+  indicatorColor = "orange",
+}: ProjectGridProps = {}) {
+  const visibleTitle = showTitle && Boolean(title?.trim());
+
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
   const lastPointerRef = useRef({ x: 0, y: 0 });
@@ -207,6 +235,22 @@ export function ProjectGrid() {
   const [pointerProject, setPointerProject] = useState<Project | null>(null);
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
+  const [customCursorEnabled, setCustomCursorEnabled] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setCustomCursorEnabled(shouldEnableCustomCursor());
+    sync();
+    const queries = [
+      "(pointer: coarse)",
+      "(hover: none)",
+      "(pointer: fine)",
+    ];
+    const mqs = queries.map((q) => window.matchMedia(q));
+    const onChange = () => sync();
+    mqs.forEach((mq) => mq.addEventListener("change", onChange));
+    return () =>
+      mqs.forEach((mq) => mq.removeEventListener("change", onChange));
+  }, []);
 
   const commitPointerUpdate = useCallback((clientX: number, clientY: number) => {
     lastPointerRef.current = { x: clientX, y: clientY };
@@ -236,6 +280,7 @@ export function ProjectGrid() {
   }, []);
 
   useEffect(() => {
+    if (!customCursorEnabled) return;
     const onScroll = () => {
       if (!pointerInGridRef.current) return;
       const { x, y } = lastPointerRef.current;
@@ -243,7 +288,7 @@ export function ProjectGrid() {
     };
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, [commitPointerUpdate]);
+  }, [commitPointerUpdate, customCursorEnabled]);
 
   const onGridMouseEnter = () => {
     pointerInGridRef.current = true;
@@ -261,19 +306,33 @@ export function ProjectGrid() {
 
   const gridClass = [
     styles.grid,
-    pointerProject ? styles.gridCursorHide : "",
+    customCursorEnabled && pointerProject ? styles.gridCursorHide : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <div className={styles.pageInset}>
+      {visibleTitle ? (
+        <h2
+          id="project-grid-title"
+          className={sectionHeadingStyles.heading}
+          style={sectionHeadingIndicatorStyle(indicatorColor)}
+        >
+          {title?.trim()}
+        </h2>
+      ) : (
+        <h2 id="project-grid-title" className="sr-only">
+          Projects
+        </h2>
+      )}
       <ul
         ref={gridRef}
         className={gridClass}
-        onMouseEnter={onGridMouseEnter}
-        onMouseMove={onGridMouseMove}
-        onMouseLeave={onGridMouseLeave}
+        aria-labelledby="project-grid-title"
+        onMouseEnter={customCursorEnabled ? onGridMouseEnter : undefined}
+        onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
+        onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}
       >
         {visibleProjects.map((project) => (
           <li key={project.slug} className={styles.gridItem}>
@@ -282,45 +341,48 @@ export function ProjectGrid() {
         ))}
       </ul>
 
-      <div
-        ref={cursorWrapRef}
-        className={styles.cursorWrap}
-        style={{
-          left: 0,
-          top: 0,
-          transform: "translate(-50%, -50%)",
-          opacity: pointerProject ? 1 : 0,
-        }}
-        aria-hidden
-      >
-        {pointerProject ? (
-          <div
-            key={cursorCrossGeneration}
-            className={`${styles.cursorBubble} ${
-              pointerProject.cursorTextColor ? "" : styles.cursorBubbleTextLight
-            }`}
-            style={{
-              backgroundColor: hexToRgba(
-                pointerProject.cursorColor,
-                CURSOR_BG_ALPHA,
-              ),
-              color: pointerProject.cursorTextColor ?? undefined,
-              animation:
-                cursorCrossGeneration > 0
-                  ? "project-cursor-cross 0.5s ease-in-out"
-                  : "none",
-            }}
-          >
-            <span
-              className={
-                pointerProject.cursorTextColor ? "" : styles.cursorLabel
-              }
+      {customCursorEnabled ? (
+        <div
+          ref={cursorWrapRef}
+          className={styles.cursorWrap}
+          style={{
+            left: 0,
+            top: 0,
+            transform: "translate(-50%, -50%)",
+            opacity: pointerProject ? 1 : 0,
+            display: pointerProject ? "block" : "none",
+          }}
+          aria-hidden
+        >
+          {pointerProject ? (
+            <div
+              key={cursorCrossGeneration}
+              className={`${styles.cursorBubble} ${
+                pointerProject.cursorTextColor ? "" : styles.cursorBubbleTextLight
+              }`}
+              style={{
+                backgroundColor: hexToRgba(
+                  pointerProject.cursorColor,
+                  CURSOR_BG_ALPHA,
+                ),
+                color: pointerProject.cursorTextColor ?? undefined,
+                animation:
+                  cursorCrossGeneration > 0
+                    ? "project-cursor-cross 0.5s ease-in-out"
+                    : "none",
+              }}
             >
-              view
-            </span>
-          </div>
-        ) : null}
-      </div>
+              <span
+                className={
+                  pointerProject.cursorTextColor ? "" : styles.cursorLabel
+                }
+              >
+                view
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

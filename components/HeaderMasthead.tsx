@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { CSSProperties } from "react";
-import styles from "./Header.module.css";
+import styles from "./HeaderMasthead.module.css";
 
 function MastheadSvg({
   className,
@@ -90,7 +90,7 @@ function getNarrowMastheadServerSnapshot() {
   return false;
 }
 
-export function Header() {
+export function HeaderMasthead() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const prevPathRef = useRef(pathname);

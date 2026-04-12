@@ -1,3 +1,5 @@
+/* Visible title uses `SectionHeading.module.css` (shared with ProjectGrid). */
+
 .logoSection {
   --logo-grid-panel: #172e37;
   --logo-grid-cell: #0b222c;
@@ -6,18 +8,31 @@
   --logo-grid-radius-outer: 24px;
   --logo-grid-radius-cell: 14px;
   --ticker-group-gap: 8px;
-  /* Keep in sync with ProjectGrid .pageInset horizontal padding at 1024px+ */
+  /* Static grid: match ProjectGrid `.pageInset` — 1rem tablet (1024–1279), 3rem large desktop */
   --logo-section-inline-margin: 3rem;
 
   width: 100%;
   margin-bottom: 2rem;
+  padding-top: 1em;
   box-sizing: border-box;
 }
 
-/* Mobile: section is flush; each tickertape unit carries the panel (see .tickerGroupPanel). */
+/*
+ * Tickertape vs static grid — CSS only (iPad Safari–safe).
+ * <1024px: ticker (iPad portrait, phones). ≥1024px: static grid (iPad landscape, laptops).
+ */
+.staticGridRoot {
+  display: none;
+}
+
+.tickerRoot {
+  display: block;
+}
+
+/* Phone + iPad portrait: full-width ticker band — no 3rem side margins (aligns with ProjectGrid <1024). */
 @media (max-width: 1023px) {
   .logoSection {
-    padding: 0;
+    padding: 1em 0 0;
     background: transparent;
     border-radius: 0;
     margin-left: 0;
@@ -25,21 +40,36 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .logoSection {
     margin-bottom: 2.5rem;
   }
 }
 
-/*
- * Desktop: side margins align the panel with ProjectGrid (.pageInset), not full-bleed past projects.
- */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .logoSection {
+    --logo-section-inline-margin: 1rem;
+  }
+}
+
+/* iPad landscape + desktop: static grid + panel shell */
 @media (min-width: 1024px) {
+  .staticGridRoot {
+    display: block;
+  }
+
+  .tickerRoot {
+    display: none;
+  }
+
   .logoSection {
     margin-bottom: 120px;
     margin-left: var(--logo-section-inline-margin);
     margin-right: var(--logo-section-inline-margin);
     width: auto;
+  }
+
+  .gridWrap {
     padding: var(--logo-grid-pad);
     border-radius: var(--logo-grid-radius-outer);
     background-color: var(--logo-grid-panel);

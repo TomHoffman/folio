@@ -1,0 +1,150 @@
+/* Horizontal rhythm matches ProjectHero `.row`; vertical rhythm via `.inner` gap only. */
+.section {
+  width: 100%;
+  padding-top: 0.5em;
+  color: var(--color-text-primary);
+  font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
+}
+
+.inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+}
+
+.split {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+/* Matches ProjectHero `.headingsEm .subtitle` size; Matter Light (300). */
+.intro {
+  margin: 0;
+  font-size: 1.75em;
+  font-weight: 300;
+  line-height: 1.42;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .intro {
+    font-size: 1.25em;
+  }
+}
+
+.rule {
+  margin: 0;
+  height: 0;
+  border: none;
+  border-top: 1px solid var(--color-divider);
+}
+
+.ruleBetweenIntroMeta {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.35em;
+  margin: 0;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  font-size: 1.3em;
+}
+
+.meta dt {
+  margin: 0;
+  font-weight: 400;
+}
+
+.meta dd {
+  margin: 0 0 1.25em;
+  font-weight: 300;
+}
+
+.meta dd:last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .meta {
+    font-size: 1em;
+  }
+}
+
+/* Two columns from tablet landscape up: intro | meta */
+@media (min-width: 1024px) {
+  .split {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+    padding-top: 0.5em;
+  }
+
+  .ruleBetweenIntroMeta {
+    display: none;
+  }
+
+  .intro {
+    max-width: none;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .meta {
+    box-sizing: border-box;
+    width: 18rem;
+    justify-self: end;
+    padding-top: 0.5em;
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .inner {
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+  }
+
+  .split {
+    column-gap: 2rem;
+    padding-bottom: 0.75em;
+  }
+
+  .intro {
+    font-size: 1.35em;
+  }
+
+  .meta {
+    padding-right: 2em;
+    font-size: 0.95em;
+  }
+}
+
+@media (min-width: 1280px) {
+  .inner {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+  }
+
+  .split {
+    column-gap: 3rem;
+    padding-bottom: 1em;
+  }
+
+  .intro {
+    font-size: 1.75em;
+  }
+
+  .meta {
+    padding-right: 4em;
+    font-size: 1em;
+  }
+}
