@@ -1,0 +1,5 @@
+.root {
+  box-sizing: border-box;
+  height: 80vh;
+  min-height: 0;
+}

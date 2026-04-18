@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ComingSoonWorkShell } from "@/components/ComingSoonWorkShell";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
+import { CardGroup } from "@/components/CardGroup";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
@@ -44,6 +45,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
         {project.overview ? (
           <ProjectOverview overview={project.overview} />
         ) : null}
+        {project.cardGroup ? <CardGroup {...project.cardGroup} /> : null}
       </div>
     </main>
   );

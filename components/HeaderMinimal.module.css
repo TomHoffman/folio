@@ -1,11 +1,15 @@
-/*
- * Horizontal inset matches ProjectHero: main.module.css `.mainProjectInner` padding
- * plus ProjectHero `.row` padding (same fluid `em` base as `.row` on `.inner`).
- */
+/* Header bar: fixed shell in HeaderMinimal.tsx */
 .root {
-  position: relative;
-  z-index: 2;
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding-top: 1rem;
+  background-color: var(--color-background);
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -24,49 +28,59 @@
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
   min-height: 1.5rem;
   font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
-  /* Mirrors .mainProjectInner + ProjectHero `.row` at each breakpoint */
-  padding-left: calc(0.5rem + 1em);
-  padding-right: calc(0.5rem + 1em);
+  padding-left: calc(3% + 0.5em);
+  padding-right: calc(3% + 0.5em);
+  padding-bottom: 1.5em;
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .inner {
-    /* 2rem matches `.mainProjectInner` horizontal padding (2em at root); + ProjectHero `.row` */
-    padding-left: calc(2rem + 1em);
-    padding-right: calc(2rem + 1em);
-  }
+/* Same horizontal inset as ProjectGrid `.pageInset` / desktop LogoGrid margins */
+.bottomRule {
+  box-sizing: border-box;
+  height: 1px;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: #516978;
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .inner {
-    padding-left: calc(2rem + 1.25em);
-    padding-right: calc(2rem + 1.25em);
+@media (min-width: 768px) and (max-width: 1279px) {
+  .bottomRule {
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 }
 
 @media (min-width: 1280px) {
-  .inner {
-    padding-left: calc(3% + 1.5em);
-    padding-right: calc(3% + 1.5em);
+  .bottomRule {
+    margin-left: 3rem;
+    margin-right: 3rem;
   }
 }
 
 .lead {
   flex-shrink: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: flex-start;
   margin: 0;
   min-width: 0;
 }
 
-/* Same arrow as ProjectHero `.back`; masthead fill for header background.
-   Padding enlarges the tap/hit area; negative margin keeps the glyph aligned. */
+.projectNav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  transform: translateY(4px);
+}
+
+/* Prev / next: same circular hit area + hover as former back control (stroke icons use currentColor). */
 .headerBack {
   position: relative;
   z-index: 1;
@@ -77,18 +91,28 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin: -0.75em;
-  padding: 0.75em;
+  margin: -0.5em;
+  padding: 0.5em;
   border-radius: 50%;
   background-color: transparent;
-  color: inherit;
+  color: var(--color-masthead);
   text-decoration: none;
   transition: background-color 0.25s ease-in-out;
+}
+
+.headerBackDisabled {
+  pointer-events: none;
+  cursor: default;
+  color: var(--color-nav-inactive);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .headerBack:hover {
     background-color: #172e37;
+  }
+
+  .headerBack.headerBackDisabled:hover {
+    background-color: transparent;
   }
 }
 
@@ -99,10 +123,6 @@
 
 .headerBack svg {
   display: block;
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.headerBack svg path {
-  fill: var(--color-masthead);
+  width: 40px;
+  height: 40px;
 }

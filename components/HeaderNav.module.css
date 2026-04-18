@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.75em;
+  gap: 0.6em;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -62,6 +62,7 @@
 .staticItem {
   display: inline-flex;
   align-items: center;
+  gap: 13px;
   font-size: 1.25em;
   font-weight: 400;
   line-height: 1.2;
@@ -72,8 +73,41 @@
   user-select: none;
 }
 
+/* Beats `.staticItem` alone when both apply (`.linkActive` is defined earlier in the file). */
+.staticItem.linkActive {
+  color: var(--color-text-primary);
+}
+
+/* Home: hash jump to `#project-grid` — match inactive `.staticItem` (not `inherit`, which picks up body foreground). */
+.projectsJump {
+  text-decoration: none;
+  color: var(--color-nav-inactive);
+  cursor: pointer;
+}
+
+/* Browsers often restyle `:focus` / `:active` links with an underline — keep none on every state. */
+.projectsJump:link,
+.projectsJump:visited,
+.projectsJump:hover,
+.projectsJump:active,
+.projectsJump:focus,
+.projectsJump:focus-visible {
+  text-decoration: none;
+}
+
+.projectsJump:link,
+.projectsJump:visited {
+  color: var(--color-nav-inactive);
+}
+
+.projectsJump:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 4px;
+}
+
 :global(html.dark) .link,
-:global(html.dark) .staticItem {
+:global(html.dark) .staticItem,
+:global(html.dark) .projectsJump {
   font-weight: 300;
 }
 
@@ -86,7 +120,12 @@
     color: var(--color-text-primary);
   }
 
-  .staticItem:hover {
+  .staticItem:hover,
+  .projectsJump:hover {
     color: #c1e0ed;
+  }
+
+  .staticItem.linkActive:hover {
+    color: var(--color-text-primary);
   }
 }

@@ -312,7 +312,10 @@ export function ProjectGrid({
     .join(" ");
 
   return (
-    <div className={styles.pageInset}>
+    <div
+      id="project-grid"
+      className={`${styles.pageInset} ${styles.scrollAnchor}`}
+    >
       {visibleTitle ? (
         <h2
           id="project-grid-title"

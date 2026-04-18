@@ -4,4 +4,6 @@
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Reserve space for fixed HeaderMinimal; exact height set via --folio-header-height */
+  padding-top: var(--folio-header-height, calc(1rem + 5rem + 1em + 1px));
 }

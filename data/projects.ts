@@ -1,3 +1,5 @@
+import type { CardGroupData } from "@/components/cardGroupTypes";
+
 export type ProjectStatus = "active" | "protected" | "coming-soon";
 
 /** Intro + fixed meta rows: Role, Duration, Team. */
@@ -35,6 +37,8 @@ export type Project = {
   year?: string;
   /** Overview block (intro + Role, Duration, Team) */
   overview?: ProjectOverviewData;
+  /** Optional icon / image card grid (e.g. project detail). */
+  cardGroup?: CardGroupData;
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
@@ -67,6 +71,39 @@ export const projects: Project[] = [
       duration: "3 years",
       team: "Direct with founders",
     },
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "licel-card-group-heading",
+      indicatorColor: "orange",
+      columnCount: 4,
+      mobileLayout: "stack",
+      items: [
+        {
+          type: "icon",
+          title: "Enterprise positioning",
+          body: "Repositioned Licel as a credible enterprise brand, shifting inbound enquiries toward international banks and large organisations.",
+          iconSrc: "/svg/lock.svg",
+        },
+        {
+          type: "icon",
+          title: "Unified brand",
+          body: "Replaced three disconnected product identities with a single visual language across web, dashboards and mobile apps.",
+          iconSrc: "/svg/lock.svg",
+        },
+        {
+          type: "icon",
+          title: "Faster to market",
+          body: "A modular design system meant the team could respond to security events quickly using reusable components to publish content at pace.",
+          iconSrc: "/svg/lock.svg",
+        },
+        {
+          type: "icon",
+          title: "Commercial credibility",
+          body: "A coherent, polished presence reduced friction in investor and partner conversations as Licel evolved and grew the business.",
+          iconSrc: "/svg/lock.svg",
+        },
+      ],
+    },
   },
   {
     slug: "x-shore-1",
@@ -79,7 +116,7 @@ export const projects: Project[] = [
     year: "2022",
     overview: {
       introText:
-        "The X Shore 1 is a fully electric daycruiser designed to put the experience of being on the water first. I was brought in as lead designer to replace the existing off-the-shelf Garmin system with a custom interface. I conducted research at sea to understand how drivers interact at speed, then designed for safety, glanceability and real operating conditions, keeping the technology invisible.",
+        "The X Shore 1 is a fully electric daycruiser designed to put the experience of being on the water first. I was brought in as lead designer to create a custom interface from the ground up, replacing the off-the-shelf Garmin approach used on the existing vessel. I conducted research at sea to understand how drivers interact at speed, then designed for safety and glanceability, keeping the technology invisible.",
       role: "Lead Product Designer",
       duration: "4 months",
       team: "X Shore and Bejo",
