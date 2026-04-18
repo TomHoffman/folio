@@ -45,7 +45,14 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
         {project.overview ? (
           <ProjectOverview overview={project.overview} />
         ) : null}
-        {project.cardGroup ? <CardGroup {...project.cardGroup} /> : null}
+        {project.cardGroup ? (
+          <CardGroup
+            {...project.cardGroup}
+            className={
+              project.overview ? mainStyles.cardGroupAfterOverview : undefined
+            }
+          />
+        ) : null}
       </div>
     </main>
   );

@@ -76,7 +76,7 @@ export const projects: Project[] = [
       headingId: "licel-card-group-heading",
       indicatorColor: "orange",
       columnCount: 4,
-      mobileLayout: "stack",
+      mobileLayout: "carousel",
       items: [
         {
           type: "icon",

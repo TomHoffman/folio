@@ -15,9 +15,7 @@
   width: 100%;
   align-items: flex-start;
   justify-content: flex-start;
-  /* Matches LogoGrid / ProjectGrid `.heading`: 1em small, 1.5em from 1024px. */
-  padding-left: 1em;
-  padding-right: 1em;
+  /* Horizontal inset via `projectContentRail.module.css` + `--project-content-rail`. */
   font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
 }
 
@@ -50,22 +48,12 @@
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
-  .row {
-    padding-left: 1.25em;
-    padding-right: 1.25em;
-  }
-
   .title {
     font-size: 5.25em;
   }
 }
 
 @media (min-width: 1280px) {
-  .row {
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-  }
-
   .title {
     font-size: 6.5em;
   }

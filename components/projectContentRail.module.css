@@ -1,0 +1,9 @@
+/*
+ * Secondary inset for project work page copy + section labels (Figma Website-2026).
+ * Use with mainProjectInner outer padding; do not wrap full-bleed media/cards.
+ */
+.contentRail {
+  box-sizing: border-box;
+  padding-left: var(--project-content-rail);
+  padding-right: var(--project-content-rail);
+}

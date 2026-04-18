@@ -1,37 +1,31 @@
-/* Horizontal inset matches ProjectGrid `.pageInset`. */
+/* Section is full width; title + cards share `contentRail` (see `sectionInner`). */
 .section {
   box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
-  padding-top: 0.5em;
   color: var(--color-text-primary);
 }
 
-.pageInset {
+.sectionInner {
   box-sizing: border-box;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
-@media (min-width: 768px) and (max-width: 1279px) {
-  .pageInset {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+.headingRail {
+  box-sizing: border-box;
+  width: 100%;
 }
 
-@media (min-width: 1280px) {
-  .pageInset {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
+/* Space between section label and card row */
+.headingRail h2.cardGroupHeading {
+  margin-bottom: 0.875rem;
 }
 
-/* Figma desktop: 8px between section label and card row (override SectionHeading margins) */
 @media (min-width: 1024px) {
-  .pageInset h2.cardGroupHeading {
-    margin-bottom: 0.5rem;
+  .headingRail h2.cardGroupHeading {
+    margin-bottom: 1rem;
   }
 }
 
@@ -45,11 +39,11 @@
   list-style: none;
 }
 
-/* Mobile (<768): stack — height from content; Figma gap 4px between cards */
+/* Mobile (<768): stack — height from content; 8px between cards */
 @media (max-width: 767px) {
   .listMobileStack {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 8px;
     align-items: stretch;
   }
 
@@ -65,8 +59,8 @@
   }
 
   .listMobileCarousel .cardSlot {
-    flex: 0 0 min(78vw, 20rem);
-    max-width: min(78vw, 20rem);
+    flex: 0 0 min(85vw, 20rem);
+    max-width: min(85vw, 20rem);
     scroll-snap-align: start;
   }
 }
@@ -79,23 +73,22 @@
   }
 }
 
-/* Tablet portrait: 2 columns, equal row heights */
+/* Tablet portrait: 2 columns — icon cards use aspect-ratio for square cells */
 @media (min-width: 768px) and (max-width: 1023px) {
   .list {
     display: grid;
     gap: 0.5rem;
-    align-items: stretch;
+    align-items: start;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 1fr;
   }
 }
 
-/* Desktop */
+/* Desktop — icon cards use aspect-ratio (square); align-items start avoids grid stretching the ratio */
 @media (min-width: 1024px) {
   .list {
     display: grid;
     gap: 0.5rem;
-    align-items: stretch;
+    align-items: start;
   }
 
   .cols2 {
@@ -117,8 +110,10 @@
   min-height: 0;
 }
 
+/* Stretch slots in grid rows (icon cards on desktop, image cards tablet+) */
 @media (min-width: 768px) {
-  .cardSlot {
+  .cardSlot:has(.cardImage) {
+    align-self: stretch;
     min-height: 100%;
   }
 }
@@ -138,41 +133,39 @@
   font-size: 1rem;
 }
 
+/*
+ * Icon cards:
+ * - All breakpoints: 1×1 aspect ratio, content aligned to bottom.
+ */
 .cardIcon {
-  padding: 1.5rem 1.5rem 1.9375rem;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  justify-content: flex-end;
+  padding: 0;
 }
 
 .cardIcon .cardContent {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.8125rem;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+  min-height: 0;
+  padding: 1.2rem;
+  flex: 0 1 auto;
 }
 
-/* Figma desktop: content anchored to bottom (extra space above icon) */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .cardIcon {
-    justify-content: flex-end;
     padding: 0.5rem 0.5rem 0.75rem;
   }
 
   .cardIcon .cardContent {
-    box-sizing: border-box;
-    width: 100%;
     padding: 1rem;
-    gap: 0.8125rem;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .cardIcon {
-    height: 100%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cardIcon {
-    height: 100%;
+    overflow-y: auto;
   }
 }
 
@@ -222,9 +215,31 @@
   object-position: left center;
 }
 
-/* Image cards: keep image top-aligned; same type scale */
+/*
+ * Image cards (all breakpoints): Figma 4056:22108 — thin shell around media; copy
+ * only in `.cardTextBlock`. Do not reuse icon-card mobile padding on `.cardContent`
+ * (that inset the image ~24px and disagreed with desktop’s 8px shell).
+ */
 .cardImage {
-  padding: 1rem 1rem 1.25rem;
+  box-sizing: border-box;
+  padding: 0.5rem 0.5rem 0.75rem;
+}
+
+.cardImage .cardContent {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.40625rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+}
+
+.cardImage .cardTextBlock {
+  box-sizing: border-box;
+  width: 100%;
+  gap: 0.25rem;
+  padding: 0.75rem;
 }
 
 @media (min-width: 1024px) {
@@ -239,17 +254,6 @@
   }
 }
 
-.cardImage .cardContent {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.cardImage .cardTextBlock {
-  gap: 0.25rem;
-}
-
 .imageFrame {
   position: relative;
   width: 100%;
@@ -258,6 +262,12 @@
   overflow: hidden;
   border-radius: 10px;
   background-color: #16343f;
+}
+
+/* Figma 4056:22108 — image panel #1C3640, radius 16px */
+.cardImage .imageFrame {
+  border-radius: 16px;
+  background-color: #1c3640;
 }
 
 .image {

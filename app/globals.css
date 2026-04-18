@@ -25,6 +25,80 @@
   --color-section-indicator-purple: #8b5cf6;
   --color-section-indicator-pink: #db2777;
   --color-section-indicator-red: #e11d48;
+  /*
+   * Project work page — secondary horizontal inset for titles + body copy (Figma: 12px inside 8px gutter).
+   * Cards / hero media stay full width inside the gutter only.
+   */
+  --project-content-rail: 0.75rem;
+  /* Home `ProjectGrid` cards + work hero media — same horizontal inset */
+  --page-gutter-x: 0.5rem;
+  /* Work project page: vertical gap between hero title, image, overview, card group */
+  --project-page-stack-gap: 1.5rem;
+  /* ProjectOverview: gap between `.split` and final `<hr>` (see `.inner`). */
+  --project-overview-split-to-rule-gap: 1.5rem;
+  /* Padding below last meta row before that gap (<1024 only; see `ProjectOverview.module.css`). */
+  --project-overview-meta-tail-pad: 0.5em;
+  /*
+   * When CardGroup follows ProjectOverview on `/work/[slug]`, pull it up so the space from the
+   * overview’s final rule to the CardGroup title matches the space from meta copy to that rule.
+   */
+  --card-group-after-overview-spacing: calc(
+    var(--project-overview-split-to-rule-gap) + var(--project-overview-meta-tail-pad)
+  );
+  /*
+   * SectionHeading (LogoGrid / ProjectGrid): inset before the indicator dot — was `1em` /
+   * `1.5em` of the heading font-size; shared so DS module labels can match.
+   */
+  --section-heading-font-size: clamp(0.8125rem, 0.45rem + 1.25vw, 1rem);
+  --section-heading-inline-start: var(--section-heading-font-size);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --project-content-rail: 1rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root {
+    --project-content-rail: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  :root {
+    --page-gutter-x: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --project-page-stack-gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root {
+    --project-overview-meta-tail-pad: 0;
+    --project-overview-split-bottom-pad: 0.75em;
+    --card-group-after-overview-spacing: calc(
+      var(--project-overview-split-to-rule-gap) + var(--project-overview-split-bottom-pad)
+    );
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --project-content-rail: 1.5rem;
+    --page-gutter-x: 3rem;
+    --project-page-stack-gap: 2.5rem;
+    --section-heading-inline-start: calc(var(--section-heading-font-size) * 1.5);
+    --project-overview-meta-tail-pad: 0;
+    --project-overview-split-bottom-pad: 1em;
+    --card-group-after-overview-spacing: calc(
+      var(--project-overview-split-to-rule-gap) + var(--project-overview-split-bottom-pad)
+    );
+  }
 }
 
 html {

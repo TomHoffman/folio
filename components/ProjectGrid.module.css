@@ -1,25 +1,10 @@
 /*
- * Horizontal inset (formerly on <main>) so full-bleed sections can sit flush with the viewport.
+ * Horizontal inset — driven by `globals.css` `--page-gutter-x` (same as work project hero media).
  */
 .pageInset {
   box-sizing: border-box;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-/* Tablet portrait + landscape: same horizontal inset; wide gutters only from 1280px. */
-@media (min-width: 768px) and (max-width: 1279px) {
-  .pageInset {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .pageInset {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
+  padding-left: var(--page-gutter-x);
+  padding-right: var(--page-gutter-x);
 }
 
 /* In-page scroll target (header is fixed; height var from HeaderMinimal). +1.5em ≈ former JS nudge. */

@@ -2,6 +2,7 @@ import Image from "next/image";
 import {
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
+import railStyles from "./projectContentRail.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./CardGroup.module.css";
 import type {
@@ -98,15 +99,17 @@ export function CardGroup({
       className={sectionClass}
       aria-labelledby={visibleTitle ? headingId : undefined}
     >
-      <div className={styles.pageInset}>
+      <div className={styles.sectionInner}>
         {visibleTitle ? (
-          <h2
-            id={headingId}
-            className={`${sectionHeadingStyles.heading} ${styles.cardGroupHeading}`}
-            style={sectionHeadingIndicatorStyle(indicatorColor)}
-          >
-            {title?.trim()}
-          </h2>
+          <div className={`${styles.headingRail} ${railStyles.contentRail}`}>
+            <h2
+              id={headingId}
+              className={`${sectionHeadingStyles.heading} ${sectionHeadingStyles.headingOnRail} ${styles.cardGroupHeading}`}
+              style={sectionHeadingIndicatorStyle(indicatorColor)}
+            >
+              {title?.trim()}
+            </h2>
+          </div>
         ) : (
           <h2 id={headingId} className="sr-only">
             {title?.trim() || "Cards"}

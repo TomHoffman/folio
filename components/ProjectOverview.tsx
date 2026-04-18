@@ -1,5 +1,6 @@
 import type { ProjectOverviewData } from "@/data/projects";
 import enterStyles from "./ProjectPageEnter.module.css";
+import railStyles from "./projectContentRail.module.css";
 import styles from "./ProjectOverview.module.css";
 
 const META_ROWS: { label: string; key: keyof Pick<ProjectOverviewData, "role" | "duration" | "team"> }[] = [
@@ -15,12 +16,14 @@ export function ProjectOverview({ overview }: Props) {
 
   return (
     <section className={styles.section} aria-label="Project overview">
-      <div className={styles.inner}>
+      <div className={`${styles.inner} ${railStyles.contentRail}`}>
         <div className={styles.split}>
           <p className={`${styles.intro} ${enterStyles.enterOverviewIntro}`}>
             {introText}
           </p>
-          <hr className={`${styles.rule} ${styles.ruleBetweenIntroMeta}`} />
+          <hr
+            className={`${styles.rule} ${styles.ruleBleed} ${styles.ruleBetweenIntroMeta}`}
+          />
           <dl className={styles.meta}>
             {META_ROWS.flatMap(({ label, key }, index) => [
               <dt key={`overview-${index}-t`}>{label}</dt>,
@@ -28,7 +31,7 @@ export function ProjectOverview({ overview }: Props) {
             ])}
           </dl>
         </div>
-        <hr className={styles.rule} />
+        <hr className={`${styles.rule} ${styles.ruleBleed}`} />
       </div>
     </section>
   );

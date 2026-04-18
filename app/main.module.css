@@ -1,7 +1,7 @@
 /*
  * Do not use flex-grow on <main> — it fills the viewport and leaves a huge empty band above the first child.
  * Sticky footer: Footer.module.css uses margin-top: auto instead.
- * Project detail stack (`.mainProjectInner`): vertical spacing between hero, image, overview via `gap` only.
+ * Project detail stack (`.mainProjectInner`): vertical spacing via `gap: var(--project-page-stack-gap)` in globals.
  */
 .main {
   position: relative;
@@ -51,8 +51,18 @@
   min-height: 0;
   width: 100%;
   margin-top: 80px;
-  padding: 0 0.5rem 52px;
-  gap: 16px;
+  padding: 0 var(--page-gutter-x) 52px;
+  gap: var(--project-page-stack-gap);
+}
+
+/*
+ * CardGroup immediately after ProjectOverview: `.mainProjectInner` stack gap is larger than the
+ * overview’s internal gap above its final rule — offset so rule→title matches meta→rule.
+ */
+.cardGroupAfterOverview {
+  margin-top: calc(
+    var(--card-group-after-overview-spacing) - var(--project-page-stack-gap)
+  );
 }
 
 @media (max-width: 767px) {
@@ -74,14 +84,6 @@
   }
 }
 
-/* Tablet + small laptop: fixed em inset; 3% only from 1280px. */
-@media (min-width: 768px) and (max-width: 1279px) {
-  .mainProjectInner {
-    padding-left: 2em;
-    padding-right: 2em;
-  }
-}
-
 /* Inner masthead hidden below 1024px — compact top until desktop */
 @media (max-width: 1023px) {
   .mainProjectInner {
@@ -89,19 +91,36 @@
   }
 }
 
-/* Project detail: tablet landscape / small laptop — lighter than full desktop */
+/* Project detail: tablet landscape / small laptop */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .mainProjectInner {
     margin-top: 200px;
-    gap: 20px;
   }
 }
 
 @media (min-width: 1280px) {
   .mainProjectInner {
     margin-top: 250px;
-    padding-left: 3%;
-    padding-right: 3%;
-    gap: 24px;
   }
+}
+
+/* Home: text link to `/ds` component playground */
+.mainHomeFooterLink {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 2rem var(--page-gutter-x) 2.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.mainHomeFooterLink a {
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.mainHomeFooterLink a:hover {
+  color: var(--color-text-primary);
 }

@@ -38,27 +38,13 @@
   padding-bottom: 1.5em;
 }
 
-/* Same horizontal inset as ProjectGrid `.pageInset` / desktop LogoGrid margins */
+/* Same horizontal inset as `ProjectGrid` / `--page-gutter-x` */
 .bottomRule {
   box-sizing: border-box;
   height: 1px;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: var(--page-gutter-x);
+  margin-right: var(--page-gutter-x);
   background-color: #516978;
-}
-
-@media (min-width: 768px) and (max-width: 1279px) {
-  .bottomRule {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .bottomRule {
-    margin-left: 3rem;
-    margin-right: 3rem;
-  }
 }
 
 .lead {

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HomepageHero } from "@/components/HomepageHero";
 import { LogoGrid } from "@/components/LogoGrid";
 import { ProjectGrid } from "@/components/ProjectGrid";
@@ -13,6 +14,9 @@ export default function HomePage() {
         showTitle={true}
         indicatorColor="secondary"
       />
+      <p className={mainStyles.mainHomeFooterLink}>
+        <Link href="/ds">DS — component playground</Link>
+      </p>
     </main>
   );
 }
