@@ -1,0 +1,276 @@
+/* Description on content rail; image group aligns to page gutter like ProjectGrid. */
+
+.section {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+  /* ~850×742 “slightly squashed square” (Figma reference) */
+  --image-block-squashed-square: 425 / 371;
+  /* Single full-width image row, tablet and up (overrides per-row `rowAspectRatio` for one cell). */
+  --image-block-single-row-ar: 16 / 8;
+  /* `rowAspect` row with two cells, tablet and up — shorter band than one-up. */
+  --image-block-row-aspect-two-up-ar: 16 / 7;
+}
+
+.sectionInner {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  /* 12px at default 16px/em — space between description rail and image group */
+  gap: 0.75em;
+}
+
+.description {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 60ch;
+}
+
+/* Tighter than shared `SectionHeading` margins — title → body only for this block. */
+.description > .descriptionHeading {
+  margin-bottom: 0.5rem;
+}
+
+.descriptionBody {
+  margin: 0;
+  font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  font-weight: 300;
+  line-height: 1.4;
+  color: #7ea6b7;
+}
+
+/* Full-width band inside page horizontal padding (same as work main). */
+.imageGroupOuter {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.imageGroupShell {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 8px;
+  border-radius: 24px;
+  background-color: #172e37;
+}
+
+.imageGroupBleed {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* `mobileLayout="mobile-carousel"`: rows from `768px`; horizontal strip only `<768px`. */
+.layoutMobileCarousel .carouselTrack {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .layoutMobileCarousel .rows {
+    display: none;
+  }
+
+  .layoutMobileCarousel .carouselTrack {
+    display: flex;
+  }
+}
+
+/*
+ * `mobileLayout="column"`: `<768px` — one full-width column (squashed square via existing
+ * mobile `.cellFrame` rules). `768px+` — same geometry as `stacked`.
+ */
+@media (max-width: 767px) {
+  .layoutColumnMobile .rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .layoutColumnMobile .rows > .row {
+    display: contents;
+  }
+
+  .layoutColumnMobile .rows > .row > .cell {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+.rows {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.rowAspect {
+  align-items: stretch;
+  aspect-ratio: var(--row-ar, 16 / 10);
+}
+
+.rowAspect .cell {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.rowSquare {
+  display: grid;
+  align-items: start;
+  gap: 8px;
+  grid-template-columns: repeat(var(--image-block-cols, 1), minmax(0, 1fr));
+}
+
+.rowSquare .cell {
+  min-width: 0;
+}
+
+.cell {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: #1f3741;
+}
+
+.cellFrame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.rowAspect .cellFrame {
+  height: 100%;
+  min-height: 0;
+}
+
+.rowSquare .cellFrame {
+  aspect-ratio: 1 / 1;
+}
+
+/*
+ * Tablet+:
+ * - One tile per row — 16:8.
+ * - `rowAspect` two-up — 16:7 (shorter row than one-up).
+ * - `rowSquare` two-up — 16:8 row; tiles fill the row.
+ * - Squashed square only `<768px` on frames / carousel slides.
+ */
+@media (min-width: 768px) {
+  .rowAspect[data-cols="1"] {
+    aspect-ratio: var(--image-block-single-row-ar);
+  }
+
+  .rowSquare[data-cols="1"] .cellFrame {
+    aspect-ratio: var(--image-block-single-row-ar);
+  }
+
+  .rowAspect[data-cols="2"] {
+    aspect-ratio: var(--image-block-row-aspect-two-up-ar);
+  }
+
+  .rowSquare[data-cols="2"] {
+    aspect-ratio: var(--image-block-single-row-ar);
+    align-items: stretch;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .rowSquare[data-cols="2"] .cellFrame {
+    aspect-ratio: unset;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+/* Mobile / tablet portrait: every image uses the squashed-square frame. */
+@media (max-width: 767px) {
+  .rowAspect {
+    aspect-ratio: unset;
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .rowAspect .cellFrame {
+    aspect-ratio: var(--image-block-squashed-square);
+    width: 100%;
+    height: auto;
+  }
+
+  .rowSquare .cellFrame {
+    aspect-ratio: var(--image-block-squashed-square);
+  }
+}
+
+.image {
+  object-fit: cover;
+}
+
+/* Mobile carousel: same rhythm as `CardGroup` (`listMobileCarousel`). */
+@media (max-width: 767px) {
+  .carouselTrack {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .carouselSlide {
+    box-sizing: border-box;
+    flex: 0 0 min(85vw, 20rem);
+    max-width: min(85vw, 20rem);
+    scroll-snap-align: start;
+  }
+
+  .carouselSlideInner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background-color: #1f3741;
+    aspect-ratio: var(--image-block-squashed-square);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @media (max-width: 767px) {
+    .carouselTrack {
+      scroll-snap-type: none;
+    }
+  }
+}

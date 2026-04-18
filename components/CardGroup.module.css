@@ -5,6 +5,8 @@
   margin: 0;
   padding: 0;
   color: var(--color-text-primary);
+  /* Same as `ImageBlock` — ~850×742 “squashed square” (Figma reference). */
+  --card-group-icon-squashed-square: 425 / 371;
 }
 
 .sectionInner {
@@ -73,7 +75,7 @@
   }
 }
 
-/* Tablet portrait: 2 columns — icon cards use aspect-ratio for square cells */
+/* Tablet portrait: 2 columns — icon cards use squashed-square aspect cells */
 @media (min-width: 768px) and (max-width: 1023px) {
   .list {
     display: grid;
@@ -83,7 +85,7 @@
   }
 }
 
-/* Desktop — icon cards use aspect-ratio (square); align-items start avoids grid stretching the ratio */
+/* Desktop — icon cards use squashed-square aspect; align-items start avoids grid stretching the ratio */
 @media (min-width: 1024px) {
   .list {
     display: grid;
@@ -135,12 +137,12 @@
 
 /*
  * Icon cards:
- * - All breakpoints: 1×1 aspect ratio, content aligned to bottom.
+ * - All breakpoints: squashed-square aspect (matches ImageBlock), content aligned to bottom.
  */
 .cardIcon {
   box-sizing: border-box;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: var(--card-group-icon-squashed-square);
   justify-content: flex-end;
   padding: 0;
 }

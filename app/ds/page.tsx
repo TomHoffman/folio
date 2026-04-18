@@ -3,10 +3,12 @@ import { CardGroup } from "@/components/CardGroup";
 import type { CardGroupData } from "@/components/cardGroupTypes";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { HomepageHero } from "@/components/HomepageHero";
+import { ImageBlock } from "@/components/ImageBlock";
 import { LogoGrid } from "@/components/LogoGrid";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { getProjectBySlug } from "@/data/projects";
+import type { ImageBlockRow } from "@/components/imageBlockTypes";
 import mainStyles from "../main.module.css";
 import dsStyles from "./ds.module.css";
 
@@ -72,6 +74,23 @@ const imageCardGroupCarouselSample: CardGroupData = {
   mobileLayout: "carousel",
   items: imageCardItems,
 };
+
+const imageBlockDescription =
+  "Quo pariatur qui ullam dicta aliquid distinctio. Eius et quo velit autem doloribus blanditiis quisquam. Et dolorum sunt minus tenetur quisquam consectetur atque tempore voluptate voluptatum. Ut sed perspiciatis dolor.";
+
+const imageBlockRows: ImageBlockRow[] = [
+  {
+    cells: [{ src: imageThumb, alt: "" }],
+    rowAspectRatio: "16 / 10",
+  },
+  {
+    cells: [
+      { src: imageThumb, alt: "" },
+      { src: imageThumb, alt: "" },
+    ],
+    rowAspectRatio: "16 / 10",
+  },
+];
 
 export default function DsPage() {
   const licelOverview = getProjectBySlug("licel")?.overview;
@@ -156,6 +175,91 @@ export default function DsPage() {
           </h2>
           <div className={dsStyles.projectMock}>
             <CardGroup {...imageCardGroupCarouselSample} />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-stack">
+          <h2 id="ds-label-image-block-bleed-stack" className={dsStyles.label}>
+            ImageBlock · not contained (stacked)
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageBlock
+              title="Title"
+              description={imageBlockDescription}
+              headingId="ds-image-block-bleed-stack-heading"
+              indicatorColor="blue"
+              contained={false}
+              mobileLayout="stacked"
+              rows={imageBlockRows}
+            />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-column">
+          <h2 id="ds-label-image-block-bleed-column" className={dsStyles.label}>
+            ImageBlock · not contained (column)
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageBlock
+              title="Title"
+              description={imageBlockDescription}
+              headingId="ds-image-block-bleed-column-heading"
+              indicatorColor="blue"
+              contained={false}
+              mobileLayout="column"
+              rows={imageBlockRows}
+            />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-carousel">
+          <h2 id="ds-label-image-block-bleed-carousel" className={dsStyles.label}>
+            ImageBlock (mobile carousel)
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageBlock
+              title="Title"
+              description={imageBlockDescription}
+              headingId="ds-image-block-bleed-carousel-heading"
+              indicatorColor="blue"
+              contained={false}
+              mobileLayout="mobile-carousel"
+              rows={imageBlockRows}
+            />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-contained-stack">
+          <h2 id="ds-label-image-block-contained-stack" className={dsStyles.label}>
+            ImageBlock · contained (stacked)
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageBlock
+              title="Title"
+              description={imageBlockDescription}
+              headingId="ds-image-block-contained-stack-heading"
+              indicatorColor="blue"
+              contained
+              mobileLayout="stacked"
+              rows={imageBlockRows}
+            />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-contained-column">
+          <h2 id="ds-label-image-block-contained-column" className={dsStyles.label}>
+            ImageBlock · contained (column)
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageBlock
+              title="Title"
+              description={imageBlockDescription}
+              headingId="ds-image-block-contained-column-heading"
+              indicatorColor="blue"
+              contained
+              mobileLayout="column"
+              rows={imageBlockRows}
+            />
           </div>
         </section>
       </div>
