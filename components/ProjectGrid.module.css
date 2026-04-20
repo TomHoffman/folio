@@ -7,11 +7,9 @@
   padding-right: var(--page-gutter-x);
 }
 
-/* In-page scroll target (header is fixed; height var from HeaderMinimal). +1.5em ≈ former JS nudge. */
+/* In-page scroll target for sticky header offset. */
 .scrollAnchor {
-  scroll-margin-top: calc(
-    var(--folio-header-height, 6rem) + 0.75rem + 1.5em
-  );
+  scroll-margin-top: calc(6rem + 0.75rem + 1.5em);
 }
 
 .grid {

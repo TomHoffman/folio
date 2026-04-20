@@ -4,6 +4,7 @@ import { ComingSoonWorkShell } from "@/components/ComingSoonWorkShell";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
 import { CardGroup } from "@/components/CardGroup";
+import { FocusLayerBlock } from "@/components/FocusLayerBlock";
 import { ImageBlock } from "@/components/ImageBlock";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
@@ -64,6 +65,12 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
                 ? mainStyles.licelScaleUpBlock
                 : undefined
             }
+          />
+        ))}
+        {(project.focusLayerBlocks ?? []).map((block, index) => (
+          <FocusLayerBlock
+            key={block.headingId ?? `focus-layer-block-${index}`}
+            {...block}
           />
         ))}
       </div>

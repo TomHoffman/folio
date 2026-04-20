@@ -1,4 +1,5 @@
 import type { CardGroupData } from "@/components/cardGroupTypes";
+import type { FocusLayerBlockData } from "@/components/focusLayerBlockTypes";
 import type { ImageBlockData } from "@/components/imageBlockTypes";
 
 export type ProjectStatus = "active" | "protected" | "coming-soon";
@@ -42,6 +43,8 @@ export type Project = {
   cardGroup?: CardGroupData;
   /** Optional image group blocks (e.g. below CardGroup on project detail). */
   imageBlocks?: ImageBlockData[];
+  /** Optional focus layer explainer blocks. */
+  focusLayerBlocks?: FocusLayerBlockData[];
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
@@ -157,6 +160,59 @@ export const projects: Project[] = [
                 fit: "contain",
               },
             ],
+          },
+          {
+            rowHeight: "medium",
+            cells: [
+              {
+                src: "/images/licel/dexprotector-symbol.svg",
+                alt: "DexProtector symbol",
+                bgColor: "#0C232C",
+                fit: "containWide",
+              },
+              {
+                src: "/images/licel/stringer-symbol.svg",
+                alt: "Stringer symbol",
+                bgColor: "#0C232C",
+                fit: "containWide",
+              },
+              {
+                src: "/images/licel/jcardsim-symbol.svg",
+                alt: "jCardSim symbol",
+                bgColor: "#0C232C",
+                fit: "containWide",
+              },
+              {
+                src: "/images/licel/alice-symbol.svg",
+                alt: "Alice symbol",
+                bgColor: "#0C232C",
+                fit: "containWide",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    focusLayerBlocks: [
+      {
+        title: "Layered illustration system",
+        description:
+          "Security threats are invisible by nature, which makes them hard to communicate to non-technical audiences. The illustration system uses layers to show where vulnerabilities exist and how Licel's products address them.",
+        headingId: "licel-focus-layer-heading",
+        indicatorColor: "powderBlue",
+        autoRotateMs: 5000,
+        items: [
+          {
+            title: "OS and flow of data",
+            body: "The base layer represents the OS ecosystem, third-party dependencies, and data flows beneath the app.",
+          },
+          {
+            title: "Underlying app code",
+            body: "This layer represents the code and files within the app that can expose perosnal data and financial information.",
+          },
+          {
+            title: "UI layer",
+            body: "The app surface represents what we see as users, with cutouts showing the vulnerabilities that can be exposed.",
           },
         ],
       },

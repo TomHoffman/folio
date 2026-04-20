@@ -8,10 +8,11 @@ export type ImageBlockCell = {
   /** Optional per-tile background color (e.g. `#3454E1`). */
   bgColor?: string;
   /** Image fit mode for this tile (`cover` by default). */
-  fit?: "cover" | "contain";
+  fit?: "cover" | "contain" | "containWide";
 };
 
 export type ImageBlockCellMode = "rowAspect" | "square";
+export type ImageBlockRowHeight = "tall" | "medium" | "short";
 
 export type ImageBlockRow = {
   cells: ImageBlockCell[];
@@ -25,12 +26,14 @@ export type ImageBlockRow = {
    * From tablet up, all `rowAspect` rows use **16:7** on the row box (this value is ignored there).
    */
   rowAspectRatio?: string;
+  /** Tablet+ row band height preset: `tall` 16:7, `medium` 16:5, `short` 16:3. */
+  rowHeight?: ImageBlockRowHeight;
 };
 
 /**
  * - `stacked`: `<768px` same row geometry as tablet (e.g. two-up rows stay two-up).
  * - `column`: `<768px` single full-width column (squashed-square tiles); `768px+` same as stacked.
- * - `mobile-carousel`: horizontal strip `<768px` only; **must** be used with `contained={false}`.
+ * - `mobile-carousel`: horizontal strip `<768px` only.
  */
 export type ImageBlockMobileLayout =
   | "stacked"
@@ -46,7 +49,7 @@ export type ImageBlockProps = {
   indicatorColor?: SectionHeadingIndicatorColor;
   /** When true, images sit in the rounded panel (`#172e37`, 8px pad) from Figma. */
   contained: boolean;
-  /** See `ImageBlockMobileLayout`. `mobile-carousel` is ignored when `contained` is true. */
+  /** See `ImageBlockMobileLayout`. */
   mobileLayout?: ImageBlockMobileLayout;
   /** Optional mobile stack pattern for row content. */
   mobileStack?: ImageBlockMobileStack;

@@ -8,8 +8,11 @@
   color: var(--color-text-primary);
   /* ~850×742 “slightly squashed square” (Figma reference) */
   --image-block-squashed-square: 425 / 371;
-  /* `rowAspect` / `rowSquare` row band, tablet and up (16:7). */
-  --image-block-single-row-ar: 16 / 7;
+  --image-block-cell-radius: 18px;
+  /* Tablet+ row-band presets. */
+  --image-block-row-ar-tall: 16 / 7;
+  --image-block-row-ar-medium: 16 / 5;
+  --image-block-row-ar-short: 16 / 3;
 }
 
 .sectionInner {
@@ -40,7 +43,7 @@
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.4;
-  color: #e2f6ff;
+  color: #7ea6b7;
 }
 
 /* Full-width band inside page horizontal padding (same as work main). */
@@ -96,14 +99,23 @@
     flex-wrap: wrap;
   }
 
-  .mobileStackOneThenTwo .rows > .row > .cell:first-child {
+  .mobileStackOneThenTwo .rows > .row:first-child {
+    flex-wrap: wrap;
+  }
+
+  .mobileStackOneThenTwo .rows > .row:first-child > .cell:first-child {
     flex: 0 0 100%;
     max-width: 100%;
   }
 
-  .mobileStackOneThenTwo .rows > .row > .cell:not(:first-child) {
+  .mobileStackOneThenTwo .rows > .row:first-child > .cell:not(:first-child) {
     flex: 0 0 calc((100% - 8px) / 2);
     max-width: calc((100% - 8px) / 2);
+  }
+
+  .mobileStackOneThenTwo .rows > .row:not(:first-child) > .cell {
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 
   .layoutColumnMobile .rows {
@@ -141,6 +153,7 @@
   min-width: 0;
   gap: 8px;
   align-items: stretch;
+  border-radius: var(--image-block-cell-radius);
 }
 
 .rowAspect {
@@ -170,7 +183,7 @@
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: var(--image-block-cell-radius);
   background-color: #1f3741;
 }
 
@@ -191,16 +204,16 @@
 }
 
 /*
- * Tablet+: every `rowAspect` / `rowSquare` row uses 16:7 band; tiles fill the row.
+ * Tablet+: every `rowAspect` / `rowSquare` row uses selected row-band preset; tiles fill the row.
  * Squashed square only `<768px` on frames / carousel slides.
  */
 @media (min-width: 768px) {
   .rowAspect {
-    aspect-ratio: var(--image-block-single-row-ar);
+    aspect-ratio: var(--row-band-ar, var(--image-block-row-ar-tall));
   }
 
   .rowSquare {
-    aspect-ratio: var(--image-block-single-row-ar);
+    aspect-ratio: var(--row-band-ar, var(--image-block-row-ar-tall));
     align-items: stretch;
     grid-template-rows: minmax(0, 1fr);
   }
@@ -237,8 +250,17 @@
 
 .imageContain {
   object-fit: contain;
-  width: min(70%, 300px) !important;
-  max-width: 300px;
+  width: min(60%, 250px) !important;
+  max-width: 250px;
+  height: 85% !important;
+  inset: 0;
+  margin: auto;
+}
+
+.imageContainWide {
+  object-fit: contain;
+  width: min(100%, 446px) !important;
+  max-width: 446px;
   height: 85% !important;
   inset: 0;
   margin: auto;

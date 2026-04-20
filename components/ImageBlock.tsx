@@ -9,6 +9,7 @@ import type {
   ImageBlockCellMode,
   ImageBlockMobileLayout,
   ImageBlockProps,
+  ImageBlockRowHeight,
   ImageBlockRow,
 } from "./imageBlockTypes";
 
@@ -16,6 +17,25 @@ const DEFAULT_ROW_AR = "16 / 10";
 
 function rowCols(row: ImageBlockRow): number {
   return Math.min(4, Math.max(1, row.cells.length));
+}
+
+function rowHeightPreset(height?: ImageBlockRowHeight): string | undefined {
+  switch (height) {
+    case "medium":
+      return "var(--image-block-row-ar-medium)";
+    case "short":
+      return "var(--image-block-row-ar-short)";
+    case "tall":
+      return "var(--image-block-row-ar-tall)";
+    default:
+      return undefined;
+  }
+}
+
+function imageFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
+  if (fit === "contain") return styles.imageContain;
+  if (fit === "containWide") return styles.imageContainWide;
+  return "";
 }
 
 function RowView({
@@ -28,13 +48,17 @@ function RowView({
   const mode: ImageBlockCellMode = row.cellMode ?? "rowAspect";
   const ar = row.rowAspectRatio?.trim() || DEFAULT_ROW_AR;
   const n = rowCols(row);
+  const rowBandAr = rowHeightPreset(row.rowHeight);
 
   if (mode === "square") {
     return (
       <div
         className={`${styles.row} ${styles.rowSquare}`}
         data-cols={n}
-        style={{ ["--image-block-cols" as string]: String(n) }}
+        style={{
+          ["--image-block-cols" as string]: String(n),
+          ...(rowBandAr ? { ["--row-band-ar" as string]: rowBandAr } : {}),
+        }}
       >
         {row.cells.map((cell, i) => (
           <div
@@ -48,7 +72,7 @@ function RowView({
                   src={cell.src}
                   alt={cell.alt ?? ""}
                   fill
-                  className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                  className={`${styles.image} ${imageFitClass(cell.fit)}`}
                   sizes={sizesHint}
                 />
               ) : null}
@@ -63,7 +87,10 @@ function RowView({
     <div
       className={`${styles.row} ${styles.rowAspect}`}
       data-cols={n}
-      style={{ ["--row-ar" as string]: ar }}
+      style={{
+        ["--row-ar" as string]: ar,
+        ...(rowBandAr ? { ["--row-band-ar" as string]: rowBandAr } : {}),
+      }}
     >
       {row.cells.map((cell, i) => (
         <div
@@ -77,7 +104,7 @@ function RowView({
                 src={cell.src}
                 alt={cell.alt ?? ""}
                 fill
-                className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                className={`${styles.image} ${imageFitClass(cell.fit)}`}
                 sizes={sizesHint}
               />
             ) : null}
@@ -127,9 +154,8 @@ export function ImageBlock({
   const sizesSlide =
     "(max-width: 767px) 85vw, (max-width: 1023px) 45vw, (max-width: 1279px) 40vw, 32vw";
 
-  /** Horizontal swipe strip only when not contained. */
-  const useCarouselTrack =
-    !contained && mobileLayout === "mobile-carousel";
+  /** Horizontal swipe strip on mobile when `mobileLayout` requests it. */
+  const useCarouselTrack = mobileLayout === "mobile-carousel";
   const useColumnMobile = mobileLayout === "column";
 
   const imageGroupClasses = [
@@ -190,7 +216,7 @@ export function ImageBlock({
                           src={cell.src}
                           alt={cell.alt ?? ""}
                           fill
-                          className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                          className={`${styles.image} ${imageFitClass(cell.fit)}`}
                           sizes={sizesSlide}
                         />
                       ) : null}
