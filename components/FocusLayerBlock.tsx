@@ -15,7 +15,7 @@ function indicatorFillWidth(index: number, active: number, progress: number): st
   return `${Math.max(0, Math.min(progress, 1)) * 100}%`;
 }
 
-const layerColors = ["#ff6363", "#7eb5ff", "#5fd6c2"];
+const FINANCE_ILLUSTRATION_SRC = "/images/licel/finance-illustration.svg";
 
 export function FocusLayerBlock({
   title,
@@ -33,6 +33,22 @@ export function FocusLayerBlock({
   const textButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const isProgrammaticScrollRef = useRef(false);
   const programmaticScrollTimerRef = useRef<number | null>(null);
+  const [illustrationSvg, setIllustrationSvg] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch(FINANCE_ILLUSTRATION_SRC)
+      .then((res) => res.text())
+      .then((text) => {
+        if (!cancelled) setIllustrationSvg(text);
+      })
+      .catch(() => {
+        if (!cancelled) setIllustrationSvg(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (safeItems.length <= 1) return;
@@ -145,20 +161,22 @@ export function FocusLayerBlock({
           <div className={styles.content}>
             <div className={styles.imageContainer}>
               <div className={styles.svgFrame}>
-                <svg
-                  className={styles.layerSvg}
-                  viewBox="0 0 1178 804"
-                  role="img"
-                  aria-label={safeItems[activeIndex]?.title ?? "Focus layer preview"}
-                >
-                  <rect
-                    x="506"
-                    y="319"
-                    width="166"
-                    height="166"
-                    fill={layerColors[activeIndex % layerColors.length]}
-                  />
-                </svg>
+                {illustrationSvg ? (
+                  <div
+                    className={styles.illustrationRoot}
+                    data-focus-frame={activeIndex}
+                    role="img"
+                    aria-label={
+                      safeItems[activeIndex]?.title ?? "Layered illustration"
+                    }
+                  >
+                    {/* Inner mount only: avoids React re-applying innerHTML when data-focus-frame updates (kills CSS transitions on SVG). */}
+                    <div
+                      className={styles.illustrationSvgMount}
+                      dangerouslySetInnerHTML={{ __html: illustrationSvg }}
+                    />
+                  </div>
+                ) : null}
               </div>
               <div className={styles.indicator} aria-hidden>
                 {safeItems.map((_, i) => (
