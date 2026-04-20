@@ -8,10 +8,8 @@
   color: var(--color-text-primary);
   /* ~850×742 “slightly squashed square” (Figma reference) */
   --image-block-squashed-square: 425 / 371;
-  /* Single full-width image row, tablet and up (overrides per-row `rowAspectRatio` for one cell). */
-  --image-block-single-row-ar: 16 / 8;
-  /* `rowAspect` row with two cells, tablet and up — shorter band than one-up. */
-  --image-block-row-aspect-two-up-ar: 16 / 7;
+  /* `rowAspect` / `rowSquare` row band, tablet and up (16:7). */
+  --image-block-single-row-ar: 16 / 7;
 }
 
 .sectionInner {
@@ -39,10 +37,10 @@
 
 .descriptionBody {
   margin: 0;
-  font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  font-size: 1rem;
   font-weight: 300;
   line-height: 1.4;
-  color: #7ea6b7;
+  color: #e2f6ff;
 }
 
 /* Full-width band inside page horizontal padding (same as work main). */
@@ -94,6 +92,20 @@
  * mobile `.cellFrame` rules). `768px+` — same geometry as `stacked`.
  */
 @media (max-width: 767px) {
+  .mobileStackOneThenTwo .rows > .row {
+    flex-wrap: wrap;
+  }
+
+  .mobileStackOneThenTwo .rows > .row > .cell:first-child {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .mobileStackOneThenTwo .rows > .row > .cell:not(:first-child) {
+    flex: 0 0 calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
+  }
+
   .layoutColumnMobile .rows {
     display: flex;
     flex-direction: column;
@@ -179,32 +191,21 @@
 }
 
 /*
- * Tablet+:
- * - One tile per row — 16:8.
- * - `rowAspect` two-up — 16:7 (shorter row than one-up).
- * - `rowSquare` two-up — 16:8 row; tiles fill the row.
- * - Squashed square only `<768px` on frames / carousel slides.
+ * Tablet+: every `rowAspect` / `rowSquare` row uses 16:7 band; tiles fill the row.
+ * Squashed square only `<768px` on frames / carousel slides.
  */
 @media (min-width: 768px) {
-  .rowAspect[data-cols="1"] {
+  .rowAspect {
     aspect-ratio: var(--image-block-single-row-ar);
   }
 
-  .rowSquare[data-cols="1"] .cellFrame {
-    aspect-ratio: var(--image-block-single-row-ar);
-  }
-
-  .rowAspect[data-cols="2"] {
-    aspect-ratio: var(--image-block-row-aspect-two-up-ar);
-  }
-
-  .rowSquare[data-cols="2"] {
+  .rowSquare {
     aspect-ratio: var(--image-block-single-row-ar);
     align-items: stretch;
     grid-template-rows: minmax(0, 1fr);
   }
 
-  .rowSquare[data-cols="2"] .cellFrame {
+  .rowSquare .cellFrame {
     aspect-ratio: unset;
     height: 100%;
     min-height: 0;
@@ -232,6 +233,15 @@
 
 .image {
   object-fit: cover;
+}
+
+.imageContain {
+  object-fit: contain;
+  width: min(70%, 300px) !important;
+  max-width: 300px;
+  height: 85% !important;
+  inset: 0;
+  margin: auto;
 }
 
 /* Mobile carousel: same rhythm as `CardGroup` (`listMobileCarousel`). */

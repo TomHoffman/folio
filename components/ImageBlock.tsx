@@ -37,15 +37,21 @@ function RowView({
         style={{ ["--image-block-cols" as string]: String(n) }}
       >
         {row.cells.map((cell, i) => (
-          <div key={`${cell.src}-${i}`} className={styles.cell}>
+          <div
+            key={`${cell.src ?? "tile"}-${i}`}
+            className={styles.cell}
+            style={{ backgroundColor: cell.bgColor }}
+          >
             <div className={styles.cellFrame}>
-              <Image
-                src={cell.src}
-                alt={cell.alt}
-                fill
-                className={styles.image}
-                sizes={sizesHint}
-              />
+              {cell.src ? (
+                <Image
+                  src={cell.src}
+                  alt={cell.alt ?? ""}
+                  fill
+                  className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                  sizes={sizesHint}
+                />
+              ) : null}
             </div>
           </div>
         ))}
@@ -60,15 +66,21 @@ function RowView({
       style={{ ["--row-ar" as string]: ar }}
     >
       {row.cells.map((cell, i) => (
-        <div key={`${cell.src}-${i}`} className={styles.cell}>
+        <div
+          key={`${cell.src ?? "tile"}-${i}`}
+          className={styles.cell}
+          style={{ backgroundColor: cell.bgColor }}
+        >
           <div className={styles.cellFrame}>
-            <Image
-              src={cell.src}
-              alt={cell.alt}
-              fill
-              className={styles.image}
-              sizes={sizesHint}
-            />
+            {cell.src ? (
+              <Image
+                src={cell.src}
+                alt={cell.alt ?? ""}
+                fill
+                className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                sizes={sizesHint}
+              />
+            ) : null}
           </div>
         </div>
       ))}
@@ -93,10 +105,23 @@ export function ImageBlock({
   indicatorColor = "blue",
   contained,
   mobileLayout = "stacked",
+  mobileStack = "default",
   rows,
   className,
 }: ImageBlockProps) {
-  const sectionClass = [styles.section, className].filter(Boolean).join(" ");
+  const useOneThenTwoMobile = mobileStack === "one-then-two";
+  const sectionClass = [
+    styles.section,
+    useOneThenTwoMobile ? styles.mobileStackOneThenTwo : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const headingText = title?.trim() ?? "";
+  const descriptionText = description?.trim() ?? "";
+  const hasHeading = headingText.length > 0;
+  const hasDescription = descriptionText.length > 0;
+  const hasDescriptionBlock = hasHeading || hasDescription;
   const sizesRow =
     "(max-width: 767px) 90vw, (max-width: 1023px) 45vw, (max-width: 1279px) 40vw, 32vw";
   const sizesSlide =
@@ -116,18 +141,27 @@ export function ImageBlock({
     .join(" ");
 
   return (
-    <section className={sectionClass} aria-labelledby={headingId}>
+    <section
+      className={sectionClass}
+      aria-labelledby={hasHeading && headingId ? headingId : undefined}
+    >
       <div className={styles.sectionInner}>
-        <div className={`${railStyles.contentRail} ${styles.description}`}>
-          <h2
-            id={headingId}
-            className={`${sectionHeadingStyles.heading} ${sectionHeadingStyles.headingOnRail} ${styles.descriptionHeading}`}
-            style={sectionHeadingIndicatorStyle(indicatorColor)}
-          >
-            {title.trim()}
-          </h2>
-          <p className={styles.descriptionBody}>{description}</p>
-        </div>
+        {hasDescriptionBlock ? (
+          <div className={`${railStyles.contentRail} ${styles.description}`}>
+            {hasHeading ? (
+              <h2
+                id={headingId}
+                className={`${sectionHeadingStyles.heading} ${sectionHeadingStyles.headingOnRail} ${styles.descriptionHeading}`}
+                style={sectionHeadingIndicatorStyle(indicatorColor)}
+              >
+                {headingText}
+              </h2>
+            ) : null}
+            {hasDescription ? (
+              <p className={styles.descriptionBody}>{descriptionText}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className={imageGroupClasses}>
           <div
@@ -144,17 +178,22 @@ export function ImageBlock({
               <div className={styles.carouselTrack}>
                 {flattenCells(rows).map(({ cell }, i) => (
                   <div
-                    key={`slide-${cell.src}-${i}`}
+                    key={`slide-${cell.src ?? i}-${i}`}
                     className={styles.carouselSlide}
                   >
-                    <div className={styles.carouselSlideInner}>
-                      <Image
-                        src={cell.src}
-                        alt={cell.alt}
-                        fill
-                        className={styles.image}
-                        sizes={sizesSlide}
-                      />
+                    <div
+                      className={styles.carouselSlideInner}
+                      style={{ backgroundColor: cell.bgColor }}
+                    >
+                      {cell.src ? (
+                        <Image
+                          src={cell.src}
+                          alt={cell.alt ?? ""}
+                          fill
+                          className={`${styles.image} ${cell.fit === "contain" ? styles.imageContain : ""}`}
+                          sizes={sizesSlide}
+                        />
+                      ) : null}
                     </div>
                   </div>
                 ))}

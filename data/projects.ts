@@ -1,4 +1,5 @@
 import type { CardGroupData } from "@/components/cardGroupTypes";
+import type { ImageBlockData } from "@/components/imageBlockTypes";
 
 export type ProjectStatus = "active" | "protected" | "coming-soon";
 
@@ -39,6 +40,8 @@ export type Project = {
   overview?: ProjectOverviewData;
   /** Optional icon / image card grid (e.g. project detail). */
   cardGroup?: CardGroupData;
+  /** Optional image group blocks (e.g. below CardGroup on project detail). */
+  imageBlocks?: ImageBlockData[];
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
@@ -74,7 +77,7 @@ export const projects: Project[] = [
     cardGroup: {
       title: "Outcomes",
       headingId: "licel-card-group-heading",
-      indicatorColor: "orange",
+      indicatorColor: "powderBlue",
       columnCount: 4,
       mobileLayout: "carousel",
       items: [
@@ -82,28 +85,82 @@ export const projects: Project[] = [
           type: "icon",
           title: "Enterprise positioning",
           body: "Repositioned Licel as a credible enterprise brand, shifting inbound enquiries toward international banks and large organisations.",
-          iconSrc: "/svg/lock.svg",
+          iconSrc: "/svg/icons/office.svg",
         },
         {
           type: "icon",
           title: "Unified brand",
           body: "Replaced three disconnected product identities with a single visual language across web, dashboards and mobile apps.",
-          iconSrc: "/svg/lock.svg",
+          iconSrc: "/svg/icons/brand.svg",
         },
         {
           type: "icon",
           title: "Faster to market",
           body: "A modular design system meant the team could respond to security events quickly using reusable components to publish content at pace.",
-          iconSrc: "/svg/lock.svg",
+          iconSrc: "/svg/icons/dial.svg",
         },
         {
           type: "icon",
           title: "Commercial credibility",
           body: "A coherent, polished presence reduced friction in investor and partner conversations as Licel evolved and grew the business.",
-          iconSrc: "/svg/lock.svg",
+          iconSrc: "/svg/icons/briefcase.svg",
         },
       ],
     },
+    imageBlocks: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            cells: [
+              {
+                src: "/images/licel/phone-homescreen.jpg",
+                alt: "Licel app home screen",
+              },
+              {
+                src: "/images/licel/phone-menu.jpg",
+                alt: "Licel app menu screen",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Start-up to scale-up",
+        description:
+          "With no parent brand, each product was operating independently. I created a brand identity to connect them under a single design language and appeal to both enterprise teams and engineers.",
+        headingId: "licel-image-block-brand-heading",
+        indicatorColor: "powderBlue",
+        contained: true,
+        mobileLayout: "stacked",
+        mobileStack: "one-then-two",
+        rows: [
+          {
+            cells: [
+              {
+                src: "/images/licel/licel-logo-white.svg",
+                alt: "Licel logo",
+                bgColor: "#3454E1",
+                fit: "contain",
+              },
+              {
+                src: "/images/licel/licel-logo-white.svg",
+                alt: "Licel logo",
+                bgColor: "#0C232C",
+                fit: "contain",
+              },
+              {
+                src: "/images/licel/licel-logo-blue.svg",
+                alt: "Licel logo",
+                bgColor: "#F3F4EF",
+                fit: "contain",
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "x-shore-1",

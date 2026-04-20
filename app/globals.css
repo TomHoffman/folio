@@ -22,6 +22,7 @@
   --color-section-indicator-green: #2f9d5c;
   --color-section-indicator-lime: var(--color-lime);
   --color-section-indicator-blue: #2b7fff;
+  --color-section-indicator-powderBlue: #a1cae2;
   --color-section-indicator-purple: #8b5cf6;
   --color-section-indicator-pink: #db2777;
   --color-section-indicator-red: #e11d48;
@@ -129,6 +130,7 @@ html.dark {
   --color-section-indicator-green: #4ade80;
   --color-section-indicator-lime: var(--color-lime);
   --color-section-indicator-blue: #60a5fa;
+  --color-section-indicator-powderBlue: #a1cae2;
   --color-section-indicator-purple: #c084fc;
   --color-section-indicator-pink: #f472b6;
   --color-section-indicator-red: #fb7185;

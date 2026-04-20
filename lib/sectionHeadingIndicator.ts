@@ -7,6 +7,7 @@ export const sectionHeadingIndicatorColors = [
   "green",
   "lime",
   "blue",
+  "powderBlue",
   "purple",
   "pink",
   "red",
@@ -17,7 +18,7 @@ export type SectionHeadingIndicatorColor =
   (typeof sectionHeadingIndicatorColors)[number];
 
 export function sectionHeadingIndicatorStyle(
-  color: SectionHeadingIndicatorColor = "orange",
+  color: SectionHeadingIndicatorColor = "powderBlue",
 ): CSSProperties {
   const value =
     color === "secondary"

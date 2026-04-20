@@ -4,6 +4,7 @@ import { ComingSoonWorkShell } from "@/components/ComingSoonWorkShell";
 import { ProjectHero } from "@/components/ProjectHero";
 import { ProjectImageContainer } from "@/components/ProjectImageContainer";
 import { CardGroup } from "@/components/CardGroup";
+import { ImageBlock } from "@/components/ImageBlock";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
@@ -53,6 +54,18 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             }
           />
         ) : null}
+        {(project.imageBlocks ?? []).map((block, index) => (
+          <ImageBlock
+            key={block.headingId ?? `image-block-${index}`}
+            {...block}
+            className={
+              project.slug === "licel" &&
+              block.headingId === "licel-image-block-brand-heading"
+                ? mainStyles.licelScaleUpBlock
+                : undefined
+            }
+          />
+        ))}
       </div>
     </main>
   );

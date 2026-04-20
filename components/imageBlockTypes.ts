@@ -1,8 +1,14 @@
 import type { SectionHeadingIndicatorColor } from "@/lib/sectionHeadingIndicator";
 
 export type ImageBlockCell = {
-  src: string;
-  alt: string;
+  /** Omit (or leave empty) to show an empty tile — no `<Image>`. */
+  src?: string;
+  /** Use `""` when the tile is decorative / empty. */
+  alt?: string;
+  /** Optional per-tile background color (e.g. `#3454E1`). */
+  bgColor?: string;
+  /** Image fit mode for this tile (`cover` by default). */
+  fit?: "cover" | "contain";
 };
 
 export type ImageBlockCellMode = "rowAspect" | "square";
@@ -16,8 +22,7 @@ export type ImageBlockRow = {
   cellMode?: ImageBlockCellMode;
   /**
    * Used when `cellMode` is `rowAspect` or omitted.
-   * From tablet up: **one** cell → **16:8** row; **two** cells → **16:7** row (`rowAspect` only).
-   * Ignored for those layouts. Three+ cells still use this on the row box where applicable.
+   * From tablet up, all `rowAspect` rows use **16:7** on the row box (this value is ignored there).
    */
   rowAspectRatio?: string;
 };
@@ -32,15 +37,22 @@ export type ImageBlockMobileLayout =
   | "column"
   | "mobile-carousel";
 
+export type ImageBlockMobileStack = "default" | "one-then-two";
+
 export type ImageBlockProps = {
-  title: string;
-  description: string;
-  headingId: string;
+  title?: string;
+  description?: string;
+  headingId?: string;
   indicatorColor?: SectionHeadingIndicatorColor;
   /** When true, images sit in the rounded panel (`#172e37`, 8px pad) from Figma. */
   contained: boolean;
   /** See `ImageBlockMobileLayout`. `mobile-carousel` is ignored when `contained` is true. */
   mobileLayout?: ImageBlockMobileLayout;
+  /** Optional mobile stack pattern for row content. */
+  mobileStack?: ImageBlockMobileStack;
   rows: ImageBlockRow[];
   className?: string;
 };
+
+/** Serializable shape for `Project.imageBlocks[]` in `data/projects.ts`. */
+export type ImageBlockData = Omit<ImageBlockProps, "className">;

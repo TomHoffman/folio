@@ -65,6 +65,11 @@
   );
 }
 
+/* Licel: extra space before the Start-up to scale-up image block. */
+.licelScaleUpBlock {
+  padding-top: 2em;
+}
+
 @media (max-width: 767px) {
   .main {
     margin-top: 130px; /* 80px base + 50px */
