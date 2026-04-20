@@ -81,7 +81,7 @@ export function ProtectedPinForm({
           <div className={styles.protectedHeader}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static SVG from public */}
             <img
-              src="/svg/lock.svg"
+              src="/svg/icons/lock.svg"
               alt=""
               width={24}
               height={24}

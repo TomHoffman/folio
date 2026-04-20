@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /**
+   * Allow LAN device testing (iOS Safari on local IP) in dev.
+   * Without this, Next can block dev resources for non-localhost origins.
+   */
+  allowedDevOrigins: ["localhost", "127.0.0.1", "192.168.1.139"],
   images: {
     /* Replace same-named files in /public without long-lived stale `/_next/image` entries (esp. in dev). */
     minimumCacheTTL:

@@ -56,6 +56,13 @@ export default function RootLayout({
         />
         <ThemeDocumentSync />
         <HeaderMinimal />
+        <Script
+          id="folio-header-scroll-toggle"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var header=document.getElementById('main-header');if(!header)return;var last=window.pageYOffset||0;function setDir(dir){header.setAttribute('data-dir',dir);}function onScroll(){var current=window.pageYOffset||0;if(current<=0){setDir('up');last=0;return;}if(current===last)return;setDir(current<last?'up':'down');last=current;}setDir('up');window.addEventListener('scroll',onScroll,{passive:true});})();`,
+          }}
+        />
         {children}
         <Footer />
       </body>

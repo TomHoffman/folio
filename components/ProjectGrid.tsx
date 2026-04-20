@@ -96,7 +96,7 @@ function findProjectUnderPointer(
 
 function ProjectStatusPill({
   label,
-  iconSrc = "/svg/lock.svg",
+  iconSrc = "/svg/icons/lock.svg",
 }: {
   label: string;
   iconSrc?: string;
@@ -183,7 +183,7 @@ function ProjectCard({ project }: { project: Project }) {
       ) : null}
 
       {project.status === "coming-soon" ? (
-        <ProjectStatusPill label="Coming soon" iconSrc="/svg/calendar.svg" />
+        <ProjectStatusPill label="Coming soon" iconSrc="/svg/icons/calendar.svg" />
       ) : null}
     </>
   );

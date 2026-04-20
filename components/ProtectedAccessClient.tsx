@@ -33,7 +33,7 @@ export function ProtectedAccessClient({ projectSlug }: { projectSlug: string }) 
           aria-label="Back to home"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- static SVG from public */}
-          <img src="/svg/close.svg" alt="" width={24} height={24} decoding="async" />
+          <img src="/svg/icons/close.svg" alt="" width={24} height={24} decoding="async" />
         </button>
       </div>
       <div className={styles.content}>

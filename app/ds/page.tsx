@@ -26,7 +26,7 @@ const iconCardItems = [1, 2, 3, 4].map(() => ({
   type: "icon" as const,
   title: dsCardTitle,
   body: dsCardParagraph,
-  iconSrc: "/svg/lock.svg",
+  iconSrc: "/svg/icons/lock.svg",
 }));
 
 const imageThumb = "/images/xshore-thumb.jpg";

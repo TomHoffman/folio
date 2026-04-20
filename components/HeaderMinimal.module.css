@@ -1,15 +1,31 @@
-/* Header bar: fixed shell in HeaderMinimal.tsx */
+/* In-flow header: keeps normal page spacing at top. */
 .root {
-  position: fixed;
-  z-index: 10;
+  position: sticky;
   top: 0;
-  right: 0;
-  left: 0;
+  z-index: 10;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   padding-top: 1rem;
   background-color: var(--color-background);
+  will-change: transform;
+  transition: transform 0.3s ease-in-out;
+}
+
+.root[data-dir="up"] {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.root[data-dir="down"] {
+  transform: translateY(calc(-100% - 1px));
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
