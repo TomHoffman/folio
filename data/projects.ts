@@ -406,7 +406,7 @@ export const projects: Project[] = [
         mobileLayout: "column",
         rows: [
           {
-            rowHeight: "short",
+            rowHeight: "full-width",
             cells: [
               {
                 alt: "",
@@ -463,6 +463,35 @@ export const projects: Project[] = [
                 alt: "",
               },
             ],
+          },
+        ],
+      },
+    ],
+    focusLayerBlocks: [
+      {
+        title: "The chart experience",
+        description:
+          "The interface is built around four modes, designed to keep the chart visible and prioritise safety while keeping the right information easily within reach.",
+        headingId: "xshore-chart-focus-heading",
+        indicatorColor: "powderBlue",
+        inlineSvgSrc: "/images/xshore/full-screen-chart_wires.svg",
+        inlineSvgUiSrc: "/images/xshore/full-screen-chart_ui.svg",
+        items: [
+          {
+            title: "Full screen chart",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          },
+          {
+            title: "Split screen view",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          },
+          {
+            title: "Safety + warnings",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          },
+          {
+            title: "North up",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
           },
         ],
       },

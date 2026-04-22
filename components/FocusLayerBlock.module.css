@@ -74,6 +74,96 @@
   aspect-ratio: 425 / 371;
 }
 
+.imageContainerWithChartToggle {
+  justify-content: flex-start;
+  padding-bottom: 10px;
+}
+
+.imageContainerGraphic {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageContainerWithChartToggle .imageContainerGraphic {
+  flex: 0 1 auto;
+  flex-grow: 0;
+}
+
+.viewToggleWrap {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.viewToggleTrack {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  width: min(248px, calc(100% - 24px));
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 80px;
+  background-color: #2f4b57;
+  cursor: pointer;
+}
+
+.viewTogglePill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  z-index: 0;
+  box-sizing: border-box;
+  width: calc((100% - 10px) / 2);
+  border-radius: 72px;
+  background-color: #22414d;
+  pointer-events: none;
+  transition: transform 0.45s ease-in-out;
+}
+
+.viewToggleTrack[data-mode="ui"] .viewTogglePill {
+  transform: translateX(calc(100% + 2px));
+}
+
+.viewToggleBtn {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 72px;
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.viewToggleBtn:focus-visible {
+  outline: 2px solid #cee7f2;
+  outline-offset: 2px;
+}
+
 .demoSquareMount {
   position: absolute;
   inset: 0;
@@ -95,12 +185,21 @@
 .svgFrame {
   position: relative;
   box-sizing: border-box;
-  width: 80%;
-  max-width: 740px;
+  width: 90%;
+  max-width: 800px;
   aspect-ratio: 740 / 645;
   flex: 0 1 auto;
   max-height: 100%;
   min-height: 0;
+}
+
+/*
+ * Inline chart SVGs: match export canvas (931×747) so the frame isn’t letterboxed vs the art.
+ */
+.svgFrame.svgFrameChart {
+  aspect-ratio: 931 / 747;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 /* Inlined SVG from `finance-illustration.svg` — target inner nodes with e.g. `.illustrationRoot :global(#illustration)`. */
@@ -109,6 +208,80 @@
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.inlineWireRoot {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inlineWireRoot :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.wipeStack {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  isolation: isolate;
+}
+
+.wipeStack .wipeLayerBase,
+.wipeStack .wipeLayerUi {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+}
+
+.wipeStack .wipeLayerBase {
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 0.35s ease-in-out;
+}
+
+/* After wipe to UI finishes, fade wireframe layer out (clip completes at 0.55s). */
+.wipeStack[data-mode="ui"] .wipeLayerBase {
+  opacity: 0;
+  transition-delay: 0.55s;
+  pointer-events: none;
+}
+
+.wipeStack[data-mode="wireframe"] .wipeLayerBase {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.wipeStack .wipeLayerUi {
+  z-index: 1;
+  clip-path: inset(0 100% 0 0);
+}
+
+/* After wipe to wireframe finishes, fade UI layer out. */
+.wipeStack[data-mode="wireframe"] .wipeLayerUi {
+  opacity: 0;
+  transition:
+    clip-path 0.55s ease-in-out,
+    opacity 0.35s ease-in-out 0.55s;
+}
+
+/* Only animate clip while revealing UI so opacity stays 1 for the wipe. */
+.wipeStack[data-mode="ui"] .wipeLayerUi.wipeLayerUiVisible {
+  clip-path: inset(0 0% 0 0);
+  opacity: 1;
+  transition: clip-path 0.55s ease-in-out;
 }
 
 .illustrationLayer {
@@ -330,7 +503,19 @@
   .textButton,
   .accordionIcon,
   .textPanel,
-  .demoSquare {
-    transition: none;
+  .demoSquare,
+  .viewTogglePill,
+  .wipeStack .wipeLayerBase,
+  .wipeStack .wipeLayerUi {
+    transition: none !important;
+    transition-delay: 0s !important;
+  }
+
+  .wipeStack[data-mode="ui"] .wipeLayerBase {
+    opacity: 0;
+  }
+
+  .wipeStack[data-mode="wireframe"] .wipeLayerUi {
+    opacity: 0;
   }
 }

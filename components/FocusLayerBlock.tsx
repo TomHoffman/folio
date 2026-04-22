@@ -16,6 +16,8 @@ const ACCORDION_CONTROLLER_SRC = "/svg/icons/accordion-controller.svg";
 
 const DEMO_SQUARE_COLORS = ["#e11d48", "#22c55e", "#3b82f6"] as const;
 
+type ChartSvgMode = "wireframe" | "ui";
+
 function layerOpacity(activeIndex: number, layer: 0 | 1 | 2): number {
   if (activeIndex <= 0) return layer === 0 ? 1 : 0;
   if (activeIndex === 1) return layer === 1 ? 1 : 0;
@@ -29,6 +31,8 @@ export function FocusLayerBlock({
   indicatorColor = "powderBlue",
   items,
   visualVariant = "illustration",
+  inlineSvgSrc,
+  inlineSvgUiSrc,
   className,
 }: FocusLayerBlockProps) {
   const safeItems = useMemo(() => items.slice(0, 4), [items]);
@@ -37,11 +41,54 @@ export function FocusLayerBlock({
   const [illustrationEndSvg, setIllustrationEndSvg] = useState<string | null>(
     null,
   );
+  const [inlineWireMarkup, setInlineWireMarkup] = useState<string | null>(null);
+  const [inlineUiMarkup, setInlineUiMarkup] = useState<string | null>(null);
+  const [chartSvgMode, setChartSvgMode] = useState<ChartSvgMode>("wireframe");
   const isDemoSquare = visualVariant === "demo-square";
+  const isEmptyVisual = visualVariant === "empty";
+  const wireSrc = inlineSvgSrc?.trim() ?? "";
+  const uiSrc = inlineSvgUiSrc?.trim() ?? "";
+  const hasChartViewToggle = Boolean(wireSrc && uiSrc);
+
+  useEffect(() => {
+    if (!uiSrc) {
+      setChartSvgMode("wireframe");
+    }
+  }, [uiSrc]);
 
   useEffect(() => {
     if (isDemoSquare) return;
     let cancelled = false;
+
+    const load = (url: string, setMarkup: (s: string | null) => void) => {
+      void fetch(url)
+        .then((res) => res.text())
+        .then((text) => {
+          if (cancelled) return;
+          setMarkup(text || null);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setMarkup(null);
+        });
+    };
+
+    if (wireSrc) load(wireSrc, setInlineWireMarkup);
+    else setInlineWireMarkup(null);
+
+    if (uiSrc) load(uiSrc, setInlineUiMarkup);
+    else setInlineUiMarkup(null);
+
+    if (wireSrc || uiSrc) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setInlineWireMarkup(null);
+    setInlineUiMarkup(null);
+    if (isEmptyVisual) return;
+
     void Promise.all([
       fetch(FINANCE_ILLUSTRATION_SRC)
         .then((res) => res.text())
@@ -57,7 +104,7 @@ export function FocusLayerBlock({
     return () => {
       cancelled = true;
     };
-  }, [isDemoSquare]);
+  }, [isDemoSquare, isEmptyVisual, wireSrc, uiSrc]);
 
   useEffect(() => {
     if (activeIndex > safeItems.length - 1) {
@@ -85,6 +132,10 @@ export function FocusLayerBlock({
     ["--focus-layer-2-opacity" as string]: String(layerOpacity(activeIndex, 2)),
   } as CSSProperties;
 
+  const chartToggleGroupId = headingId
+    ? `${headingId}-chart-view`
+    : "focus-layer-chart-view";
+
   return (
     <section
       className={sectionClass}
@@ -110,7 +161,15 @@ export function FocusLayerBlock({
 
         <div className={styles.shell}>
           <div className={styles.content}>
-            <div className={styles.imageContainer}>
+            <div
+              className={[
+                styles.imageContainer,
+                hasChartViewToggle ? styles.imageContainerWithChartToggle : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-hidden={isEmptyVisual && !wireSrc ? true : undefined}
+            >
               {isDemoSquare ? (
                 <div className={styles.demoSquareMount}>
                   <div
@@ -125,7 +184,86 @@ export function FocusLayerBlock({
                     aria-label={safeItems[activeIndex]?.title ?? "Demo"}
                   />
                 </div>
-              ) : (
+              ) : wireSrc ? (
+                <>
+                  <div className={styles.imageContainerGraphic}>
+                    <div
+                      className={`${styles.svgFrame} ${styles.svgFrameChart}`}
+                    >
+                      {hasChartViewToggle &&
+                      inlineWireMarkup &&
+                      inlineUiMarkup ? (
+                        <div
+                          className={styles.wipeStack}
+                          data-mode={chartSvgMode}
+                          role="img"
+                          aria-label={
+                            safeItems[activeIndex]?.title ?? "Chart diagram"
+                          }
+                        >
+                          <div
+                            className={`${styles.inlineWireRoot} ${styles.wipeLayerBase}`}
+                            aria-hidden={chartSvgMode === "ui"}
+                            data-focus-active-index={activeIndex}
+                            dangerouslySetInnerHTML={{
+                              __html: inlineWireMarkup,
+                            }}
+                          />
+                          <div
+                            className={`${styles.inlineWireRoot} ${styles.wipeLayerUi} ${chartSvgMode === "ui" ? styles.wipeLayerUiVisible : ""}`}
+                            aria-hidden={chartSvgMode === "wireframe"}
+                            data-focus-active-index={activeIndex}
+                            dangerouslySetInnerHTML={{
+                              __html: inlineUiMarkup,
+                            }}
+                          />
+                        </div>
+                      ) : inlineWireMarkup ? (
+                        <div
+                          className={styles.inlineWireRoot}
+                          role="img"
+                          aria-label={
+                            safeItems[activeIndex]?.title ?? "Diagram"
+                          }
+                          data-focus-active-index={activeIndex}
+                          dangerouslySetInnerHTML={{
+                            __html: inlineWireMarkup,
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+                  {hasChartViewToggle ? (
+                    <div className={styles.viewToggleWrap}>
+                      <div
+                        className={styles.viewToggleTrack}
+                        data-mode={chartSvgMode}
+                        id={chartToggleGroupId}
+                        role="group"
+                        aria-label="Chart display"
+                      >
+                        <span className={styles.viewTogglePill} aria-hidden />
+                        <button
+                          type="button"
+                          className={styles.viewToggleBtn}
+                          aria-pressed={chartSvgMode === "wireframe"}
+                          onClick={() => setChartSvgMode("wireframe")}
+                        >
+                          Wireframe
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.viewToggleBtn}
+                          aria-pressed={chartSvgMode === "ui"}
+                          onClick={() => setChartSvgMode("ui")}
+                        >
+                          UI Design
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : isEmptyVisual ? null : (
                 <div className={styles.svgFrame}>
                   {illustrationSvg ? (
                     <div
@@ -136,17 +274,14 @@ export function FocusLayerBlock({
                         safeItems[activeIndex]?.title ?? "Layered illustration"
                       }
                     >
-                      {/* Layer 0: base only */}
                       <div
                         className={`${styles.illustrationLayer} ${styles.illustrationLayer0}`}
                         dangerouslySetInnerHTML={{ __html: illustrationSvg }}
                       />
-                      {/* Layer 1: base + phone/location overlay */}
                       <div
                         className={`${styles.illustrationLayer} ${styles.illustrationLayer1}`}
                         dangerouslySetInnerHTML={{ __html: illustrationSvg }}
                       />
-                      {/* Layer 2: full UI */}
                       <div
                         className={`${styles.illustrationLayer} ${styles.illustrationLayer2}`}
                         dangerouslySetInnerHTML={{
@@ -176,9 +311,7 @@ export function FocusLayerBlock({
                       aria-controls={panelId}
                     >
                       <div className={styles.textMain}>
-                        <p className={styles.textTitle}>
-                          {i + 1}. {item.title}
-                        </p>
+                        <p className={styles.textTitle}>{item.title}</p>
                       </div>
                       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG icon */}
                       <img
