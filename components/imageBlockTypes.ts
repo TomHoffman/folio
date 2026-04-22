@@ -3,16 +3,25 @@ import type { SectionHeadingIndicatorColor } from "@/lib/sectionHeadingIndicator
 export type ImageBlockCell = {
   /** Omit (or leave empty) to show an empty tile — no `<Image>`. */
   src?: string;
+  /** Optional inline SVG path from `/public` (e.g. `/images/foo.svg`) for CSS-targetable inner layers. */
+  inlineSvgSrc?: string;
   /** Use `""` when the tile is decorative / empty. */
   alt?: string;
   /** Optional per-tile background color (e.g. `#3454E1`). */
   bgColor?: string;
+  /** Optional mobile-only background color override (`<768px`). */
+  mobileBgColor?: string;
   /** Image fit mode for this tile (`cover` by default). */
-  fit?: "cover" | "contain" | "containWide";
+  fit?: "cover" | "contain" | "containWide" | "containLogo";
 };
 
 export type ImageBlockCellMode = "rowAspect" | "square";
-export type ImageBlockRowHeight = "tall" | "medium" | "short";
+export type ImageBlockRowHeight =
+  | "tall"
+  | "med-tall"
+  | "medium"
+  | "short"
+  | "content";
 
 export type ImageBlockRow = {
   cells: ImageBlockCell[];
@@ -26,7 +35,14 @@ export type ImageBlockRow = {
    * From tablet up, all `rowAspect` rows use **16:7** on the row box (this value is ignored there).
    */
   rowAspectRatio?: string;
-  /** Tablet+ row band height preset: `tall` 16:7, `medium` 16:5, `short` 16:3. */
+  /**
+   * Tablet+ row height preset:
+   * - `short`: shallow landscape band.
+   * - `medium`: squashed-square band.
+   * - `med-tall`: midway between `medium` and `tall`.
+   * - `tall`: portrait-leaning band.
+   * - `content`: no forced ratio; row height follows its content.
+   */
   rowHeight?: ImageBlockRowHeight;
 };
 
@@ -49,6 +65,8 @@ export type ImageBlockProps = {
   indicatorColor?: SectionHeadingIndicatorColor;
   /** When true, images sit in the rounded panel (`#172e37`, 8px pad) from Figma. */
   contained: boolean;
+  /** When false, remove container shell on mobile (`<768px`) even if `contained` is true. */
+  mobileContained?: boolean;
   /** See `ImageBlockMobileLayout`. */
   mobileLayout?: ImageBlockMobileLayout;
   /** Optional mobile stack pattern for row content. */

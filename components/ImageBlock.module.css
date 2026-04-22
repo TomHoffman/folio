@@ -10,9 +10,10 @@
   --image-block-squashed-square: 425 / 371;
   --image-block-cell-radius: 18px;
   /* Tablet+ row-band presets. */
-  --image-block-row-ar-tall: 16 / 7;
-  --image-block-row-ar-medium: 16 / 5;
-  --image-block-row-ar-short: 16 / 3;
+  --image-block-row-ar-tall: 2 / 3;
+  --image-block-row-ar-med-tall: 9 / 10;
+  --image-block-row-ar-medium: var(--image-block-squashed-square);
+  --image-block-row-ar-short: 16 / 9;
 }
 
 .sectionInner {
@@ -75,6 +76,14 @@
   gap: 8px;
 }
 
+@media (max-width: 767px) {
+  .shellUncontainedOnMobile {
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+}
+
 /* `mobileLayout="mobile-carousel"`: rows from `768px`; horizontal strip only `<768px`. */
 .layoutMobileCarousel .carouselTrack {
   display: none;
@@ -87,6 +96,17 @@
 
   .layoutMobileCarousel .carouselTrack {
     display: flex;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .layoutMobileCarousel .rows > .row[data-cols="4"] {
+    flex-wrap: wrap;
+  }
+
+  .layoutMobileCarousel .rows > .row[data-cols="4"] > .cell {
+    flex: 0 0 calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
   }
 }
 
@@ -125,7 +145,9 @@
   }
 
   .layoutColumnMobile .rows > .row {
-    display: contents;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .layoutColumnMobile .rows > .row > .cell {
@@ -158,7 +180,6 @@
 
 .rowAspect {
   align-items: stretch;
-  aspect-ratio: var(--row-ar, 16 / 10);
 }
 
 .rowAspect .cell {
@@ -184,7 +205,7 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--image-block-cell-radius);
-  background-color: #1f3741;
+  background-color: var(--cell-bg, #1f3741);
 }
 
 .cellFrame {
@@ -192,6 +213,22 @@
   width: 100%;
   height: 100%;
   min-height: 0;
+}
+
+.cellFrameContain {
+  --image-block-contain-frame-min-h: clamp(14rem, 26vw, 24rem);
+  box-sizing: border-box;
+  min-height: var(--image-block-contain-frame-min-h);
+  padding-inline: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-block: clamp(1rem, 2.25vw, 1.75rem);
+}
+
+.cellFrameContent {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1.25rem;
 }
 
 .rowAspect .cellFrame {
@@ -209,24 +246,54 @@
  */
 @media (min-width: 768px) {
   .rowAspect {
-    aspect-ratio: var(--row-band-ar, var(--image-block-row-ar-tall));
+    aspect-ratio: unset;
+    height: auto;
+  }
+
+  .rowAspect .cellFrame {
+    aspect-ratio: var(--row-band-ar, var(--row-ar, 16 / 10));
+    height: auto;
+    min-height: 0;
   }
 
   .rowSquare {
-    aspect-ratio: var(--row-band-ar, var(--image-block-row-ar-tall));
-    align-items: stretch;
-    grid-template-rows: minmax(0, 1fr);
+    aspect-ratio: unset;
+    align-items: start;
+    grid-template-rows: unset;
   }
 
   .rowSquare .cellFrame {
-    aspect-ratio: unset;
-    height: 100%;
+    aspect-ratio: var(--row-band-ar, var(--image-block-row-ar-tall));
+    height: auto;
     min-height: 0;
+  }
+
+  .rowContent {
+    align-items: stretch;
+  }
+
+  .rowContent.rowSquare {
+    align-items: stretch;
+  }
+
+  .rowContent .cell {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .rowContent .cellFrame {
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
   }
 }
 
 /* Mobile / tablet portrait: every image uses the squashed-square frame. */
 @media (max-width: 767px) {
+  .cell {
+    background-color: var(--cell-bg-mobile, var(--cell-bg, #1f3741));
+  }
+
   .rowAspect {
     aspect-ratio: unset;
     height: auto;
@@ -242,28 +309,102 @@
   .rowSquare .cellFrame {
     aspect-ratio: var(--image-block-squashed-square);
   }
+
+  .rowTall.rowAspect .cellFrame,
+  .rowTall.rowSquare .cellFrame {
+    aspect-ratio: var(--image-block-row-ar-tall);
+  }
+
+  .rowContent .cellFrame {
+    aspect-ratio: auto;
+    height: auto;
+  }
 }
 
 .image {
   object-fit: cover;
 }
 
+.inlineSvgRoot {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+.inlineSvgFlow {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.inlineSvgRoot :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.inlineSvgFlow :global(svg) {
+  width: auto;
+  height: auto;
+}
+
 .imageContain {
   object-fit: contain;
-  width: min(60%, 250px) !important;
-  max-width: 250px;
-  height: 85% !important;
+  width: 80% !important;
+  max-width: 80%;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
   inset: 0;
   margin: auto;
 }
 
 .imageContainWide {
   object-fit: contain;
-  width: min(100%, 446px) !important;
-  max-width: 446px;
-  height: 85% !important;
+  width: 80% !important;
+  max-width: 80%;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
   inset: 0;
   margin: auto;
+}
+
+.imageContainLogo {
+  object-fit: contain;
+  width: 60% !important;
+  max-width: 220px;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
+  inset: 0;
+  margin: auto;
+}
+
+.imageFlow {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.imageFlowCover {
+  width: 100%;
+}
+
+.imageFlowContain {
+  width: min(60%, 250px);
+  max-width: 250px;
+  margin-inline: auto;
+}
+
+.imageFlowContainWide {
+  width: min(100%, 446px);
+  max-width: 446px;
+  margin-inline: auto;
+}
+
+.imageFlowContainLogo {
+  width: min(60%, 220px);
+  max-width: 220px;
+  margin-inline: auto;
 }
 
 /* Mobile carousel: same rhythm as `CardGroup` (`listMobileCarousel`). */
@@ -294,8 +435,12 @@
     width: 100%;
     overflow: hidden;
     border-radius: 18px;
-    background-color: #1f3741;
-    aspect-ratio: var(--image-block-squashed-square);
+    background-color: var(--carousel-bg, #1f3741);
+    aspect-ratio: var(--carousel-ar, var(--image-block-squashed-square));
+  }
+
+  .carouselSlideInner {
+    background-color: var(--carousel-bg-mobile, var(--carousel-bg, #1f3741));
   }
 }
 

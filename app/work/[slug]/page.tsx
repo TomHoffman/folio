@@ -73,6 +73,12 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             {...block}
           />
         ))}
+        {(project.imageBlocksAfterFocus ?? []).map((block, index) => (
+          <ImageBlock
+            key={block.headingId ?? `image-block-after-focus-${index}`}
+            {...block}
+          />
+        ))}
       </div>
     </main>
   );

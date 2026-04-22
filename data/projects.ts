@@ -45,6 +45,8 @@ export type Project = {
   imageBlocks?: ImageBlockData[];
   /** Optional focus layer explainer blocks. */
   focusLayerBlocks?: FocusLayerBlockData[];
+  /** Optional image blocks rendered below focus layer content. */
+  imageBlocksAfterFocus?: ImageBlockData[];
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
@@ -116,6 +118,7 @@ export const projects: Project[] = [
         mobileLayout: "column",
         rows: [
           {
+            rowHeight: "med-tall",
             cells: [
               {
                 src: "/images/licel/phone-homescreen.jpg",
@@ -140,27 +143,35 @@ export const projects: Project[] = [
         mobileStack: "one-then-two",
         rows: [
           {
+            rowHeight: "med-tall",
             cells: [
               {
                 src: "/images/licel/licel-logo-white.svg",
                 alt: "Licel logo",
                 bgColor: "#3454E1",
-                fit: "contain",
+                fit: "containLogo",
               },
               {
                 src: "/images/licel/licel-logo-white.svg",
                 alt: "Licel logo",
                 bgColor: "#0C232C",
-                fit: "contain",
+                fit: "containLogo",
               },
               {
                 src: "/images/licel/licel-logo-blue.svg",
                 alt: "Licel logo",
                 bgColor: "#F3F4EF",
-                fit: "contain",
+                fit: "containLogo",
               },
             ],
           },
+        ],
+      },
+      {
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
           {
             rowHeight: "medium",
             cells: [
@@ -168,24 +179,28 @@ export const projects: Project[] = [
                 src: "/images/licel/dexprotector-symbol.svg",
                 alt: "DexProtector symbol",
                 bgColor: "#0C232C",
+                mobileBgColor: "#172E37",
                 fit: "containWide",
               },
               {
                 src: "/images/licel/stringer-symbol.svg",
                 alt: "Stringer symbol",
                 bgColor: "#0C232C",
+                mobileBgColor: "#172E37",
                 fit: "containWide",
               },
               {
                 src: "/images/licel/jcardsim-symbol.svg",
                 alt: "jCardSim symbol",
                 bgColor: "#0C232C",
+                mobileBgColor: "#172E37",
                 fit: "containWide",
               },
               {
                 src: "/images/licel/alice-symbol.svg",
                 alt: "Alice symbol",
                 bgColor: "#0C232C",
+                mobileBgColor: "#172E37",
                 fit: "containWide",
               },
             ],
@@ -213,6 +228,58 @@ export const projects: Project[] = [
           {
             title: "UI layer",
             body: "The app surface represents what we see as users, with cutouts showing the vulnerabilities that can be exposed.",
+          },
+        ],
+      },
+    ],
+    imageBlocksAfterFocus: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            rowHeight: "medium",
+            cells: [
+              {
+                inlineSvgSrc: "/images/licel/automotive-illustration.svg",
+                alt: "Automotive illustration",
+              },
+              {
+                inlineSvgSrc: "/images/licel/aerospace-illustration-end.svg",
+                alt: "Aerospace illustration",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Designed to scale",
+        description:
+          "The design language was built to work across every surface from website to dashboards, internal tooling and mobile apps so that common tokens and components could be quickly used and adapted.",
+        indicatorColor: "powderBlue",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                src: "/images/licel/authenticator1.svg",
+                alt: "Authenticator screen",
+                fit: "contain",
+              },
+              {
+                src: "/images/licel/authenticator2.svg",
+                alt: "Authenticator screen",
+                fit: "contain",
+              },
+              {
+                src: "/images/licel/authenticator3.svg",
+                alt: "Authenticator screen",
+                fit: "contain",
+              },
+            ],
           },
         ],
       },
