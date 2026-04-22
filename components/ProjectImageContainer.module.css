@@ -9,13 +9,50 @@
   aspect-ratio: 4 / 3;
   border-radius: 24px;
   overflow: hidden;
-  background-color: #16343f;
 }
 
 @media (min-width: 768px) {
   .stage {
     aspect-ratio: 16 / 8;
   }
+}
+
+.stageSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  gap: 1px;
+  border-radius: 24px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 768px) {
+  .stageSplit {
+    grid-template-columns: minmax(0, 37fr) minmax(0, 63fr);
+    gap: 8px;
+    aspect-ratio: 16 / 8;
+  }
+}
+
+.splitPane {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .splitPane {
+    border-radius: 24px;
+  }
+}
+
+.splitPaneSecondary {
+  background-color: #f7f6f4;
+}
+
+.splitPanePrimary {
+  background-color: #16343f;
 }
 
 .heroImage {
@@ -26,4 +63,9 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   clip-path: inset(0 round 24px);
+}
+
+.heroImageSplit {
+  border-radius: 0;
+  clip-path: none;
 }

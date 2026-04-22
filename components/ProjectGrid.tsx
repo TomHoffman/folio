@@ -218,14 +218,24 @@ export type ProjectGridProps = {
   showTitle?: boolean;
   /** Dot before the title; token from `globals.css`. Default `orange`. */
   indicatorColor?: SectionHeadingIndicatorColor;
+  /** Optional explicit project list override. */
+  projects?: Project[];
+  /** Horizontal page inset wrapper. Default `true`. */
+  usePageInset?: boolean;
+  /** Apply scroll anchor offset class. Default `true`. */
+  enableScrollAnchor?: boolean;
 };
 
 export function ProjectGrid({
   title,
   showTitle = true,
   indicatorColor = "orange",
+  projects,
+  usePageInset = true,
+  enableScrollAnchor = true,
 }: ProjectGridProps = {}) {
   const visibleTitle = showTitle && Boolean(title?.trim());
+  const displayedProjects = projects?.length ? projects : visibleProjects;
 
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
@@ -314,12 +324,17 @@ export function ProjectGrid({
   return (
     <div
       id="project-grid"
-      className={`${styles.pageInset} ${styles.scrollAnchor}`}
+      className={[
+        usePageInset ? styles.pageInset : "",
+        enableScrollAnchor ? styles.scrollAnchor : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       {visibleTitle ? (
         <h2
           id="project-grid-title"
-          className={sectionHeadingStyles.heading}
+          className={`${sectionHeadingStyles.heading} ${styles.title}`}
           style={sectionHeadingIndicatorStyle(indicatorColor)}
         >
           {title?.trim()}
@@ -337,7 +352,7 @@ export function ProjectGrid({
         onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
         onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}
       >
-        {visibleProjects.map((project) => (
+        {displayedProjects.map((project) => (
           <li key={project.slug} className={styles.gridItem}>
             <ProjectCard project={project} />
           </li>

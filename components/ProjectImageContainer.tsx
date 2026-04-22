@@ -4,17 +4,58 @@ import enterStyles from "./ProjectPageEnter.module.css";
 import styles from "./ProjectImageContainer.module.css";
 
 export function ProjectImageContainer({ project }: { project: Project }) {
+  const isSplitLayout = project.heroImageCount === 2;
+  const heroImageClass = [
+    styles.heroImage,
+    isSplitLayout ? styles.heroImageSplit : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div
-      className={`${styles.stage} ${enterStyles.enterMedia}`}
+      className={[
+        styles.stage,
+        isSplitLayout ? styles.stageSplit : "",
+        enterStyles.enterMedia,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       role="presentation"
     >
-      {project.heroImage ? (
+      {isSplitLayout ? (
+        <>
+          <div className={`${styles.splitPane} ${styles.splitPaneSecondary}`}>
+            {project.heroImageSecondary ? (
+              <Image
+                src={projectAssetSrc(project.heroImageSecondary, project.assetVersion)}
+                alt=""
+                fill
+                className={heroImageClass}
+                sizes="(max-width: 767px) 40vw, 36vw"
+                priority
+              />
+            ) : null}
+          </div>
+          <div className={`${styles.splitPane} ${styles.splitPanePrimary}`}>
+            {project.heroImage ? (
+              <Image
+                src={projectAssetSrc(project.heroImage, project.assetVersion)}
+                alt=""
+                fill
+                className={heroImageClass}
+                sizes="(max-width: 767px) 60vw, 60vw"
+                priority
+              />
+            ) : null}
+          </div>
+        </>
+      ) : project.heroImage ? (
         <Image
           src={projectAssetSrc(project.heroImage, project.assetVersion)}
           alt=""
           fill
-          className={styles.heroImage}
+          className={heroImageClass}
           sizes="(max-width: 767px) 100vw, 96vw"
           priority
         />

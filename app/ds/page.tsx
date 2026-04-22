@@ -29,7 +29,7 @@ const iconCardItems = [1, 2, 3, 4].map(() => ({
   iconSrc: "/svg/icons/lock.svg",
 }));
 
-const imageThumb = "/images/xshore-thumb.jpg";
+const imageThumb = "/images/xshore/xshore-thumb.jpg";
 
 const iconCardGroupStackedSample: CardGroupData = {
   title: "Outcomes",

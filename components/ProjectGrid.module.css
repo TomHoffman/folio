@@ -12,6 +12,10 @@
   scroll-margin-top: calc(6rem + 0.75rem + 1.5em);
 }
 
+.title {
+  margin-top: 2em;
+}
+
 .grid {
   display: grid;
   list-style: none;

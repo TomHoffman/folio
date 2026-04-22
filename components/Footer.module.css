@@ -1,4 +1,19 @@
 .footer {
-  display: block;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  height: 50px;
+  padding: 0 1rem;
   margin-top: auto;
+}
+
+.copy {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+  text-align: center;
 }

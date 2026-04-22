@@ -1,5 +1,11 @@
 import styles from "./Footer.module.css";
 
 export function Footer() {
-  return <footer className={styles.footer} />;
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className={styles.footer}>
+      <p className={styles.copy}>&copy; Tom Hoffman {year}</p>
+    </footer>
+  );
 }

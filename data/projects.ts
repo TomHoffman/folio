@@ -1,6 +1,7 @@
 import type { CardGroupData } from "@/components/cardGroupTypes";
 import type { FocusLayerBlockData } from "@/components/focusLayerBlockTypes";
 import type { ImageBlockData } from "@/components/imageBlockTypes";
+import type { TestimonialData } from "@/components/testimonialTypes";
 
 export type ProjectStatus = "active" | "protected" | "coming-soon";
 
@@ -26,6 +27,10 @@ export type Project = {
   cardBottomGradient?: string;
   /** Full-width media in ProjectImageContainer (e.g. hero SVG) */
   heroImage?: string;
+  /** Optional second media slot in ProjectImageContainer. */
+  heroImageSecondary?: string;
+  /** ProjectImageContainer slot count (single or split). */
+  heroImageCount?: 1 | 2;
   /** Grid card image: translateY on small viewports only (px, negative = up) */
   cardImageMobileOffsetY?: number;
   /** Grid card image: uniform scale on small viewports only (e.g. 0.95 = 5% smaller) */
@@ -47,6 +52,10 @@ export type Project = {
   focusLayerBlocks?: FocusLayerBlockData[];
   /** Optional image blocks rendered below focus layer content. */
   imageBlocksAfterFocus?: ImageBlockData[];
+  /** Optional testimonial module. */
+  testimonial?: TestimonialData;
+  /** Optional explicit slugs for the "More projects" module. */
+  moreProjectSlugs?: string[];
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
@@ -60,13 +69,23 @@ export function projectAssetSrc(path: string, assetVersion?: string): string {
   return `${path}${sep}v=${encodeURIComponent(assetVersion)}`;
 }
 
+const outcomesPlaceholderItems: CardGroupData["items"] = Array.from(
+  { length: 4 },
+  () => ({
+    type: "icon",
+    title: "Title",
+    body: "Description",
+    iconSrc: "/svg/icons/brand.svg",
+  }),
+);
+
 export const projects: Project[] = [
   {
     slug: "licel",
     title: "Licel",
     industry: "Cyber security",
-    image: "/images/licel-thumb.svg",
-    heroImage: "/images/licel-hero.svg",
+    image: "/images/licel/licel-thumb.svg",
+    heroImage: "/images/licel/licel-hero.svg",
     cardImageMobileOffsetY: -30,
     cardImageMobileScale: 0.95,
     cardImageDesktopScale: 0.95,
@@ -213,6 +232,19 @@ export const projects: Project[] = [
           },
         ],
       },
+      {
+        contained: true,
+        rows: [
+          {
+            rowHeight: "short",
+            cells: [
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
     ],
     focusLayerBlocks: [
       {
@@ -288,14 +320,40 @@ export const projects: Project[] = [
           },
         ],
       },
+      {
+        contained: true,
+        rows: [
+          {
+            rowHeight: "content",
+            cells: [
+              {
+                src: "/images/licel/alice.jpg",
+                alt: "Alice brand asset",
+                fit: "containLarge",
+              },
+            ],
+          },
+        ],
+      },
     ],
+    testimonial: {
+      imageSrc: "/images/testimonials/stefan-wessels.png",
+      imageAlt: "Portrait of Stefan Wessels",
+      quote:
+        '"Tom is always easy to talk to and give feedback, very mature and open in his approach. Of course, he is a great designer and strategist too. Happy to work with him again - keep him if you get him!"',
+      name: "Stefan Wessels",
+      jobTitle: "Tech Collab and Innovation Lead",
+      company: "X Shore",
+    },
   },
   {
     slug: "x-shore-1",
     title: "X Shore 1",
     industry: "Electric boating and mobility",
-    image: "/images/xshore-thumb.jpg",
-    heroImage: "/images/xshore-hero.jpg",
+    image: "/images/xshore/xshore-thumb.jpg",
+    heroImage: "/images/xshore/xshore-hero.jpg",
+    heroImageSecondary: "/images/xshore/heropanel2.jpg",
+    heroImageCount: 2,
     status: "active",
     cursorColor: "#615E56",
     year: "2022",
@@ -306,6 +364,14 @@ export const projects: Project[] = [
       duration: "4 months",
       team: "X Shore and Bejo",
     },
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "xshore-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+    },
   },
   {
     slug: "allied-irish-bank",
@@ -313,6 +379,7 @@ export const projects: Project[] = [
     industry: "Banking and finance",
     image: "/images/aib-thumb.jpg",
     heroImage: "/images/aib-hero.jpg",
+    heroImageCount: 2,
     status: "active",
     cursorColor: "#811C81",
     assetVersion: "2",
@@ -322,6 +389,14 @@ export const projects: Project[] = [
       role: "Lead Product Designer",
       duration: "15 months",
       team: "AIB and Globant",
+    },
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "aib-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
     },
   },
   {
@@ -335,6 +410,14 @@ export const projects: Project[] = [
     cursorTextColor: "#000000",
     cardBottomGradient:
       "linear-gradient(360deg, #282828 0%, rgba(41, 41, 41, 0) 100%)",
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "zeppelin-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+    },
   },
   {
     slug: "volta-zero",
@@ -344,6 +427,14 @@ export const projects: Project[] = [
     heroImage: "/images/volta-hero.jpg",
     status: "active",
     cursorColor: "#0C0C0C",
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "volta-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+    },
   },
   {
     slug: "jobhelp",
@@ -356,6 +447,14 @@ export const projects: Project[] = [
     cursorTextColor: "#000000",
     cardBottomGradient:
       "linear-gradient(360deg, #273B46 0%, rgba(80, 99, 108, 0) 100%)",
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "jobhelp-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+    },
   },
   {
     slug: "british-heart-foundation",
@@ -367,6 +466,14 @@ export const projects: Project[] = [
     cursorColor: "#A52241",
     cardBottomGradient:
       "linear-gradient(360deg, #2D2D1E 0%, rgba(165, 158, 129, 0) 100%)",
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "bhf-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+    },
     hidden: true,
   },
 ];
@@ -378,4 +485,46 @@ export function getProjectBySlug(slug: string): Project | undefined {
   const p = projects.find((pr) => pr.slug === slug);
   if (!p || p.hidden) return undefined;
   return p;
+}
+
+export function getMoreProjectsForProject(
+  currentProject: Project,
+  count = 2,
+): Project[] {
+  const maxCount = Math.max(0, count);
+  if (maxCount === 0) return [];
+
+  const available = visibleProjects.filter((p) => p.slug !== currentProject.slug);
+  if (available.length === 0) return [];
+
+  const selected = (currentProject.moreProjectSlugs ?? [])
+    .map((slug) => available.find((p) => p.slug === slug))
+    .filter((p): p is Project => Boolean(p));
+
+  const uniqueSelected: Project[] = [];
+  for (const project of selected) {
+    if (!uniqueSelected.some((p) => p.slug === project.slug)) {
+      uniqueSelected.push(project);
+    }
+  }
+
+  const filledFromSelected = uniqueSelected.slice(0, maxCount);
+  if (filledFromSelected.length >= maxCount) return filledFromSelected;
+
+  const currentIndex = visibleProjects.findIndex(
+    (p) => p.slug === currentProject.slug,
+  );
+  if (currentIndex === -1) return filledFromSelected;
+
+  const nextProjects: Project[] = [];
+  for (let step = 1; step < visibleProjects.length; step += 1) {
+    const index = (currentIndex + step) % visibleProjects.length;
+    const candidate = visibleProjects[index];
+    if (!candidate || candidate.slug === currentProject.slug) continue;
+    if (filledFromSelected.some((p) => p.slug === candidate.slug)) continue;
+    nextProjects.push(candidate);
+    if (nextProjects.length >= maxCount - filledFromSelected.length) break;
+  }
+
+  return [...filledFromSelected, ...nextProjects].slice(0, maxCount);
 }

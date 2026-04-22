@@ -12,7 +12,12 @@ export type ImageBlockCell = {
   /** Optional mobile-only background color override (`<768px`). */
   mobileBgColor?: string;
   /** Image fit mode for this tile (`cover` by default). */
-  fit?: "cover" | "contain" | "containWide" | "containLogo";
+  fit?:
+    | "cover"
+    | "contain"
+    | "containWide"
+    | "containLogo"
+    | "containLarge";
 };
 
 export type ImageBlockCellMode = "rowAspect" | "square";

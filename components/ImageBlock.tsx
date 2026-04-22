@@ -49,6 +49,7 @@ function imageFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageContain;
   if (fit === "containWide") return styles.imageContainWide;
   if (fit === "containLogo") return styles.imageContainLogo;
+  if (fit === "containLarge") return styles.imageContainLarge;
   return "";
 }
 
@@ -63,6 +64,7 @@ function imageFlowFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageFlowContain;
   if (fit === "containWide") return styles.imageFlowContainWide;
   if (fit === "containLogo") return styles.imageFlowContainLogo;
+  if (fit === "containLarge") return styles.imageFlowContainLarge;
   return styles.imageFlowCover;
 }
 

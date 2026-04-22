@@ -34,7 +34,7 @@
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.25em;
+  gap: 0;
 }
 
 .title {
@@ -63,7 +63,7 @@
 .headingsEm .subtitle {
   margin: 0;
   width: 100%;
-  font-size: 1.3em;
+  font-size: 1.1em;
   font-weight: 400; /* Matter Regular — light and dark */
   line-height: 1.42;
   color: var(--color-text-secondary);

@@ -6,6 +6,8 @@ import { ProjectImageContainer } from "@/components/ProjectImageContainer";
 import { CardGroup } from "@/components/CardGroup";
 import { FocusLayerBlock } from "@/components/FocusLayerBlock";
 import { ImageBlock } from "@/components/ImageBlock";
+import { MoreProjects } from "@/components/MoreProjects";
+import { Testimonial } from "@/components/Testimonial";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
@@ -73,6 +75,8 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             {...block}
           />
         ))}
+        {project.testimonial ? <Testimonial {...project.testimonial} /> : null}
+        <MoreProjects currentProject={project} />
       </div>
     </main>
   );

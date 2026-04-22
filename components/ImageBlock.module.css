@@ -379,6 +379,17 @@
   margin: auto;
 }
 
+.imageContainLarge {
+  object-fit: contain;
+  width: 70% !important;
+  max-width: 1400px;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
+  inset: 0;
+  margin: auto;
+  border-radius: 20px;
+  border: 10px solid #000000;
+}
+
 .imageFlow {
   display: block;
   width: 100%;
@@ -406,6 +417,15 @@
   width: min(60%, 220px);
   max-width: 220px;
   margin-inline: auto;
+}
+
+.imageFlowContainLarge {
+  width: min(70%, 1400px);
+  max-width: 1400px;
+  margin-inline: auto;
+  margin-block: 2em;
+  border-radius: 20px;
+  border: 10px solid #000000;
 }
 
 /* Mobile carousel: same rhythm as `CardGroup` (`listMobileCarousel`). */
