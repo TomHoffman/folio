@@ -1,4 +1,4 @@
-@keyframes projectFadeInUp {
+@keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(50px);
@@ -10,7 +10,7 @@
   }
 }
 
-@keyframes projectFadeIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
   }
@@ -20,35 +20,85 @@
   }
 }
 
-/* Soft ease-out: quick start, long gentle settle */
-.enterTitle {
-  animation: projectFadeInUp 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
-  animation-delay: 0.08s;
+/*
+ * Reusable entry utilities:
+ * - `.fadeInUp` / `.fade-in-up`: opacity + translateY
+ * - `.fadeIn` / `.fade-in`: opacity-only
+ * - `.offset0`…`.offset4`: delay presets
+ *
+ * Existing semantic classes (`enterTitle`, `enterRow2`, etc.) remain as aliases.
+ */
+
+.fadeInUp,
+.fade-in-up,
+.enterTitle,
+.enterRow2,
+.enterMedia {
+  animation-name: fadeInUp;
+  animation-duration: var(--enter-duration, 0.85s);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.32, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--enter-delay, 0s);
 }
 
-/* Header back — opacity only, same duration / easing / delay as .enterTitle */
+.fadeIn,
+.fade-in,
+.enterBack,
+.enterOverviewIntro {
+  animation-name: fadeIn;
+  animation-duration: var(--enter-duration, 0.85s);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.32, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--enter-delay, 0s);
+}
+
+.offset0 {
+  --enter-delay: 0s;
+}
+
+.offset1 {
+  --enter-delay: 0.08s;
+}
+
+.offset2 {
+  --enter-delay: 0.16s;
+}
+
+.offset3 {
+  --enter-delay: 0.24s;
+}
+
+.offset4 {
+  --enter-delay: 0.4s;
+}
+
+.revealPending {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+/* Existing project page timings preserved via aliases. */
+.enterTitle,
 .enterBack {
-  animation: projectFadeIn 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
-  animation-delay: 0.08s;
+  --enter-delay: 0.08s;
 }
 
 .enterRow2 {
-  animation: projectFadeInUp 0.85s cubic-bezier(0.22, 1, 0.32, 1) both;
-  animation-delay: 0.24s;
+  --enter-delay: 0.24s;
 }
 
-.enterMedia {
-  animation: projectFadeInUp 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
-  animation-delay: 0.4s;
-}
-
-/* Opacity only; same delay, duration, and easing as `.enterMedia` */
+.enterMedia,
 .enterOverviewIntro {
-  animation: projectFadeIn 0.95s cubic-bezier(0.22, 1, 0.32, 1) both;
-  animation-delay: 0.4s;
+  --enter-duration: 0.95s;
+  --enter-delay: 0.4s;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fadeInUp,
+  .fade-in-up,
+  .fadeIn,
+  .fade-in,
+  .revealPending,
   .enterTitle,
   .enterRow2,
   .enterMedia,

@@ -18,6 +18,8 @@
   flex-direction: column;
   gap: 0;
   min-width: 0;
+  padding-top: 2em;
+  padding-bottom: 2em;
 }
 
 /* Matches ProjectHero `.headingsEm .subtitle` size; Matter Light (300). */
@@ -98,7 +100,6 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     align-items: start;
-    padding-top: 0.5em;
   }
 
   .ruleBetweenIntroMeta {
@@ -123,7 +124,6 @@
 @media (min-width: 1024px) and (max-width: 1279px) {
   .split {
     column-gap: 2rem;
-    padding-bottom: 0.75em;
   }
 
   .intro {
@@ -139,7 +139,6 @@
 @media (min-width: 1280px) {
   .split {
     column-gap: 3rem;
-    padding-bottom: 1em;
   }
 
   .intro {

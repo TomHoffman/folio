@@ -57,6 +57,9 @@ export type ImageBlockMobileLayout =
   | "mobile-carousel";
 
 export type ImageBlockMobileStack = "default" | "one-then-two";
+export type ImageBlockRevealOffset = 0 | 1 | 2 | 3 | 4;
+export type ImageBlockScrollReveal = "none" | "self" | "on-outcomes";
+export type ImageBlockScrollRevealTarget = "section" | "svg-only";
 
 export type ImageBlockProps = {
   title?: string;
@@ -71,9 +74,21 @@ export type ImageBlockProps = {
   mobileLayout?: ImageBlockMobileLayout;
   /** Optional mobile stack pattern for row content. */
   mobileStack?: ImageBlockMobileStack;
+  /** Optional selective scroll reveal trigger. */
+  scrollReveal?: ImageBlockScrollReveal;
+  /** Reveal scope when `scrollReveal` is enabled. */
+  scrollRevealTarget?: ImageBlockScrollRevealTarget;
+  /** Delay offset preset used when `scrollReveal` is enabled. */
+  revealOffset?: ImageBlockRevealOffset;
+  /** Optional reveal delay preset for the description rail block. */
+  descriptionRevealOffset?: ImageBlockRevealOffset;
   rows: ImageBlockRow[];
   className?: string;
+  descriptionClassName?: string;
 };
 
 /** Serializable shape for `Project.imageBlocks[]` in `data/projects.ts`. */
-export type ImageBlockData = Omit<ImageBlockProps, "className">;
+export type ImageBlockData = Omit<
+  ImageBlockProps,
+  "className" | "descriptionClassName"
+>;

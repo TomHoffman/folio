@@ -18,6 +18,11 @@
 .headingRail {
   box-sizing: border-box;
   width: 100%;
+  padding-top: 2em;
+}
+
+.headingRailOutcomes {
+  padding-top: 4em;
 }
 
 /* Space between section label and card row */

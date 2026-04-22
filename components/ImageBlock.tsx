@@ -5,14 +5,19 @@ import { useEffect, useMemo, useState } from "react";
 import {
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
+import enterStyles from "./ProjectPageEnter.module.css";
 import railStyles from "./projectContentRail.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ImageBlock.module.css";
+import { useScrollRevealElement } from "./useScrollReveal";
 import type {
   ImageBlockCellMode,
   ImageBlockMobileLayout,
   ImageBlockProps,
+  ImageBlockRevealOffset,
   ImageBlockRowHeight,
+  ImageBlockScrollReveal,
+  ImageBlockScrollRevealTarget,
   ImageBlockRow,
 } from "./imageBlockTypes";
 
@@ -61,16 +66,33 @@ function imageFlowFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   return styles.imageFlowCover;
 }
 
+function revealOffsetClass(offset: ImageBlockRevealOffset): string {
+  if (offset === 0) return enterStyles.offset0;
+  if (offset === 1) return enterStyles.offset1;
+  if (offset === 2) return enterStyles.offset2;
+  if (offset === 3) return enterStyles.offset3;
+  return enterStyles.offset4;
+}
+
+function isSvgCell(cell: ImageBlockCell): boolean {
+  if (cell.inlineSvgSrc) return true;
+  const src = cell.src?.trim();
+  if (!src) return false;
+  return /\.svg(?:$|\?)/i.test(src);
+}
+
 function CellMedia({
   cell,
   sizesHint,
   inlineSvgMap,
   useFill = true,
+  revealClassName,
 }: {
   cell: ImageBlockCell;
   sizesHint: string;
   inlineSvgMap: Record<string, string>;
   useFill?: boolean;
+  revealClassName?: string;
 }) {
   if (cell.inlineSvgSrc) {
     const svgMarkup = inlineSvgMap[cell.inlineSvgSrc];
@@ -81,6 +103,7 @@ function CellMedia({
         className={[
           styles.inlineSvgRoot,
           useFill ? "" : styles.inlineSvgFlow,
+          revealClassName ?? "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -100,7 +123,7 @@ function CellMedia({
       <img
         src={cell.src}
         alt={cell.alt ?? ""}
-        className={`${styles.imageFlow} ${imageFlowFitClass(cell.fit)}`}
+        className={`${styles.imageFlow} ${imageFlowFitClass(cell.fit)} ${revealClassName ?? ""}`}
         loading="lazy"
         decoding="async"
       />
@@ -112,7 +135,7 @@ function CellMedia({
       src={cell.src}
       alt={cell.alt ?? ""}
       fill
-      className={`${styles.image} ${imageFitClass(cell.fit)}`}
+      className={`${styles.image} ${imageFitClass(cell.fit)} ${revealClassName ?? ""}`}
       sizes={sizesHint}
     />
   );
@@ -122,10 +145,18 @@ function RowView({
   row,
   sizesHint,
   inlineSvgMap,
+  scrollReveal,
+  scrollRevealTarget,
+  isRevealVisible,
+  revealOffset,
 }: {
   row: ImageBlockRow;
   sizesHint: string;
   inlineSvgMap: Record<string, string>;
+  scrollReveal: ImageBlockScrollReveal;
+  scrollRevealTarget: ImageBlockScrollRevealTarget;
+  isRevealVisible: boolean;
+  revealOffset: ImageBlockRevealOffset;
 }) {
   const mode: ImageBlockCellMode = row.cellMode ?? "rowAspect";
   const ar = row.rowAspectRatio?.trim() || DEFAULT_ROW_AR;
@@ -162,12 +193,26 @@ function RowView({
                 .filter(Boolean)
                 .join(" ")}
             >
-              <CellMedia
-                cell={cell}
-                sizesHint={sizesHint}
-                inlineSvgMap={inlineSvgMap}
-                useFill={!isContentHeight}
-              />
+              {(() => {
+                const shouldAnimateMedia =
+                  scrollReveal !== "none" &&
+                  scrollRevealTarget === "svg-only" &&
+                  isSvgCell(cell);
+                const mediaRevealClass = shouldAnimateMedia
+                  ? isRevealVisible
+                    ? `${enterStyles.fadeInUp} ${revealOffsetClass(revealOffset)}`
+                    : enterStyles.revealPending
+                  : "";
+                return (
+                  <CellMedia
+                    cell={cell}
+                    sizesHint={sizesHint}
+                    inlineSvgMap={inlineSvgMap}
+                    useFill={!isContentHeight}
+                    revealClassName={mediaRevealClass}
+                  />
+                );
+              })()}
             </div>
           </div>
         ))}
@@ -202,12 +247,26 @@ function RowView({
               .filter(Boolean)
               .join(" ")}
           >
-            <CellMedia
-              cell={cell}
-              sizesHint={sizesHint}
-              inlineSvgMap={inlineSvgMap}
-              useFill={!isContentHeight}
-            />
+            {(() => {
+              const shouldAnimateMedia =
+                scrollReveal !== "none" &&
+                scrollRevealTarget === "svg-only" &&
+                isSvgCell(cell);
+              const mediaRevealClass = shouldAnimateMedia
+                ? isRevealVisible
+                  ? `${enterStyles.fadeInUp} ${revealOffsetClass(revealOffset)}`
+                  : enterStyles.revealPending
+                : "";
+              return (
+                <CellMedia
+                  cell={cell}
+                  sizesHint={sizesHint}
+                  inlineSvgMap={inlineSvgMap}
+                  useFill={!isContentHeight}
+                  revealClassName={mediaRevealClass}
+                />
+              );
+            })()}
           </div>
         </div>
       ))}
@@ -239,14 +298,36 @@ export function ImageBlock({
   mobileContained = true,
   mobileLayout = "stacked",
   mobileStack = "default",
+  scrollReveal = "none",
+  scrollRevealTarget = "section",
+  revealOffset = 2,
+  descriptionRevealOffset,
   rows,
   className,
+  descriptionClassName,
 }: ImageBlockProps) {
+  const {
+    ref: selfRevealRef,
+    isVisible: isSelfRevealVisible,
+  } = useScrollRevealElement<HTMLElement>({
+    enabled: scrollReveal === "self",
+  });
+  const [isSectionVisible, setIsSectionVisible] = useState(scrollReveal === "none");
   const [inlineSvgMap, setInlineSvgMap] = useState<Record<string, string>>({});
   const useOneThenTwoMobile = mobileStack === "one-then-two";
+  const isRevealVisible = scrollReveal === "self" ? isSelfRevealVisible : isSectionVisible;
   const sectionClass = [
     styles.section,
     useOneThenTwoMobile ? styles.mobileStackOneThenTwo : "",
+    scrollReveal !== "none" && scrollRevealTarget === "section" && !isRevealVisible
+      ? enterStyles.revealPending
+      : "",
+    scrollReveal !== "none" && scrollRevealTarget === "section" && isRevealVisible
+      ? enterStyles.fadeInUp
+      : "",
+    scrollReveal !== "none" && scrollRevealTarget === "section" && isRevealVisible
+      ? revealOffsetClass(revealOffset)
+      : "",
     className,
   ]
     .filter(Boolean)
@@ -272,6 +353,26 @@ export function ImageBlock({
       ),
     [rows]
   );
+
+  useEffect(() => {
+    if (scrollReveal !== "on-outcomes") {
+      setIsSectionVisible(true);
+      return;
+    }
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsSectionVisible(true);
+      return;
+    }
+    if (document.documentElement.dataset.outcomesRevealed === "true") {
+      setIsSectionVisible(true);
+      return;
+    }
+
+    const onReveal = () => setIsSectionVisible(true);
+    window.addEventListener("folio:outcomes-reveal", onReveal);
+    return () => window.removeEventListener("folio:outcomes-reveal", onReveal);
+  }, [scrollReveal]);
 
   useEffect(() => {
     if (inlineSvgSources.length === 0) return;
@@ -320,12 +421,36 @@ export function ImageBlock({
 
   return (
     <section
+      ref={selfRevealRef}
       className={sectionClass}
       aria-labelledby={hasHeading && headingId ? headingId : undefined}
     >
       <div className={styles.sectionInner}>
         {hasDescriptionBlock ? (
-          <div className={`${railStyles.contentRail} ${styles.description}`}>
+          <div
+            className={[
+              railStyles.contentRail,
+              styles.description,
+              descriptionClassName ?? "",
+              scrollReveal !== "none" &&
+              typeof descriptionRevealOffset === "number" &&
+              !isRevealVisible
+                ? enterStyles.revealPending
+                : "",
+              scrollReveal !== "none" &&
+              typeof descriptionRevealOffset === "number" &&
+              isRevealVisible
+                ? enterStyles.fadeInUp
+                : "",
+              scrollReveal !== "none" &&
+              typeof descriptionRevealOffset === "number" &&
+              isRevealVisible
+                ? revealOffsetClass(descriptionRevealOffset)
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             {hasHeading ? (
               <h2
                 id={headingId}
@@ -350,6 +475,10 @@ export function ImageBlock({
                   row={row}
                   sizesHint={sizesRow}
                   inlineSvgMap={inlineSvgMap}
+                  scrollReveal={scrollReveal}
+                  scrollRevealTarget={scrollRevealTarget}
+                  isRevealVisible={isRevealVisible}
+                  revealOffset={revealOffset}
                 />
               ))}
             </div>

@@ -34,7 +34,7 @@
   /* Home `ProjectGrid` cards + work hero media — same horizontal inset */
   --page-gutter-x: 0.5rem;
   /* Work project page: vertical gap between hero title, image, overview, card group */
-  --project-page-stack-gap: 1.5rem;
+  --project-page-stack-gap: 1em;
   /* ProjectOverview: gap between `.split` and final `<hr>` (see `.inner`). */
   --project-overview-split-to-rule-gap: 1.5rem;
   /* Padding below last meta row before that gap (<1024 only; see `ProjectOverview.module.css`). */
@@ -74,7 +74,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --project-page-stack-gap: 2rem;
+    --project-page-stack-gap: 1em;
   }
 }
 
@@ -92,7 +92,7 @@
   :root {
     --project-content-rail: 1.5rem;
     --page-gutter-x: 3rem;
-    --project-page-stack-gap: 2.5rem;
+    --project-page-stack-gap: 1em;
     --section-heading-inline-start: calc(var(--section-heading-font-size) * 1.5);
     --project-overview-meta-tail-pad: 0;
     --project-overview-split-bottom-pad: 1em;

@@ -59,12 +59,6 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
           <ImageBlock
             key={block.headingId ?? `image-block-${index}`}
             {...block}
-            className={
-              project.slug === "licel" &&
-              block.headingId === "licel-image-block-brand-heading"
-                ? mainStyles.licelScaleUpBlock
-                : undefined
-            }
           />
         ))}
         {(project.focusLayerBlocks ?? []).map((block, index) => (

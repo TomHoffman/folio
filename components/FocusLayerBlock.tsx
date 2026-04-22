@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import {
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
@@ -9,13 +10,15 @@ import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./FocusLayerBlock.module.css";
 import type { FocusLayerBlockProps } from "./focusLayerBlockTypes";
 
-function indicatorFillWidth(index: number, active: number, progress: number): string {
-  if (index < active) return "100%";
-  if (index > active) return "0%";
-  return `${Math.max(0, Math.min(progress, 1)) * 100}%`;
-}
-
 const FINANCE_ILLUSTRATION_SRC = "/images/licel/finance-illustration.svg";
+const FINANCE_ILLUSTRATION_END_SRC = "/images/licel/finance-illustration-end.svg";
+const ACCORDION_CONTROLLER_SRC = "/svg/icons/accordion-controller.svg";
+
+function layerOpacity(activeIndex: number, layer: 0 | 1 | 2): number {
+  if (activeIndex <= 0) return layer === 0 ? 1 : 0;
+  if (activeIndex === 1) return layer === 1 ? 1 : 0;
+  return layer === 2 ? 1 : 0;
+}
 
 export function FocusLayerBlock({
   title,
@@ -23,56 +26,31 @@ export function FocusLayerBlock({
   headingId,
   indicatorColor = "powderBlue",
   items,
-  autoRotateMs = 5000,
   className,
 }: FocusLayerBlockProps) {
-  const safeItems = useMemo(() => items.slice(0, 3), [items]);
+  const safeItems = useMemo(() => items.slice(0, 4), [items]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const textListRef = useRef<HTMLDivElement>(null);
-  const textButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const isProgrammaticScrollRef = useRef(false);
-  const programmaticScrollTimerRef = useRef<number | null>(null);
   const [illustrationSvg, setIllustrationSvg] = useState<string | null>(null);
+  const [illustrationEndSvg, setIllustrationEndSvg] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let cancelled = false;
-    void fetch(FINANCE_ILLUSTRATION_SRC)
-      .then((res) => res.text())
-      .then((text) => {
-        if (!cancelled) setIllustrationSvg(text);
-      })
-      .catch(() => {
-        if (!cancelled) setIllustrationSvg(null);
-      });
+    void Promise.all([
+      fetch(FINANCE_ILLUSTRATION_SRC)
+        .then((res) => res.text())
+        .catch(() => ""),
+      fetch(FINANCE_ILLUSTRATION_END_SRC)
+        .then((res) => res.text())
+        .catch(() => ""),
+    ]).then(([baseText, endText]) => {
+      if (cancelled) return;
+      setIllustrationSvg(baseText || null);
+      setIllustrationEndSvg(endText || null);
+    });
     return () => {
       cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (safeItems.length <= 1) return;
-    let start = performance.now();
-    const interval = window.setInterval(() => {
-      const elapsed = performance.now() - start;
-      const ratio = Math.min(elapsed / autoRotateMs, 1);
-      setProgress(ratio);
-      if (ratio >= 1) {
-        start = performance.now();
-        setProgress(0);
-        onSelect((activeIndex + 1) % safeItems.length, true);
-      }
-    }, 50);
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [activeIndex, autoRotateMs, safeItems.length]);
-
-  useEffect(() => {
-    return () => {
-      if (programmaticScrollTimerRef.current !== null) {
-        window.clearTimeout(programmaticScrollTimerRef.current);
-      }
     };
   }, []);
 
@@ -82,57 +60,25 @@ export function FocusLayerBlock({
     }
   }, [activeIndex, safeItems.length]);
 
-  const onSelect = (index: number, shouldScroll = true) => {
-    setActiveIndex(index);
-    setProgress(0);
-    if (typeof window === "undefined") return;
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
-    if (!shouldScroll) return;
-    const container = textListRef.current;
-    const target = textButtonRefs.current[index];
-    if (!container || !target) return;
-    isProgrammaticScrollRef.current = true;
-    container.scrollTo({ left: target.offsetLeft, behavior: "smooth" });
-    if (programmaticScrollTimerRef.current !== null) {
-      window.clearTimeout(programmaticScrollTimerRef.current);
-    }
-    programmaticScrollTimerRef.current = window.setTimeout(() => {
-      isProgrammaticScrollRef.current = false;
-      programmaticScrollTimerRef.current = null;
-    }, 450);
-  };
-
-  const onTextListScroll = () => {
-    if (typeof window === "undefined") return;
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
-    if (isProgrammaticScrollRef.current) return;
-    const container = textListRef.current;
-    if (!container) return;
-    const centerX = container.scrollLeft + container.clientWidth / 2;
-    let closestIndex = 0;
-    let closestDistance = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < textButtonRefs.current.length; i++) {
-      const button = textButtonRefs.current[i];
-      if (!button) continue;
-      const buttonCenter = button.offsetLeft + button.offsetWidth / 2;
-      const distance = Math.abs(buttonCenter - centerX);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = i;
-      }
-    }
-    if (closestIndex !== activeIndex) {
-      setActiveIndex(closestIndex);
-      setProgress(0);
-    }
-  };
-
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
   const headingText = title?.trim() ?? "";
   const descriptionText = description?.trim() ?? "";
   const hasHeading = headingText.length > 0;
   const hasDescription = descriptionText.length > 0;
   const hasDescriptionBlock = hasHeading || hasDescription;
+  const onAccordionTriggerClick = (index: number) => {
+    if (safeItems.length <= 1) return;
+    if (index === activeIndex) {
+      setActiveIndex((index + 1) % safeItems.length);
+      return;
+    }
+    setActiveIndex(index);
+  };
+  const illustrationVars = {
+    ["--focus-layer-0-opacity" as string]: String(layerOpacity(activeIndex, 0)),
+    ["--focus-layer-1-opacity" as string]: String(layerOpacity(activeIndex, 1)),
+    ["--focus-layer-2-opacity" as string]: String(layerOpacity(activeIndex, 2)),
+  } as CSSProperties;
 
   return (
     <section
@@ -164,57 +110,70 @@ export function FocusLayerBlock({
                 {illustrationSvg ? (
                   <div
                     className={styles.illustrationRoot}
-                    data-focus-frame={activeIndex}
+                    style={illustrationVars}
                     role="img"
                     aria-label={
                       safeItems[activeIndex]?.title ?? "Layered illustration"
                     }
                   >
-                    {/* Inner mount only: avoids React re-applying innerHTML when data-focus-frame updates (kills CSS transitions on SVG). */}
+                    {/* Layer 0: base only */}
                     <div
-                      className={styles.illustrationSvgMount}
+                      className={`${styles.illustrationLayer} ${styles.illustrationLayer0}`}
                       dangerouslySetInnerHTML={{ __html: illustrationSvg }}
+                    />
+                    {/* Layer 1: base + phone/location overlay */}
+                    <div
+                      className={`${styles.illustrationLayer} ${styles.illustrationLayer1}`}
+                      dangerouslySetInnerHTML={{ __html: illustrationSvg }}
+                    />
+                    {/* Layer 2: full UI */}
+                    <div
+                      className={`${styles.illustrationLayer} ${styles.illustrationLayer2}`}
+                      dangerouslySetInnerHTML={{
+                        __html: illustrationEndSvg ?? illustrationSvg,
+                      }}
                     />
                   </div>
                 ) : null}
               </div>
-              <div className={styles.indicator} aria-hidden>
-                {safeItems.map((_, i) => (
-                  <div key={`indicator-${i}`} className={styles.indicatorTrack}>
-                    <div
-                      className={styles.indicatorFill}
-                      style={{ width: indicatorFillWidth(i, activeIndex, progress) }}
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
 
-            <div
-              ref={textListRef}
-              className={styles.textList}
-              onScroll={onTextListScroll}
-            >
+            <div className={styles.textList}>
               {safeItems.map((item, i) => {
                 const isActive = i === activeIndex;
+                const panelId = `${headingId ?? "focus-layer"}-panel-${i}`;
                 return (
-                  <button
+                  <div
                     key={`${item.title}-${i}`}
-                    type="button"
-                    ref={(el) => {
-                      textButtonRefs.current[i] = el;
-                    }}
                     className={`${styles.textButton} ${isActive ? styles.textButtonActive : ""}`}
-                    onClick={() => onSelect(i)}
-                    aria-pressed={isActive}
                   >
-                    <div className={styles.textMain}>
-                      <p className={styles.textTitle}>
-                        {i + 1}. {item.title}
-                      </p>
+                    <button
+                      type="button"
+                      className={styles.accordionTrigger}
+                      onClick={() => onAccordionTriggerClick(i)}
+                      aria-expanded={isActive}
+                      aria-controls={panelId}
+                    >
+                      <div className={styles.textMain}>
+                        <p className={styles.textTitle}>
+                          {i + 1}. {item.title}
+                        </p>
+                      </div>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG icon */}
+                      <img
+                        className={`${styles.accordionIcon} ${isActive ? styles.accordionIconOpen : ""}`}
+                        src={ACCORDION_CONTROLLER_SRC}
+                        alt=""
+                        aria-hidden
+                      />
+                    </button>
+                    <div
+                      id={panelId}
+                      className={`${styles.textPanel} ${isActive ? styles.textPanelOpen : ""}`}
+                    >
                       <p className={styles.textBody}>{item.body}</p>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

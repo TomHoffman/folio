@@ -60,14 +60,8 @@
  * overview’s internal gap above its final rule — offset so rule→title matches meta→rule.
  */
 .cardGroupAfterOverview {
-  margin-top: calc(
-    var(--card-group-after-overview-spacing) - var(--project-page-stack-gap)
-  );
-}
-
-/* Licel: extra space before the Start-up to scale-up image block. */
-.licelScaleUpBlock {
-  padding-top: 2em;
+  /* Let divider→title spacing be controlled by CardGroup heading rail padding. */
+  margin-top: calc(-1 * var(--project-page-stack-gap));
 }
 
 @media (max-width: 767px) {

@@ -1,10 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
+import enterStyles from "./ProjectPageEnter.module.css";
 import {
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
 import railStyles from "./projectContentRail.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./CardGroup.module.css";
+import { useScrollRevealElement } from "./useScrollReveal";
 import type {
   CardGroupItem,
   CardGroupProps,
@@ -82,6 +87,20 @@ export function CardGroup({
   className,
   headingId = "card-group-heading",
 }: CardGroupProps) {
+  const isOutcomesGroup = (title?.trim().toLowerCase() ?? "") === "outcomes";
+  const { ref: titleRevealRef, isVisible: isTitleVisible } = useScrollRevealElement<HTMLHeadingElement>({
+    enabled: isOutcomesGroup,
+  });
+  const { ref: cardsRevealRef, isVisible: areCardsVisible } = useScrollRevealElement<HTMLUListElement>({
+    enabled: isOutcomesGroup,
+  });
+
+  useEffect(() => {
+    if (!isOutcomesGroup) return;
+    if (!isTitleVisible && !areCardsVisible) return;
+    document.documentElement.dataset.outcomesRevealed = "true";
+    window.dispatchEvent(new CustomEvent("folio:outcomes-reveal"));
+  }, [isOutcomesGroup, isTitleVisible, areCardsVisible]);
   const visibleTitle = showTitle && Boolean(title?.trim());
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
   const listClass = [
@@ -101,10 +120,28 @@ export function CardGroup({
     >
       <div className={styles.sectionInner}>
         {visibleTitle ? (
-          <div className={`${styles.headingRail} ${railStyles.contentRail}`}>
+          <div
+            className={[
+              styles.headingRail,
+              isOutcomesGroup ? styles.headingRailOutcomes : "",
+              railStyles.contentRail,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             <h2
+              ref={titleRevealRef}
               id={headingId}
-              className={`${sectionHeadingStyles.heading} ${sectionHeadingStyles.headingOnRail} ${styles.cardGroupHeading}`}
+              className={[
+                sectionHeadingStyles.heading,
+                sectionHeadingStyles.headingOnRail,
+                styles.cardGroupHeading,
+                isOutcomesGroup && !isTitleVisible ? enterStyles.revealPending : "",
+                isOutcomesGroup && isTitleVisible ? enterStyles.fadeInUp : "",
+                isOutcomesGroup && isTitleVisible ? enterStyles.offset0 : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               style={sectionHeadingIndicatorStyle(indicatorColor)}
             >
               {title?.trim()}
@@ -115,9 +152,25 @@ export function CardGroup({
             {title?.trim() || "Cards"}
           </h2>
         )}
-        <ul className={listClass}>
+        <ul className={listClass} ref={cardsRevealRef}>
           {items.map((item, i) => (
-            <li key={`${item.type}-${i}`} className={styles.cardSlot}>
+            <li
+              key={`${item.type}-${i}`}
+              className={[
+                styles.cardSlot,
+                isOutcomesGroup && item.type === "icon" && !areCardsVisible
+                  ? enterStyles.revealPending
+                  : "",
+                isOutcomesGroup && item.type === "icon" && areCardsVisible
+                  ? enterStyles.fadeInUp
+                  : "",
+                isOutcomesGroup && item.type === "icon" && areCardsVisible
+                  ? enterStyles.offset1
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
               <CardItem item={item} />
             </li>
           ))}

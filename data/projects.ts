@@ -116,6 +116,8 @@ export const projects: Project[] = [
       {
         contained: true,
         mobileLayout: "column",
+        scrollReveal: "on-outcomes",
+        revealOffset: 2,
         rows: [
           {
             rowHeight: "med-tall",
@@ -141,6 +143,10 @@ export const projects: Project[] = [
         contained: true,
         mobileLayout: "stacked",
         mobileStack: "one-then-two",
+        scrollReveal: "self",
+        scrollRevealTarget: "svg-only",
+        revealOffset: 2,
+        descriptionRevealOffset: 0,
         rows: [
           {
             rowHeight: "med-tall",
@@ -215,7 +221,6 @@ export const projects: Project[] = [
           "Security threats are invisible by nature, which makes them hard to communicate to non-technical audiences. The illustration system uses layers to show where vulnerabilities exist and how Licel's products address them.",
         headingId: "licel-focus-layer-heading",
         indicatorColor: "powderBlue",
-        autoRotateMs: 5000,
         items: [
           {
             title: "OS and flow of data",

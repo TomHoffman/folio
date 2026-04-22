@@ -11,8 +11,6 @@ export type FocusLayerBlockProps = {
   headingId?: string;
   indicatorColor?: SectionHeadingIndicatorColor;
   items: FocusLayerItem[];
-  /** Time in ms before advancing to the next item. */
-  autoRotateMs?: number;
   className?: string;
 };
 

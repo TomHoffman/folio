@@ -2,8 +2,9 @@
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  padding: 2em 0 0;
+  padding: 0;
   color: var(--color-text-primary);
+  --focus-ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .sectionInner {
@@ -20,6 +21,7 @@
   width: 100%;
   min-width: 0;
   max-width: 60ch;
+  padding-top: 2em;
 }
 
 .description > .descriptionHeading {
@@ -65,8 +67,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Indicator: bottom 17px + 5px track + clearance so art does not sit under it */
-  padding-bottom: calc(17px + 5px + 20px);
+  padding: 0;
   overflow: hidden;
   border-radius: 18px;
   background-color: #1f3741;
@@ -87,23 +88,35 @@
 /* Inlined SVG from `finance-illustration.svg` — target inner nodes with e.g. `.illustrationRoot :global(#illustration)`. */
 .illustrationRoot {
   box-sizing: border-box;
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.illustrationSvgMount {
+.illustrationLayer {
+  position: absolute;
+  inset: 0;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  will-change: opacity;
+  transition: opacity 0.6s ease-in-out;
 }
 
-.illustrationSvgMount :global(svg) {
+.illustrationLayer0 {
+  opacity: var(--focus-layer-0-opacity, 1);
+}
+
+.illustrationLayer1 {
+  opacity: var(--focus-layer-1-opacity, 0);
+}
+
+.illustrationLayer2 {
+  opacity: var(--focus-layer-2-opacity, 0);
+}
+
+.illustrationLayer :global(svg) {
   display: block;
   width: 100%;
   height: 100%;
@@ -111,82 +124,24 @@
   max-height: 100%;
 }
 
-/*
-  #UI stays at finance-illustration-end.svg position (Δy 162 in viewBox h 646).
-  Frames 0–1: hidden; frame 2: visible — opacity cross-fades over 0.5s via data-focus-frame.
-*/
-/*
-  Opacity transitions must stay on stable SVG nodes: the outer div used to mix
-  dangerouslySetInnerHTML with data-focus-frame, which could replace the subtree
-  and skip transitions — see illustrationSvgMount in the TSX.
-*/
-.illustrationRoot :global(#UI),
-.illustrationRoot :global([id="Phone base 2"]),
-.illustrationRoot :global(#location2) {
-  transition: opacity 0.5s ease-in-out;
-}
-
-.illustrationRoot :global(#UI) {
-  transform-box: view-box;
-  transform: translate(0, -25.077%);
+/* Layer 0: hide additional UI overlay pieces. */
+.illustrationLayer0 :global(#UI) {
   opacity: 0;
 }
 
-.illustrationRoot[data-focus-frame="2"] :global(#UI) {
-  opacity: 1;
-}
-
-/* Frame 1 (index 0): hide second phone body; id contains a space in the exported SVG */
-.illustrationRoot :global([id="Phone base 2"]) {
-  opacity: 1;
-}
-
-.illustrationRoot[data-focus-frame="0"] :global([id="Phone base 2"]) {
+.illustrationLayer0 :global([id="Phone base 2"]),
+.illustrationLayer0 :global(#location2) {
   opacity: 0;
 }
 
-.illustrationRoot :global(#location2) {
-  opacity: 1;
-}
-
-.illustrationRoot[data-focus-frame="0"] :global(#location2) {
+/* Layer 1: keep phone/location, hide UI overlay. */
+.illustrationLayer1 :global(#UI) {
   opacity: 0;
 }
 
-.indicator {
-  position: absolute;
-  right: 17px;
-  bottom: 17px;
-  left: 17px;
-  display: flex;
-  gap: 6px;
-  pointer-events: none;
-}
-
-@media (min-width: 768px) {
-  .indicator {
-    left: 50%;
-    right: auto;
-    width: min(100%, 250px);
-    max-width: 250px;
-    transform: translateX(-50%);
-  }
-}
-
-.indicatorTrack {
-  position: relative;
-  flex: 1 1 0;
-  height: 5px;
-  overflow: hidden;
-  border-radius: 9px;
-  background-color: #2e4b56;
-}
-
-.indicatorFill {
-  height: 100%;
-  border-radius: 9px;
-  background-color: #a1cae2;
-  transition: width 0.1s linear;
+.illustrationLayer2 :global([id="Group 801"]) {
+  transform-box: fill-box;
+  transform-origin: 55% 55%;
 }
 
 .textList {
@@ -201,48 +156,89 @@
 .textButton {
   box-sizing: border-box;
   display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 60px;
   width: 100%;
   min-width: 0;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px;
+  min-height: 60px;
+  flex-direction: column;
+  align-items: stretch;
   border: 0;
   border-radius: 18px;
   background-color: #1f3741;
   color: inherit;
   text-align: left;
-  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background-color 0.45s ease-in-out,
+    flex-grow 0.45s ease-in-out;
 }
 
 .textButtonActive {
   background-color: #2f4b57;
+  flex-grow: 1;
+}
+
+.accordionTrigger {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  font: inherit;
+  line-height: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accordionIcon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transition: transform 0.45s ease-in-out;
+}
+
+.accordionIconOpen {
+  transform: rotate(180deg);
 }
 
 .textMain {
   min-width: 0;
-  width: 100%;
+  flex: 1 1 auto;
 }
 
-@media (max-width: 767px) {
-  .textList {
-    flex-direction: row;
-    gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
+.textPanel {
+  box-sizing: border-box;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 20px;
+  transition:
+    max-height 0.45s ease-in-out,
+    padding 0.45s ease-in-out;
+}
 
-  .textButton {
-    flex: 0 0 100%;
-    max-width: 100%;
-    scroll-snap-align: start;
-  }
+.textPanelOpen {
+  max-height: 240px;
+  padding: 0 20px 20px;
 }
 
 .textTitle {
-  margin: 0 0 0.35rem;
+  margin: 0;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.4;
@@ -272,12 +268,27 @@
 
   .textList {
     flex: 1 1 0;
+    min-height: 0;
   }
 
   .textButton {
-    flex: 1 1 0;
-    min-height: 0;
     border-radius: 16px;
-    padding: 24px;
+  }
+
+  .accordionTrigger {
+    min-height: 60px;
+    padding: 18px 20px;
+  }
+
+  .textPanelOpen {
+    padding: 0 20px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textButton,
+  .accordionIcon,
+  .textPanel {
+    transition: none;
   }
 }
