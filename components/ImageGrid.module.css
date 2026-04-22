@@ -1,0 +1,191 @@
+.section {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+  --image-grid-columns: 3;
+  --image-grid-gap: 8px;
+  --image-grid-mobile-ar: 425 / 371;
+}
+
+.sectionInner {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75em;
+}
+
+.description {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 60ch;
+  padding-top: 2em;
+}
+
+.description > .descriptionHeading {
+  margin-bottom: 0.5rem;
+}
+
+.descriptionBody {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.4;
+  color: #7ea6b7;
+}
+
+.gridOuter {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.gridShell {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 8px;
+  border-radius: 24px;
+  background-color: #172e37;
+}
+
+.gridBleed {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.desktopGrid {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(var(--image-grid-columns), minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--image-grid-gap);
+}
+
+.gridColumn {
+  box-sizing: border-box;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--image-grid-gap);
+}
+
+.gridColumnSingle {
+  height: 100%;
+}
+
+.gridItem {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: var(--grid-cell-bg, #1f3741);
+}
+
+.gridItemRatio {
+  /* Slightly taller than prior `short` (16:9) for better collage rhythm. */
+  aspect-ratio: 16 / 10;
+}
+
+.gridItemFill {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.imageCover {
+  object-fit: cover;
+}
+
+.imageContain {
+  object-fit: contain;
+  width: 90% !important;
+  height: 90% !important;
+  inset: 0;
+  margin: auto;
+}
+
+.carouselTrack {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .shellUncontainedOnMobile {
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  .desktopGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gridItem {
+    background-color: var(--grid-cell-bg-mobile, var(--grid-cell-bg, #1f3741));
+  }
+
+  .layoutMobileCarousel .desktopGrid {
+    display: none;
+  }
+
+  .layoutMobileCarousel .carouselTrack {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .carouselSlide {
+    box-sizing: border-box;
+    flex: 0 0 min(85vw, 20rem);
+    max-width: min(85vw, 20rem);
+    scroll-snap-align: start;
+  }
+
+  .carouselSlideInner {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background-color: var(--carousel-bg-mobile, var(--carousel-bg, #1f3741));
+    aspect-ratio: var(--image-grid-mobile-ar);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @media (max-width: 767px) {
+    .layoutMobileCarousel .carouselTrack {
+      scroll-snap-type: none;
+    }
+  }
+}

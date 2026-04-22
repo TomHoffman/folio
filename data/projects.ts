@@ -1,6 +1,7 @@
 import type { CardGroupData } from "@/components/cardGroupTypes";
 import type { FocusLayerBlockData } from "@/components/focusLayerBlockTypes";
 import type { ImageBlockData } from "@/components/imageBlockTypes";
+import type { ImageGridData } from "@/components/imageGridTypes";
 import type { TestimonialData } from "@/components/testimonialTypes";
 
 export type ProjectStatus = "active" | "protected" | "coming-soon";
@@ -48,6 +49,8 @@ export type Project = {
   cardGroup?: CardGroupData;
   /** Optional image group blocks (e.g. below CardGroup on project detail). */
   imageBlocks?: ImageBlockData[];
+  /** Optional collage/grid image module. */
+  imageGrids?: ImageGridData[];
   /** Optional focus layer explainer blocks. */
   focusLayerBlocks?: FocusLayerBlockData[];
   /** Optional image blocks rendered below focus layer content. */
@@ -139,7 +142,7 @@ export const projects: Project[] = [
         revealOffset: 2,
         rows: [
           {
-            rowHeight: "med-tall",
+            rowHeight: "medium",
             cells: [
               {
                 src: "/images/licel/phone-homescreen.jpg",
@@ -174,19 +177,19 @@ export const projects: Project[] = [
                 src: "/images/licel/licel-logo-white.svg",
                 alt: "Licel logo",
                 bgColor: "#3454E1",
-                fit: "containLogo",
+                fit: "containLogoSpaced",
               },
               {
                 src: "/images/licel/licel-logo-white.svg",
                 alt: "Licel logo",
                 bgColor: "#0C232C",
-                fit: "containLogo",
+                fit: "containLogoSpaced",
               },
               {
                 src: "/images/licel/licel-logo-blue.svg",
                 alt: "Licel logo",
                 bgColor: "#F3F4EF",
-                fit: "containLogo",
+                fit: "containLogoSpaced",
               },
             ],
           },
@@ -370,8 +373,100 @@ export const projects: Project[] = [
       indicatorColor: "powderBlue",
       columnCount: 4,
       mobileLayout: "carousel",
-      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+      items: [
+        {
+          type: "icon",
+          title: "Safety by design",
+          body: "Designed a glanceable interface that keeps critical information accessible without taking the driver's eyes off the water.",
+          iconSrc: "/svg/icons/safety.svg",
+        },
+        {
+          type: "icon",
+          title: "Built for real conditions",
+          body: "Interaction patterns validated through very cold on-water testing at speeds up to 30 knots at sea in Stockholm.",
+          iconSrc: "/svg/icons/boat.svg",
+        },
+        {
+          type: "icon",
+          title: "Making range accessible",
+          body: "Visualising range as concentric rings on the chart turned an abstract number into actionable planning information.",
+          iconSrc: "/svg/icons/range.svg",
+        },
+        {
+          type: "icon",
+          title: "Designed to scale",
+          body: "A modular design system built to expand across X Shore's product roadmap, reducing design time for new features going forwards.",
+          iconSrc: "/svg/icons/scale.svg",
+        },
+      ],
     },
+    imageBlocks: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            rowHeight: "short",
+            cells: [
+              {
+                alt: "",
+              },
+            ],
+          },
+          {
+            rowHeight: "medium",
+            cells: [
+              {
+                alt: "",
+              },
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    imageGrids: [
+      {
+        title: "Touchscreens at speed",
+        description:
+          "Testing at sea showed us that most touchscreen interactions become impossible at speed. The chart needed to stay visible at all times, with common tasks like centre and zoom supported with physical controls.",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "carousel",
+        columns: [
+          {
+            items: [
+              {
+                src: "/images/xshore/research1.jpg",
+                alt: "",
+              },
+            ],
+          },
+          {
+            items: [
+              {
+                src: "/images/xshore/research2.jpg",
+                alt: "",
+              },
+              {
+                src: "/images/xshore/research3.jpg",
+                alt: "",
+              },
+            ],
+          },
+          {
+            items: [
+              {
+                src: "/images/xshore/research4.jpg",
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "allied-irish-bank",

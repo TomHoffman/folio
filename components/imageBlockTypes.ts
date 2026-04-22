@@ -17,11 +17,13 @@ export type ImageBlockCell = {
     | "contain"
     | "containWide"
     | "containLogo"
+    | "containLogoSpaced"
     | "containLarge";
 };
 
 export type ImageBlockCellMode = "rowAspect" | "square";
 export type ImageBlockRowHeight =
+  | "full-width"
   | "tall"
   | "med-tall"
   | "medium"
@@ -42,6 +44,7 @@ export type ImageBlockRow = {
   rowAspectRatio?: string;
   /**
    * Tablet+ row height preset:
+ * - `full-width`: matches project hero media ratio.
    * - `short`: shallow landscape band.
    * - `medium`: squashed-square band.
    * - `med-tall`: midway between `medium` and `tall`.

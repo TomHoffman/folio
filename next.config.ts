@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
      * `/_next/static/media/**` is still auto-appended for static image imports.
      */
     localPatterns: [{ pathname: "/images/**" }],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

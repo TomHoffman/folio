@@ -2,37 +2,80 @@ import type { Metadata } from "next";
 import { CardGroup } from "@/components/CardGroup";
 import type { CardGroupData } from "@/components/cardGroupTypes";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
-import { HomepageHero } from "@/components/HomepageHero";
+import { FocusLayerBlock } from "@/components/FocusLayerBlock";
+import type { FocusLayerBlockData } from "@/components/focusLayerBlockTypes";
 import { ImageBlock } from "@/components/ImageBlock";
+import { ImageGrid } from "@/components/ImageGrid";
+import type { ImageGridData } from "@/components/imageGridTypes";
+import type { ImageBlockRow } from "@/components/imageBlockTypes";
 import { LogoGrid } from "@/components/LogoGrid";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import { ProjectOverview } from "@/components/ProjectOverview";
-import { getProjectBySlug } from "@/data/projects";
-import type { ImageBlockRow } from "@/components/imageBlockTypes";
+import { defaultLogoGridItems } from "@/data/logoGridItems";
+import type { ProjectOverviewData } from "@/data/projects";
+import { visibleProjects } from "@/data/projects";
 import mainStyles from "../main.module.css";
 import dsStyles from "./ds.module.css";
 
+const dsTitle = "Title";
+const dsLorem =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
 export const metadata: Metadata = {
-  title: "DS",
-  description: "Component playground for layout and QA.",
+  title: dsTitle,
+  description: dsLorem,
 };
 
-/** Unified card copy on `/ds` for layout QA (icon + image groups). */
-const dsCardTitle = "Title";
-const dsCardParagraph =
-  "Voluptates aut dicta aperiam molestiae illo omnis hic sunt voluptatum soluta. Aut quidem itaque et. Voluptates aut dicta aperiam.";
+const dsLogoGridItems = defaultLogoGridItems.map((item) => ({
+  ...item,
+  name: dsTitle,
+}));
+
+const dsProjectGridProjects = visibleProjects.map((p) => ({
+  ...p,
+  title: dsTitle,
+}));
+
+const dsProjectOverview: ProjectOverviewData = {
+  introText: dsLorem,
+  role: dsTitle,
+  duration: dsTitle,
+  team: dsLorem,
+};
+
+const dsFocusLayerBlock: FocusLayerBlockData = {
+  title: dsTitle,
+  description: dsLorem,
+  headingId: "ds-focus-layer-heading",
+  indicatorColor: "powderBlue",
+  visualVariant: "demo-square",
+  items: [
+    { title: dsTitle, body: dsLorem },
+    { title: dsTitle, body: dsLorem },
+    { title: dsTitle, body: dsLorem },
+  ],
+};
 
 const iconCardItems = [1, 2, 3, 4].map(() => ({
   type: "icon" as const,
-  title: dsCardTitle,
-  body: dsCardParagraph,
+  title: dsTitle,
+  body: dsLorem,
   iconSrc: "/svg/icons/lock.svg",
 }));
 
-const imageThumb = "/images/xshore/xshore-thumb.jpg";
+function dsPlaceholderImage(seed: string, width: number, height: number): string {
+  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${width}/${height}`;
+}
+
+const imageCardThumbs = [
+  dsPlaceholderImage("ds-card-1", 1200, 800),
+  dsPlaceholderImage("ds-card-2", 1200, 800),
+  dsPlaceholderImage("ds-card-3", 1200, 800),
+  dsPlaceholderImage("ds-card-4", 1200, 800),
+];
 
 const iconCardGroupStackedSample: CardGroupData = {
-  title: "Outcomes",
+  title: dsTitle,
   headingId: "ds-icon-card-group-stacked",
   indicatorColor: "blue",
   columnCount: 4,
@@ -41,7 +84,7 @@ const iconCardGroupStackedSample: CardGroupData = {
 };
 
 const iconCardGroupCarouselSample: CardGroupData = {
-  title: "Outcomes",
+  title: dsTitle,
   headingId: "ds-icon-card-group-carousel",
   indicatorColor: "blue",
   columnCount: 4,
@@ -49,16 +92,16 @@ const iconCardGroupCarouselSample: CardGroupData = {
   items: iconCardItems,
 };
 
-const imageCardItems = [1, 2, 3, 4].map(() => ({
+const imageCardItems = [1, 2, 3, 4].map((n, index) => ({
   type: "image" as const,
-  title: dsCardTitle,
-  body: dsCardParagraph,
-  imageSrc: imageThumb,
+  title: dsTitle,
+  body: dsLorem,
+  imageSrc: imageCardThumbs[index],
   imageAlt: "",
 }));
 
 const imageCardGroupStackedSample: CardGroupData = {
-  title: "Outcomes",
+  title: dsTitle,
   headingId: "ds-image-card-group-stacked",
   indicatorColor: "blue",
   columnCount: 4,
@@ -67,7 +110,7 @@ const imageCardGroupStackedSample: CardGroupData = {
 };
 
 const imageCardGroupCarouselSample: CardGroupData = {
-  title: "Outcomes",
+  title: dsTitle,
   headingId: "ds-image-card-group-carousel",
   indicatorColor: "blue",
   columnCount: 4,
@@ -75,76 +118,80 @@ const imageCardGroupCarouselSample: CardGroupData = {
   items: imageCardItems,
 };
 
-const imageBlockDescription =
-  "Quo pariatur qui ullam dicta aliquid distinctio. Eius et quo velit autem doloribus blanditiis quisquam. Et dolorum sunt minus tenetur quisquam consectetur atque tempore voluptate voluptatum. Ut sed perspiciatis dolor.";
+const imageGridSample: ImageGridData = {
+  title: dsTitle,
+  description: dsLorem,
+  contained: true,
+  mobileContained: false,
+  mobileLayout: "carousel",
+  columns: [
+    {
+      items: [{ src: dsPlaceholderImage("ds-grid-1", 1200, 900), alt: "" }],
+    },
+    {
+      items: [
+        { src: dsPlaceholderImage("ds-grid-2", 1200, 900), alt: "" },
+        { src: dsPlaceholderImage("ds-grid-3", 1200, 900), alt: "" },
+      ],
+    },
+    {
+      items: [{ src: dsPlaceholderImage("ds-grid-4", 1200, 900), alt: "" }],
+    },
+  ],
+};
 
 const imageBlockRows: ImageBlockRow[] = [
   {
-    cells: [{ src: imageThumb, alt: "" }],
-    rowAspectRatio: "16 / 10",
+    rowHeight: "full-width",
+    cells: [{ src: dsPlaceholderImage("ds-image-block-1", 1400, 900), alt: "" }],
   },
   {
+    rowHeight: "medium",
     cells: [
-      { src: imageThumb, alt: "" },
-      { src: imageThumb, alt: "" },
+      { src: dsPlaceholderImage("ds-image-block-2", 1200, 900), alt: "" },
+      { src: dsPlaceholderImage("ds-image-block-3", 1200, 900), alt: "" },
     ],
-    rowAspectRatio: "16 / 10",
   },
 ];
 
 export default function DsPage() {
-  const licelOverview = getProjectBySlug("licel")?.overview;
-
   return (
     <main className={`${mainStyles.main} ${mainStyles.mainHome}`}>
       <div className={dsStyles.stack}>
-        <section className={dsStyles.block} aria-labelledby="ds-label-dark-toggle">
-          <h2 id="ds-label-dark-toggle" className={dsStyles.label}>
-            DarkModeToggle
-          </h2>
-          <div className={dsStyles.toggleRow}>
-            <DarkModeToggle />
-          </div>
-        </section>
-
-        <section className={dsStyles.block} aria-labelledby="ds-label-homepage-hero">
-          <h2 id="ds-label-homepage-hero" className={dsStyles.label}>
-            HomepageHero
-          </h2>
-          <HomepageHero />
-        </section>
-
         <section className={dsStyles.block} aria-labelledby="ds-label-logo-grid">
           <h2
             id="ds-label-logo-grid"
             className={`${dsStyles.label} ${dsStyles.labelLogoGrid}`}
           >
-            LogoGrid
+            {dsTitle}
           </h2>
-          <LogoGrid title="Selected clients" indicatorColor="secondary" />
+          <LogoGrid title={dsTitle} indicatorColor="secondary" items={dsLogoGridItems} />
         </section>
 
         <section className={dsStyles.block} aria-labelledby="ds-label-project-grid">
           <h2 id="ds-label-project-grid" className={dsStyles.label}>
-            ProjectGrid
+            {dsTitle}
           </h2>
-          <ProjectGrid title="Projects" showTitle indicatorColor="secondary" />
+          <ProjectGrid
+            title={dsTitle}
+            showTitle
+            indicatorColor="secondary"
+            projects={dsProjectGridProjects}
+          />
         </section>
 
-        {licelOverview ? (
-          <section className={dsStyles.block} aria-labelledby="ds-label-project-overview">
-            <h2 id="ds-label-project-overview" className={dsStyles.label}>
-              ProjectOverview
-            </h2>
-            <div className={dsStyles.projectMock}>
-              <ProjectOverview overview={licelOverview} />
-            </div>
-          </section>
-        ) : null}
+        <section className={dsStyles.block} aria-labelledby="ds-label-project-overview">
+          <h2 id="ds-label-project-overview" className={dsStyles.label}>
+            {dsTitle}
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ProjectOverview overview={dsProjectOverview} category={dsTitle} />
+          </div>
+        </section>
 
         <section className={dsStyles.block} aria-labelledby="ds-label-icon-cards-stacked">
           <h2 id="ds-label-icon-cards-stacked" className={dsStyles.label}>
-            CardGroup Icons (stacked)
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <CardGroup {...iconCardGroupStackedSample} />
@@ -153,7 +200,7 @@ export default function DsPage() {
 
         <section className={dsStyles.block} aria-labelledby="ds-label-icon-cards-carousel">
           <h2 id="ds-label-icon-cards-carousel" className={dsStyles.label}>
-            CardGroup Icons (carousel)
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <CardGroup {...iconCardGroupCarouselSample} />
@@ -162,7 +209,7 @@ export default function DsPage() {
 
         <section className={dsStyles.block} aria-labelledby="ds-label-image-cards-stacked">
           <h2 id="ds-label-image-cards-stacked" className={dsStyles.label}>
-            CardGroup Image (stacked)
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <CardGroup {...imageCardGroupStackedSample} />
@@ -171,22 +218,40 @@ export default function DsPage() {
 
         <section className={dsStyles.block} aria-labelledby="ds-label-image-cards-carousel">
           <h2 id="ds-label-image-cards-carousel" className={dsStyles.label}>
-            CardGroup Image (carousel)
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <CardGroup {...imageCardGroupCarouselSample} />
           </div>
         </section>
 
-        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-stack">
-          <h2 id="ds-label-image-block-bleed-stack" className={dsStyles.label}>
-            ImageBlock · not contained (stacked)
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-grid">
+          <h2 id="ds-label-image-grid" className={dsStyles.label}>
+            {dsTitle}
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <ImageGrid {...imageGridSample} />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-focus-layer-block">
+          <h2 id="ds-label-focus-layer-block" className={dsStyles.label}>
+            {dsTitle}
+          </h2>
+          <div className={dsStyles.projectMock}>
+            <FocusLayerBlock {...dsFocusLayerBlock} />
+          </div>
+        </section>
+
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-stacked">
+          <h2 id="ds-label-image-block-stacked" className={dsStyles.label}>
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <ImageBlock
-              title="Title"
-              description={imageBlockDescription}
-              headingId="ds-image-block-bleed-stack-heading"
+              title={dsTitle}
+              description={dsLorem}
+              headingId="ds-image-block-stacked-heading"
               indicatorColor="blue"
               contained={false}
               mobileLayout="stacked"
@@ -195,32 +260,15 @@ export default function DsPage() {
           </div>
         </section>
 
-        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-column">
-          <h2 id="ds-label-image-block-bleed-column" className={dsStyles.label}>
-            ImageBlock · not contained (column)
+        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-carousel">
+          <h2 id="ds-label-image-block-carousel" className={dsStyles.label}>
+            {dsTitle}
           </h2>
           <div className={dsStyles.projectMock}>
             <ImageBlock
-              title="Title"
-              description={imageBlockDescription}
-              headingId="ds-image-block-bleed-column-heading"
-              indicatorColor="blue"
-              contained={false}
-              mobileLayout="column"
-              rows={imageBlockRows}
-            />
-          </div>
-        </section>
-
-        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-bleed-carousel">
-          <h2 id="ds-label-image-block-bleed-carousel" className={dsStyles.label}>
-            ImageBlock (mobile carousel)
-          </h2>
-          <div className={dsStyles.projectMock}>
-            <ImageBlock
-              title="Title"
-              description={imageBlockDescription}
-              headingId="ds-image-block-bleed-carousel-heading"
+              title={dsTitle}
+              description={dsLorem}
+              headingId="ds-image-block-carousel-heading"
               indicatorColor="blue"
               contained={false}
               mobileLayout="mobile-carousel"
@@ -229,37 +277,12 @@ export default function DsPage() {
           </div>
         </section>
 
-        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-contained-stack">
-          <h2 id="ds-label-image-block-contained-stack" className={dsStyles.label}>
-            ImageBlock · contained (stacked)
+        <section className={dsStyles.block} aria-labelledby="ds-label-dark-toggle">
+          <h2 id="ds-label-dark-toggle" className={dsStyles.label}>
+            {dsTitle}
           </h2>
-          <div className={dsStyles.projectMock}>
-            <ImageBlock
-              title="Title"
-              description={imageBlockDescription}
-              headingId="ds-image-block-contained-stack-heading"
-              indicatorColor="blue"
-              contained
-              mobileLayout="stacked"
-              rows={imageBlockRows}
-            />
-          </div>
-        </section>
-
-        <section className={dsStyles.block} aria-labelledby="ds-label-image-block-contained-column">
-          <h2 id="ds-label-image-block-contained-column" className={dsStyles.label}>
-            ImageBlock · contained (column)
-          </h2>
-          <div className={dsStyles.projectMock}>
-            <ImageBlock
-              title="Title"
-              description={imageBlockDescription}
-              headingId="ds-image-block-contained-column-heading"
-              indicatorColor="blue"
-              contained
-              mobileLayout="column"
-              rows={imageBlockRows}
-            />
+          <div className={dsStyles.toggleRow}>
+            <DarkModeToggle />
           </div>
         </section>
       </div>

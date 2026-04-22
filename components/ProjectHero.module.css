@@ -61,6 +61,7 @@
 
 /* Scoped under .headingsEm so typography beats .enterRow2 (same element, equal single-class specificity). */
 .headingsEm .subtitle {
+  display: none;
   margin: 0;
   width: 100%;
   font-size: 1.1em;

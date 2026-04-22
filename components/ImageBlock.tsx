@@ -30,6 +30,8 @@ function rowCols(row: ImageBlockRow): number {
 
 function rowHeightPreset(height?: ImageBlockRowHeight): string | undefined {
   switch (height) {
+    case "full-width":
+      return "var(--image-block-row-ar-full-width)";
     case "med-tall":
       return "var(--image-block-row-ar-med-tall)";
     case "medium":
@@ -49,11 +51,15 @@ function imageFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageContain;
   if (fit === "containWide") return styles.imageContainWide;
   if (fit === "containLogo") return styles.imageContainLogo;
+  if (fit === "containLogoSpaced") return styles.imageContainLogo;
   if (fit === "containLarge") return styles.imageContainLarge;
   return "";
 }
 
 function frameFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
+  if (fit === "containLogoSpaced") {
+    return `${styles.cellFrameContain} ${styles.cellFrameContainLogoSpaced}`;
+  }
   if (fit === "contain" || fit === "containWide" || fit === "containLogo") {
     return styles.cellFrameContain;
   }
@@ -64,6 +70,7 @@ function imageFlowFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageFlowContain;
   if (fit === "containWide") return styles.imageFlowContainWide;
   if (fit === "containLogo") return styles.imageFlowContainLogo;
+  if (fit === "containLogoSpaced") return styles.imageFlowContainLogo;
   if (fit === "containLarge") return styles.imageFlowContainLarge;
   return styles.imageFlowCover;
 }

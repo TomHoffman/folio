@@ -2,9 +2,8 @@
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  margin-block: 2em;
+  margin-top: 2em;
   border-top: 1px solid var(--color-divider);
-  border-bottom: 1px solid var(--color-divider);
   color: var(--color-text-primary);
 }
 
@@ -16,7 +15,8 @@
   grid-template-columns: 176px minmax(0, 1fr);
   align-items: center;
   column-gap: clamp(1.25rem, 2.2vw, 2.5rem);
-  padding-block: clamp(1.5rem, 2.5vw, 2.75rem);
+  padding-top: clamp(1.5rem, 2.5vw, 2.75rem);
+  padding-bottom: 0;
 }
 
 .innerNoImage {
@@ -63,12 +63,18 @@
   color: #c1e0ed;
 }
 
+.citationName,
+.citationMeta {
+  display: inline;
+}
+
 @media (max-width: 767px) {
   .inner {
     grid-template-columns: 1fr;
     row-gap: 1rem;
-    justify-items: center;
-    padding-block: 1.5rem;
+    justify-items: start;
+    padding-top: 1.5rem;
+    padding-bottom: 0;
   }
 
   .imageFrame {
@@ -88,5 +94,10 @@
 
   .citation {
     font-size: 0.9375rem;
+  }
+
+  .citationName,
+  .citationMeta {
+    display: block;
   }
 }

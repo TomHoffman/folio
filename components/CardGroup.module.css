@@ -25,6 +25,12 @@
   padding-top: 4em;
 }
 
+@media (max-width: 1023px) {
+  .headingRailOutcomes {
+    padding-top: 2.5rem;
+  }
+}
+
 /* Space between section label and card row */
 .headingRail h2.cardGroupHeading {
   margin-bottom: 0.875rem;

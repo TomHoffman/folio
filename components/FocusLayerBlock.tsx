@@ -14,6 +14,8 @@ const FINANCE_ILLUSTRATION_SRC = "/images/licel/finance-illustration.svg";
 const FINANCE_ILLUSTRATION_END_SRC = "/images/licel/finance-illustration-end.svg";
 const ACCORDION_CONTROLLER_SRC = "/svg/icons/accordion-controller.svg";
 
+const DEMO_SQUARE_COLORS = ["#e11d48", "#22c55e", "#3b82f6"] as const;
+
 function layerOpacity(activeIndex: number, layer: 0 | 1 | 2): number {
   if (activeIndex <= 0) return layer === 0 ? 1 : 0;
   if (activeIndex === 1) return layer === 1 ? 1 : 0;
@@ -26,6 +28,7 @@ export function FocusLayerBlock({
   headingId,
   indicatorColor = "powderBlue",
   items,
+  visualVariant = "illustration",
   className,
 }: FocusLayerBlockProps) {
   const safeItems = useMemo(() => items.slice(0, 4), [items]);
@@ -34,8 +37,10 @@ export function FocusLayerBlock({
   const [illustrationEndSvg, setIllustrationEndSvg] = useState<string | null>(
     null,
   );
+  const isDemoSquare = visualVariant === "demo-square";
 
   useEffect(() => {
+    if (isDemoSquare) return;
     let cancelled = false;
     void Promise.all([
       fetch(FINANCE_ILLUSTRATION_SRC)
@@ -52,7 +57,7 @@ export function FocusLayerBlock({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isDemoSquare]);
 
   useEffect(() => {
     if (activeIndex > safeItems.length - 1) {
@@ -106,36 +111,52 @@ export function FocusLayerBlock({
         <div className={styles.shell}>
           <div className={styles.content}>
             <div className={styles.imageContainer}>
-              <div className={styles.svgFrame}>
-                {illustrationSvg ? (
+              {isDemoSquare ? (
+                <div className={styles.demoSquareMount}>
                   <div
-                    className={styles.illustrationRoot}
-                    style={illustrationVars}
+                    className={styles.demoSquare}
+                    style={{
+                      backgroundColor:
+                        DEMO_SQUARE_COLORS[
+                          activeIndex % DEMO_SQUARE_COLORS.length
+                        ],
+                    }}
                     role="img"
-                    aria-label={
-                      safeItems[activeIndex]?.title ?? "Layered illustration"
-                    }
-                  >
-                    {/* Layer 0: base only */}
+                    aria-label={safeItems[activeIndex]?.title ?? "Demo"}
+                  />
+                </div>
+              ) : (
+                <div className={styles.svgFrame}>
+                  {illustrationSvg ? (
                     <div
-                      className={`${styles.illustrationLayer} ${styles.illustrationLayer0}`}
-                      dangerouslySetInnerHTML={{ __html: illustrationSvg }}
-                    />
-                    {/* Layer 1: base + phone/location overlay */}
-                    <div
-                      className={`${styles.illustrationLayer} ${styles.illustrationLayer1}`}
-                      dangerouslySetInnerHTML={{ __html: illustrationSvg }}
-                    />
-                    {/* Layer 2: full UI */}
-                    <div
-                      className={`${styles.illustrationLayer} ${styles.illustrationLayer2}`}
-                      dangerouslySetInnerHTML={{
-                        __html: illustrationEndSvg ?? illustrationSvg,
-                      }}
-                    />
-                  </div>
-                ) : null}
-              </div>
+                      className={styles.illustrationRoot}
+                      style={illustrationVars}
+                      role="img"
+                      aria-label={
+                        safeItems[activeIndex]?.title ?? "Layered illustration"
+                      }
+                    >
+                      {/* Layer 0: base only */}
+                      <div
+                        className={`${styles.illustrationLayer} ${styles.illustrationLayer0}`}
+                        dangerouslySetInnerHTML={{ __html: illustrationSvg }}
+                      />
+                      {/* Layer 1: base + phone/location overlay */}
+                      <div
+                        className={`${styles.illustrationLayer} ${styles.illustrationLayer1}`}
+                        dangerouslySetInnerHTML={{ __html: illustrationSvg }}
+                      />
+                      {/* Layer 2: full UI */}
+                      <div
+                        className={`${styles.illustrationLayer} ${styles.illustrationLayer2}`}
+                        dangerouslySetInnerHTML={{
+                          __html: illustrationEndSvg ?? illustrationSvg,
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             <div className={styles.textList}>

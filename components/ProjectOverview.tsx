@@ -3,16 +3,24 @@ import enterStyles from "./ProjectPageEnter.module.css";
 import railStyles from "./projectContentRail.module.css";
 import styles from "./ProjectOverview.module.css";
 
-const META_ROWS: { label: string; key: keyof Pick<ProjectOverviewData, "role" | "duration" | "team"> }[] = [
+const META_ROWS: {
+  label: string;
+  key: keyof Pick<ProjectOverviewData, "role" | "duration"> | "category";
+}[] = [
   { label: "Role:", key: "role" },
   { label: "Duration:", key: "duration" },
-  { label: "Team:", key: "team" },
+  { label: "Category:", key: "category" },
 ];
 
-type Props = { overview: ProjectOverviewData };
+type Props = { overview: ProjectOverviewData; category: string };
 
-export function ProjectOverview({ overview }: Props) {
+export function ProjectOverview({ overview, category }: Props) {
   const { introText } = overview;
+  const values = {
+    role: overview.role,
+    category,
+    duration: overview.duration,
+  };
 
   return (
     <section className={styles.section} aria-label="Project overview">
@@ -27,7 +35,7 @@ export function ProjectOverview({ overview }: Props) {
           <dl className={styles.meta}>
             {META_ROWS.flatMap(({ label, key }, index) => [
               <dt key={`overview-${index}-t`}>{label}</dt>,
-              <dd key={`overview-${index}-d`}>{overview[key]}</dd>,
+              <dd key={`overview-${index}-d`}>{values[key]}</dd>,
             ])}
           </dl>
         </div>

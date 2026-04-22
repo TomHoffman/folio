@@ -25,8 +25,6 @@ export function Testimonial({
 
   const hasImage = Boolean(imageSrc?.trim());
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
-  const citationText = `${safeName}, ${safeJobTitle} - ${safeCompany}`;
-
   return (
     <section className={sectionClass} aria-label="Testimonial">
       <div
@@ -51,7 +49,12 @@ export function Testimonial({
         ) : null}
         <div className={styles.copy}>
           <blockquote className={styles.quote}>{safeQuote}</blockquote>
-          <p className={styles.citation}>{citationText}</p>
+          <p className={styles.citation}>
+            <span className={styles.citationName}>{safeName},</span>
+            <span className={styles.citationMeta}>
+              {safeJobTitle} - {safeCompany}
+            </span>
+          </p>
         </div>
       </div>
     </section>

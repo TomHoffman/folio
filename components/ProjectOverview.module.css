@@ -94,6 +94,18 @@
   }
 }
 
+@media (max-width: 767px) {
+  .split {
+    padding-top: 1em;
+    padding-bottom: 0;
+  }
+
+  .meta {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
 /* Two columns from tablet landscape up: intro | meta */
 @media (min-width: 1024px) {
   .split {

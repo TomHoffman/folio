@@ -6,6 +6,7 @@ import { ProjectImageContainer } from "@/components/ProjectImageContainer";
 import { CardGroup } from "@/components/CardGroup";
 import { FocusLayerBlock } from "@/components/FocusLayerBlock";
 import { ImageBlock } from "@/components/ImageBlock";
+import { ImageGrid } from "@/components/ImageGrid";
 import { MoreProjects } from "@/components/MoreProjects";
 import { Testimonial } from "@/components/Testimonial";
 import { ProjectOverview } from "@/components/ProjectOverview";
@@ -47,7 +48,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
         <ProjectHero project={project} />
         <ProjectImageContainer project={project} />
         {project.overview ? (
-          <ProjectOverview overview={project.overview} />
+          <ProjectOverview overview={project.overview} category={project.industry} />
         ) : null}
         {project.cardGroup ? (
           <CardGroup
@@ -62,6 +63,9 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             key={block.headingId ?? `image-block-${index}`}
             {...block}
           />
+        ))}
+        {(project.imageGrids ?? []).map((grid, index) => (
+          <ImageGrid key={grid.headingId ?? `image-grid-${index}`} {...grid} />
         ))}
         {(project.focusLayerBlocks ?? []).map((block, index) => (
           <FocusLayerBlock
