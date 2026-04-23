@@ -198,8 +198,14 @@
  */
 .svgFrame.svgFrameChart {
   aspect-ratio: 931 / 747;
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+/* Without the UI toggle, keep the chart vertically centered. */
+.imageContainer:not(.imageContainerWithChartToggle) .svgFrame.svgFrameChart {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* Inlined SVG from `finance-illustration.svg` — target inner nodes with e.g. `.illustrationRoot :global(#illustration)`. */
@@ -228,6 +234,12 @@
   max-height: 100%;
 }
 
+/* X Shore chart state motion (accordion index 1 = Split screen view). */
+.inlineWireRoot :global([id="split screen"]) {
+  pointer-events: none;
+}
+
+
 .wipeStack {
   position: relative;
   box-sizing: border-box;
@@ -244,6 +256,10 @@
   position: absolute;
   inset: 0;
   box-sizing: border-box;
+}
+
+.wipeStack .wipeLayerHidden {
+  display: none;
 }
 
 .wipeStack .wipeLayerBase {
@@ -457,7 +473,7 @@
   transition-delay: 0.2s;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .textButton {
     flex: 0 0 auto;
     min-height: 60px;
@@ -506,7 +522,9 @@
   .demoSquare,
   .viewTogglePill,
   .wipeStack .wipeLayerBase,
-  .wipeStack .wipeLayerUi {
+  .wipeStack .wipeLayerUi,
+  .inlineWireRoot :global([id="Boat-marker"]),
+  .inlineWireRoot :global([id="split screen"]) {
     transition: none !important;
     transition-delay: 0s !important;
   }

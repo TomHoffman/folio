@@ -475,23 +475,22 @@ export const projects: Project[] = [
         headingId: "xshore-chart-focus-heading",
         indicatorColor: "powderBlue",
         inlineSvgSrc: "/images/xshore/full-screen-chart_wires.svg",
-        inlineSvgUiSrc: "/images/xshore/full-screen-chart_ui.svg",
         items: [
           {
             title: "Full screen chart",
-            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            body: "Charts are full screen by default to prioritise safety. Key information is available through the widgets and dial.",
           },
           {
             title: "Split screen view",
-            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            body: "Widgets open a detailed split screen view, ensuring the chart is always available without any obstructions.",
           },
           {
             title: "Safety + warnings",
-            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            body: "Critical alerts surface above the dial in the driver's line of sight. Details can be viewed from the left-hand widget.",
           },
           {
             title: "North up",
-            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            body: "North up mode centres the boat marker and shows the direction of travel, keeping the full chart visible in all directions.",
           },
         ],
       },
