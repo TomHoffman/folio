@@ -7,6 +7,12 @@ export type ImageBlockCell = {
   inlineSvgSrc?: string;
   /** Use `""` when the tile is decorative / empty. */
   alt?: string;
+  /** Optional short caption shown inside the tile. */
+  label?: string;
+  /** Optional placeholder container mode for layout exploration before final media is ready. */
+  placeholderMode?: "left-inset-no-right";
+  /** Optional placeholder background color (defaults to red). */
+  placeholderColor?: string;
   /** Optional per-tile background color (e.g. `#3454E1`). */
   bgColor?: string;
   /** Optional mobile-only background color override (`<768px`). */

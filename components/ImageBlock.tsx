@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
@@ -125,6 +125,20 @@ function CellMedia({
     );
   }
 
+  if (cell.placeholderMode === "left-inset-no-right") {
+    return (
+      <div
+        className={styles.cellPlaceholderLeftInsetNoRight}
+        style={
+          {
+            ["--cell-placeholder-bg" as string]: cell.placeholderColor ?? "#ff0000",
+          } as CSSProperties
+        }
+        aria-hidden
+      />
+    );
+  }
+
   if (!cell.src) return null;
 
   if (!useFill) {
@@ -222,6 +236,9 @@ function RowView({
                   />
                 );
               })()}
+              {cell.label?.trim() ? (
+                <span className={styles.cellLabel}>{cell.label.trim()}</span>
+              ) : null}
             </div>
           </div>
         ))}
@@ -276,6 +293,9 @@ function RowView({
                 />
               );
             })()}
+            {cell.label?.trim() ? (
+              <span className={styles.cellLabel}>{cell.label.trim()}</span>
+            ) : null}
           </div>
         </div>
       ))}

@@ -217,6 +217,31 @@
   min-height: 0;
 }
 
+.cellLabel {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.9rem;
+  z-index: 2;
+  margin: 2em;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #7ea6b7;
+  pointer-events: none;
+}
+
+.cellPlaceholderLeftInsetNoRight {
+  position: absolute;
+  left: 10%;
+  right: 0;
+  top: 50%;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem));
+  transform: translateY(-50%);
+  border-radius: 10px 0 0 10px;
+  background-color: var(--cell-placeholder-bg, #ff0000);
+}
+
 .cellFrameContain {
   --image-block-contain-frame-min-h: clamp(14rem, 26vw, 24rem);
   box-sizing: border-box;

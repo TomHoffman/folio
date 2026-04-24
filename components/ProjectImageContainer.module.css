@@ -51,6 +51,10 @@
   background-color: #f7f6f4;
 }
 
+.stageAib .splitPaneSecondary {
+  background-color: transparent;
+}
+
 .splitPanePrimary {
   background-color: #16343f;
 }

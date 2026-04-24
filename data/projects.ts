@@ -354,7 +354,7 @@ export const projects: Project[] = [
     title: "X Shore 1",
     industry: "Electric boating and mobility",
     image: "/images/xshore/xshore-thumb.jpg",
-    heroImage: "/images/xshore/xshore-hero.jpg",
+    heroImage: "/images/xshore/xshore-hero2.jpg",
     heroImageSecondary: "/images/xshore/heropanel2.jpg",
     heroImageCount: 2,
     status: "active",
@@ -406,19 +406,19 @@ export const projects: Project[] = [
         mobileLayout: "column",
         rows: [
           {
-            rowHeight: "full-width",
+            rowHeight: "medium",
             cells: [
+              {
+                alt: "",
+              },
               {
                 alt: "",
               },
             ],
           },
           {
-            rowHeight: "medium",
+            rowHeight: "full-width",
             cells: [
-              {
-                alt: "",
-              },
               {
                 alt: "",
               },
@@ -495,20 +495,53 @@ export const projects: Project[] = [
         ],
       },
     ],
+    imageBlocksAfterFocus: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            rowHeight: "med-tall",
+            cells: [
+              {
+                src: "/images/xshore/widgets.svg",
+                alt: "Widget module examples",
+                label: "Widgets",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                label: "Split screen view",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    testimonial: {
+      imageSrc: "/images/testimonials/stefan-wessels.png",
+      imageAlt: "Portrait of Stefan Wessels",
+      quote:
+        '"Tom is always easy to talk to and give feedback, very mature and open in his approach. Of course, he is a great designer and strategist too. Happy to work with him again - keep him if you get him!"',
+      name: "Stefan Wessels",
+      jobTitle: "Tech Collab and Innovation Lead",
+      company: "X Shore",
+    },
   },
   {
     slug: "allied-irish-bank",
     title: "Allied Irish Bank",
     industry: "Banking and finance",
-    image: "/images/aib-thumb.jpg",
-    heroImage: "/images/aib-hero.jpg",
+    image: "/images/aib/aib-thumb.jpg",
+    heroImage: "/images/aib/aib-hero3.jpg",
+    heroImageSecondary: "/images/aib/aib-hero2.jpg",
     heroImageCount: 2,
     status: "active",
     cursorColor: "#811C81",
     assetVersion: "2",
     overview: {
       introText:
-        "AIB is one of Ireland's main high-street banks, used by more than 3 million customers for everything from day-to-day spending to major life events. As part of a large programme to rebuild the mobile app from the ground up, I led the design of the home screen and payments experience as one of five design leads, working across research, information architecture, design system and creative direction.",
+        "AIB is one of Ireland's main high-street banks, used by more than 3 million customers for everything from day-to-day spending to major life events. As part of a large programme to rebuild the mobile app from the ground up, I led the design of the home screen and payments experience as one of four design leads, working across research, information architecture, design system and creative direction.",
       role: "Lead Product Designer",
       duration: "15 months",
       team: "AIB and Globant",
@@ -519,8 +552,98 @@ export const projects: Project[] = [
       indicatorColor: "powderBlue",
       columnCount: 4,
       mobileLayout: "carousel",
-      items: outcomesPlaceholderItems.map((item) => ({ ...item })),
+      items: [
+        {
+          type: "icon",
+          title: "A modern banking experience",
+          body: "Delivered an app that competes with challenger banks on experience while meeting the complexity of a legacy bank with 3 million customers.",
+          iconSrc: "/svg/icons/phone.svg",
+        },
+        {
+          type: "icon",
+          title: "Validated with real customers",
+          body: "Three interaction models tested with customers in London and Dublin, with the strongest approach informing the final design.",
+          iconSrc: "/svg/icons/testing.svg",
+        },
+        {
+          type: "icon",
+          title: "Built to grow",
+          body: "A flexible design system gave the team a foundation to deliver new features consistently across a complex, multi-squad programme.",
+          iconSrc: "/svg/icons/scale.svg",
+        },
+        {
+          type: "icon",
+          title: "From discovery to launch",
+          body: "The first release let customers apply for products directly in the app for the first time, with a roadmap in place for new features.",
+          iconSrc: "/svg/icons/route.svg",
+        },
+      ],
     },
+    imageBlocks: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Designed for everyday use",
+        description:
+          "The legacy app showed all accounts on a single dashboard, regardless of how differently people manage them. Splitting content into product spaces meant we could prioritise daily tasks with other features within reach.",
+        headingId: "aib-image-block-everyday-heading",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                alt: "",
+              },
+              {
+                alt: "",
+              },
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    focusLayerBlocks: [
+      {
+        title: "Validating with customers",
+        description:
+          "Three interaction models were tested with customers in London and Dublin to understand the best way to structure the home screen for a varied customer base.",
+        headingId: "aib-focus-layer-validating-heading",
+        indicatorColor: "powderBlue",
+        visualVariant: "empty",
+        items: [
+          {
+            title: "Single screen dashboard",
+            body: "Customisable dashboard that gives an overview of all your accounts.",
+          },
+          {
+            title: "Time-based spaces",
+            body: "Custom dashboard spaces organised by time for everyday, coming up and looking ahead.",
+          },
+          {
+            title: "Goal-based spaces",
+            body: "Custom dashboard spaces organised by goal for everyday, grow, protect and borrow.",
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "zeppelin-rental",

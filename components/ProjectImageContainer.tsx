@@ -5,6 +5,7 @@ import styles from "./ProjectImageContainer.module.css";
 
 export function ProjectImageContainer({ project }: { project: Project }) {
   const isSplitLayout = project.heroImageCount === 2;
+  const isAibProject = project.slug === "allied-irish-bank";
   const heroImageClass = [
     styles.heroImage,
     isSplitLayout ? styles.heroImageSplit : "",
@@ -17,6 +18,7 @@ export function ProjectImageContainer({ project }: { project: Project }) {
       className={[
         styles.stage,
         isSplitLayout ? styles.stageSplit : "",
+        isAibProject ? styles.stageAib : "",
         enterStyles.enterMedia,
       ]
         .filter(Boolean)
