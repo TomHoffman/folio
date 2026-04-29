@@ -13,8 +13,14 @@ export type ImageCardData = {
   type: "image";
   title: string;
   body?: string;
-  imageSrc: string;
-  imageAlt: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  /** Text alignment for image-card copy block. Defaults to `left`. */
+  alignment?: "left" | "center";
+  /** Image placement variant for image cards. */
+  imageLayout?: "default" | "bottomContain448";
+  /** Optional background color for the image frame (e.g. `#414F57`). */
+  imageBgColor?: string;
 };
 
 export type CardGroupItem = IconCardData | ImageCardData;
@@ -24,6 +30,7 @@ export type CardGroupMobileLayout = "stack" | "carousel";
 /** Serializable block for `Project.cardGroup` in `data/projects.ts`. */
 export type CardGroupData = {
   title: string;
+  description?: string;
   showTitle?: boolean;
   indicatorColor?: SectionHeadingIndicatorColor;
   columnCount?: 2 | 3 | 4;

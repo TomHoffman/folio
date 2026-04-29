@@ -7,6 +7,17 @@
   color: var(--color-text-primary);
   /* Same as `ImageBlock` — ~850×742 “squashed square” (Figma reference). */
   --card-group-icon-squashed-square: 425 / 371;
+  --card-group-outcomes-bg: #f1ede3;
+  --card-group-outcomes-text: #2b2b2b;
+  --card-group-outcomes-body: #2b2b2b;
+  --card-group-outcomes-icon-filter: brightness(0) saturate(100%) opacity(82.8%);
+}
+
+:global(html.dark) .section {
+  --card-group-outcomes-bg: #172e37;
+  --card-group-outcomes-text: #ffffff;
+  --card-group-outcomes-body: #e2f6ff;
+  --card-group-outcomes-icon-filter: none;
 }
 
 .sectionInner {
@@ -40,6 +51,23 @@
   .headingRail h2.cardGroupHeading {
     margin-bottom: 1rem;
   }
+}
+
+.headingRailWithDescription {
+  padding-bottom: 0.75em;
+}
+
+.headingRail h2.cardGroupHeadingWithDescription {
+  margin-bottom: 0.5rem;
+}
+
+.groupDescription {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.4;
+  color: #7ea6b7;
 }
 
 .list {
@@ -156,6 +184,7 @@
   aspect-ratio: var(--card-group-icon-squashed-square);
   justify-content: flex-end;
   padding: 0;
+  background-color: var(--card-group-outcomes-bg);
 }
 
 .cardIcon .cardContent {
@@ -197,16 +226,17 @@
   line-height: 1.4;
   letter-spacing: normal;
   text-transform: none;
-  color: #ffffff;
+  color: var(--card-group-outcomes-text);
 }
 
 /* Matter Light 16px (1em), #E2F6FF */
 .cardBody {
   margin: 0;
+  max-width: 40ch;
   font-size: 1em;
   font-weight: 300;
   line-height: 1.4;
-  color: #e2f6ff;
+  color: var(--card-group-outcomes-body);
 }
 
 .iconWrap {
@@ -226,6 +256,7 @@
   max-height: 32px;
   object-fit: contain;
   object-position: left center;
+  filter: var(--card-group-outcomes-icon-filter);
 }
 
 /*
@@ -255,6 +286,16 @@
   padding: 0.75rem;
 }
 
+.cardTextLeft {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cardTextCenter {
+  align-items: center;
+  text-align: center;
+}
+
 @media (min-width: 1024px) {
   .cardImage {
     height: 100%;
@@ -280,9 +321,23 @@
 /* Figma 4056:22108 — image panel #1C3640, radius 16px */
 .cardImage .imageFrame {
   border-radius: 16px;
-  background-color: #1c3640;
+  background-color: var(--image-frame-bg, #1c3640);
 }
 
 .image {
   object-fit: cover;
+}
+
+.imageBottomContain448 {
+  object-fit: contain;
+  object-position: center bottom;
+  width: 90% !important;
+  max-width: 448px;
+  height: 100% !important;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 0 !important;
+  transform: translateX(-50%);
+  margin: 0 !important;
 }

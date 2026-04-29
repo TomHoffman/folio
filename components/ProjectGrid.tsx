@@ -203,6 +203,7 @@ function ProjectCard({ project }: { project: Project }) {
     <Link
       href={href}
       className={styles.card}
+      style={project.slug === "licel" ? { backgroundColor: "#16343f" } : undefined}
       data-project-slug={project.slug}
       aria-label={ariaLabel}
     >

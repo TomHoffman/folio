@@ -4,9 +4,14 @@
   margin: 0;
   padding: 0;
   color: var(--color-text-primary);
+  --image-grid-shell-bg: #f1ede3;
   --image-grid-columns: 3;
   --image-grid-gap: 8px;
   --image-grid-mobile-ar: 425 / 371;
+}
+
+:global(html.dark) .section {
+  --image-grid-shell-bg: #172e37;
 }
 
 .sectionInner {
@@ -54,7 +59,7 @@
   align-items: stretch;
   padding: 8px;
   border-radius: 24px;
-  background-color: #172e37;
+  background-color: var(--image-grid-shell-bg);
 }
 
 .gridBleed {

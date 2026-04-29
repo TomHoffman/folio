@@ -1,8 +1,9 @@
 /* Visible title uses `SectionHeading.module.css` (shared with ProjectGrid). */
 
 .logoSection {
-  --logo-grid-panel: #172e37;
-  --logo-grid-cell: #0b222c;
+  --logo-grid-panel: #f1ede3;
+  --logo-grid-cell: #f9f6ed;
+  --logo-grid-logo-filter: brightness(0) saturate(100%) opacity(82.8%);
   --logo-grid-gap: 8px;
   --logo-grid-pad: 8px;
   --logo-grid-radius-outer: 24px;
@@ -15,6 +16,12 @@
   margin-bottom: 2rem;
   padding-top: 1em;
   box-sizing: border-box;
+}
+
+:global(html.dark) .logoSection {
+  --logo-grid-panel: #172e37;
+  --logo-grid-cell: #0b222c;
+  --logo-grid-logo-filter: none;
 }
 
 /*
@@ -113,6 +120,7 @@
   max-height: 100%;
   object-fit: contain;
   object-position: center;
+  filter: var(--logo-grid-logo-filter);
 }
 
 /* —— Mobile: full-bleed tickertape; each unit matches desktop panel + 2×2 —— */
@@ -183,6 +191,7 @@
   max-height: 100%;
   object-fit: contain;
   object-position: center;
+  filter: var(--logo-grid-logo-filter);
   transform: scale(1.2);
   transform-origin: center center;
 }

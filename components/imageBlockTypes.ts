@@ -22,6 +22,8 @@ export type ImageBlockCell = {
     | "cover"
     | "contain"
     | "containWide"
+    | "containWide365"
+    | "containWide900"
     | "containLogo"
     | "containLogoSpaced"
     | "containLarge";

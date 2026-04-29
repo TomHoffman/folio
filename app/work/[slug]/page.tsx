@@ -79,6 +79,12 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             {...block}
           />
         ))}
+        {(project.cardGroupsAfterFocus ?? []).map((group, index) => (
+          <CardGroup
+            key={group.headingId ?? `card-group-after-focus-${index}`}
+            {...group}
+          />
+        ))}
         {project.testimonial ? <Testimonial {...project.testimonial} /> : null}
         <MoreProjects currentProject={project} />
       </div>

@@ -50,6 +50,8 @@ function rowHeightPreset(height?: ImageBlockRowHeight): string | undefined {
 function imageFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageContain;
   if (fit === "containWide") return styles.imageContainWide;
+  if (fit === "containWide365") return styles.imageContainWide365;
+  if (fit === "containWide900") return styles.imageContainWide900;
   if (fit === "containLogo") return styles.imageContainLogo;
   if (fit === "containLogoSpaced") return styles.imageContainLogo;
   if (fit === "containLarge") return styles.imageContainLarge;
@@ -60,7 +62,13 @@ function frameFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "containLogoSpaced") {
     return `${styles.cellFrameContain} ${styles.cellFrameContainLogoSpaced}`;
   }
-  if (fit === "contain" || fit === "containWide" || fit === "containLogo") {
+  if (
+    fit === "contain" ||
+    fit === "containWide" ||
+    fit === "containWide365" ||
+    fit === "containWide900" ||
+    fit === "containLogo"
+  ) {
     return styles.cellFrameContain;
   }
   return "";
@@ -69,6 +77,8 @@ function frameFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
 function imageFlowFitClass(fit?: ImageBlockRow["cells"][0]["fit"]): string {
   if (fit === "contain") return styles.imageFlowContain;
   if (fit === "containWide") return styles.imageFlowContainWide;
+  if (fit === "containWide365") return styles.imageFlowContainWide365;
+  if (fit === "containWide900") return styles.imageFlowContainWide900;
   if (fit === "containLogo") return styles.imageFlowContainLogo;
   if (fit === "containLogoSpaced") return styles.imageFlowContainLogo;
   if (fit === "containLarge") return styles.imageFlowContainLarge;

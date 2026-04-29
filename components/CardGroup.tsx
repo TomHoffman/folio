@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import type { CSSProperties } from "react";
 import enterStyles from "./ProjectPageEnter.module.css";
 import {
   sectionHeadingIndicatorStyle,
@@ -41,19 +42,36 @@ function IconCard({ data }: { data: IconCardData }) {
 }
 
 function ImageCard({ data }: { data: ImageCardData }) {
+  const alignmentClass =
+    data.alignment === "center"
+      ? styles.cardTextCenter
+      : styles.cardTextLeft;
+  const imageClass =
+    data.imageLayout === "bottomContain448"
+      ? `${styles.image} ${styles.imageBottomContain448}`
+      : styles.image;
   return (
     <article className={`${styles.card} ${styles.cardImage}`}>
       <div className={styles.cardContent}>
-        <div className={styles.imageFrame}>
-          <Image
-            src={data.imageSrc}
-            alt={data.imageAlt}
-            fill
-            className={styles.image}
-            sizes="(max-width: 767px) 78vw, (max-width: 1023px) 45vw, 25vw"
-          />
+        <div
+          className={styles.imageFrame}
+          style={
+            data.imageBgColor
+              ? ({ ["--image-frame-bg" as string]: data.imageBgColor } as CSSProperties)
+              : undefined
+          }
+        >
+          {data.imageSrc ? (
+            <Image
+              src={data.imageSrc}
+              alt={data.imageAlt ?? ""}
+              fill
+              className={imageClass}
+              sizes="(max-width: 767px) 78vw, (max-width: 1023px) 45vw, 25vw"
+            />
+          ) : null}
         </div>
-        <div className={styles.cardTextBlock}>
+        <div className={`${styles.cardTextBlock} ${alignmentClass}`}>
           <h3 className={styles.cardTitle}>{data.title}</h3>
           {data.body ? <p className={styles.cardBody}>{data.body}</p> : null}
         </div>
@@ -79,6 +97,7 @@ function desktopColClass(
 
 export function CardGroup({
   title,
+  description,
   showTitle = true,
   indicatorColor = "orange",
   columnCount = 4,
@@ -102,6 +121,7 @@ export function CardGroup({
     window.dispatchEvent(new CustomEvent("folio:outcomes-reveal"));
   }, [isOutcomesGroup, isTitleVisible, areCardsVisible]);
   const visibleTitle = showTitle && Boolean(title?.trim());
+  const hasDescription = Boolean(description?.trim());
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
   const listClass = [
     styles.list,
@@ -123,6 +143,7 @@ export function CardGroup({
           <div
             className={[
               styles.headingRail,
+              hasDescription ? styles.headingRailWithDescription : "",
               isOutcomesGroup ? styles.headingRailOutcomes : "",
               railStyles.contentRail,
             ]
@@ -136,6 +157,7 @@ export function CardGroup({
                 sectionHeadingStyles.heading,
                 sectionHeadingStyles.headingOnRail,
                 styles.cardGroupHeading,
+                hasDescription ? styles.cardGroupHeadingWithDescription : "",
                 isOutcomesGroup && !isTitleVisible ? enterStyles.revealPending : "",
                 isOutcomesGroup && isTitleVisible ? enterStyles.fadeInUp : "",
                 isOutcomesGroup && isTitleVisible ? enterStyles.offset0 : "",
@@ -146,6 +168,9 @@ export function CardGroup({
             >
               {title?.trim()}
             </h2>
+            {hasDescription ? (
+              <p className={styles.groupDescription}>{description?.trim()}</p>
+            ) : null}
           </div>
         ) : (
           <h2 id={headingId} className="sr-only">

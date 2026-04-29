@@ -52,7 +52,7 @@
   overflow: hidden;
   border-radius: 24px;
   isolation: isolate;
-  background-color: #16343f;
+  background-color: transparent;
   outline-offset: 2px;
   color: inherit;
   text-decoration: none;

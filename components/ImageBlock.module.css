@@ -6,6 +6,7 @@
   margin: 0;
   padding: 0;
   color: var(--color-text-primary);
+  --image-block-shell-bg: #d6d3d0;
   /* ~850×700 — squashed square for ImageBlock medium / mobile frames */
   --image-block-squashed-square: 425 / 350;
   --image-block-cell-radius: 18px;
@@ -15,6 +16,10 @@
   --image-block-row-ar-med-tall: 9 / 10;
   --image-block-row-ar-medium: var(--image-block-squashed-square);
   --image-block-row-ar-short: 16 / 9;
+}
+
+:global(html.dark) .section {
+  --image-block-shell-bg: #172e37;
 }
 
 .sectionInner {
@@ -65,7 +70,7 @@
   align-items: stretch;
   padding: 8px;
   border-radius: 24px;
-  background-color: #172e37;
+  background-color: var(--image-block-shell-bg);
 }
 
 .imageGroupBleed {
@@ -406,6 +411,24 @@
   margin: auto;
 }
 
+.imageContainWide365 {
+  object-fit: contain;
+  width: 90% !important;
+  max-width: 365px;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
+  inset: 0;
+  margin: auto;
+}
+
+.imageContainWide900 {
+  object-fit: contain;
+  width: 90% !important;
+  max-width: 900px;
+  height: calc(100% - clamp(1.5rem, 3vw, 2.5rem)) !important;
+  inset: 0;
+  margin: auto;
+}
+
 .imageContainLogo {
   object-fit: contain;
   width: 60% !important;
@@ -446,6 +469,18 @@
 .imageFlowContainWide {
   width: min(100%, 446px);
   max-width: 446px;
+  margin-inline: auto;
+}
+
+.imageFlowContainWide365 {
+  width: min(90%, 365px);
+  max-width: 365px;
+  margin-inline: auto;
+}
+
+.imageFlowContainWide900 {
+  width: min(90%, 900px);
+  max-width: 900px;
   margin-inline: auto;
 }
 

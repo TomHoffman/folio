@@ -47,6 +47,8 @@ export type Project = {
   overview?: ProjectOverviewData;
   /** Optional icon / image card grid (e.g. project detail). */
   cardGroup?: CardGroupData;
+  /** Optional additional card groups rendered after focus-layer image blocks. */
+  cardGroupsAfterFocus?: CardGroupData[];
   /** Optional image group blocks (e.g. below CardGroup on project detail). */
   imageBlocks?: ImageBlockData[];
   /** Optional collage/grid image module. */
@@ -96,7 +98,7 @@ export const projects: Project[] = [
     cursorColor: "#3454E1",
     overview: {
       introText:
-        "Licel are a cyber security company specialising in app protection for iOS, Android and Java. Their products were trusted by engineers and security specialists but the products had no unifying brand and identity which was critical to their growth strategy as they scaled up with more enterprise customers. I joined as founding designer to establish the brand, design system, and product interfaces across web and mobile.",
+        "Licel are a pioneer in app security and their products protect millions of Android, iOS and Java apps against cyber threats. Their products were trusted by security specialists but they had no unifying identity which was critical to their growth strategy as they scaled. I joined as the founding designer to establish a single brand and develop a consistent design language across product interfaces, dashboards and internal tooling.",
       role: "Founding Designer",
       duration: "3 years",
       team: "Direct with founders",
@@ -409,18 +411,12 @@ export const projects: Project[] = [
             rowHeight: "medium",
             cells: [
               {
-                alt: "",
+                src: "/images/xshore/energy.jpg",
+                alt: "Energy usage card on X Shore interface",
               },
               {
-                alt: "",
-              },
-            ],
-          },
-          {
-            rowHeight: "full-width",
-            cells: [
-              {
-                alt: "",
+                src: "/images/xshore/spotify2.jpg",
+                alt: "Spotify interface on X Shore display",
               },
             ],
           },
@@ -498,22 +494,91 @@ export const projects: Project[] = [
     imageBlocksAfterFocus: [
       {
         contained: true,
-        mobileLayout: "column",
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
         rows: [
           {
             rowHeight: "med-tall",
             cells: [
               {
-                src: "/images/xshore/widgets.svg",
-                alt: "Widget module examples",
-                label: "Widgets",
-                fit: "contain",
+                src: "/images/xshore/widgets1.svg",
+                alt: "Widgets overview",
+                fit: "containWide365",
               },
               {
-                alt: "",
-                label: "Split screen view",
+                src: "/images/xshore/widgets2.svg",
+                alt: "Widgets detail view",
+                fit: "containWide365",
+              },
+              {
+                src: "/images/xshore/widgets3.svg",
+                alt: "Widgets warnings view",
+                fit: "containWide365",
+              },
+              {
+                src: "/images/xshore/widgets4.svg",
+                alt: "Widgets route summary view",
+                fit: "containWide365",
               },
             ],
+          },
+        ],
+      },
+      {
+        contained: true,
+        rows: [
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                src: "/images/xshore/spotify-split-screen.png",
+                alt: "Spotify split screen on X Shore display",
+                fit: "containWide900",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    cardGroupsAfterFocus: [
+      {
+        title: "One adaptive dial",
+        description:
+          "Anchoring critical information to a single consistent location means drivers can rely on peripheral vision rather than focused attention - reducing glance time and keeping eyes on the water. The dial adapts automatically based on speed and context, prioritising safety and speed of interpretation.",
+        headingId: "xshore-adaptive-dial-cards-heading",
+        indicatorColor: "powderBlue",
+        columnCount: 3,
+        mobileLayout: "stack",
+        items: [
+          {
+            type: "image",
+            title: "0-17 knots",
+            body: "When travelling at slow speeds or docking it is crucial to display speed, range and depth. The dial also displays energy usage, rpm, and heading with the outer compass.",
+            alignment: "center",
+            imageSrc: "/images/xshore/dial1.svg",
+            imageAlt: "Dial view for 0-17 knots",
+            imageLayout: "bottomContain448",
+            imageBgColor: "#414F57",
+          },
+          {
+            type: "image",
+            title: "18+ knots",
+            body: "Above 18 knots, depth readings show what\u2019s already beneath you so too late to make any decisions. The dial removes depth and emphasises speed, keeping focus on the chart where you can see what\u2019s ahead.",
+            alignment: "center",
+            imageSrc: "/images/xshore/dial2.svg",
+            imageAlt: "Dial view for 18+ knots",
+            imageLayout: "bottomContain448",
+            imageBgColor: "#414F57",
+          },
+          {
+            type: "image",
+            title: "Tracking",
+            body: "When you start a route the dial transitions to give finer details around the compass and highlights the next waypoint on an additional ring. We also introduce a progress indicator to show journey completion.",
+            alignment: "center",
+            imageSrc: "/images/xshore/dial3.svg",
+            imageAlt: "Dial view for tracking mode",
+            imageLayout: "bottomContain448",
+            imageBgColor: "#414F57",
           },
         ],
       },
@@ -585,10 +650,15 @@ export const projects: Project[] = [
         mobileLayout: "column",
         rows: [
           {
-            rowHeight: "full-width",
+            rowHeight: "medium",
             cells: [
               {
-                alt: "",
+                src: "/images/aib/making-payment.jpg",
+                alt: "Making a payment in the AIB app",
+              },
+              {
+                src: "/images/aib/making-payment.jpg",
+                alt: "Making a payment in the AIB app",
               },
             ],
           },
@@ -599,6 +669,7 @@ export const projects: Project[] = [
         description:
           "The legacy app showed all accounts on a single dashboard, regardless of how differently people manage them. Splitting content into product spaces meant we could prioritise daily tasks with other features within reach.",
         headingId: "aib-image-block-everyday-heading",
+        indicatorColor: "powderBlue",
         contained: true,
         mobileContained: false,
         mobileLayout: "mobile-carousel",
@@ -607,13 +678,22 @@ export const projects: Project[] = [
             rowHeight: "tall",
             cells: [
               {
-                alt: "",
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
               },
               {
-                alt: "",
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
               },
               {
-                alt: "",
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
               },
             ],
           },
@@ -673,6 +753,13 @@ export const projects: Project[] = [
     heroImage: "/images/volta-hero.jpg",
     status: "active",
     cursorColor: "#0C0C0C",
+    overview: {
+      introText:
+        "The Volta Zero is the world's first purpose-built 16-tonne electric truck, revolutionising commercial vehicle operations and delivering a next-generation driving experience. I worked on the Alpha stage of the project alongside UI designers and technical partners to deliver a solution combining a safe driving experience with delivery management.",
+      role: "Product Designer",
+      duration: "3 months",
+      team: "UI designers and technical partners",
+    },
     cardGroup: {
       title: "Outcomes",
       headingId: "volta-card-group-heading",
