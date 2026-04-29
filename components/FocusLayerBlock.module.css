@@ -24,6 +24,12 @@
   padding-top: 2em;
 }
 
+@media (min-width: 1024px) {
+  .description {
+    padding-top: 3rem;
+  }
+}
+
 .description > .descriptionHeading {
   margin-bottom: 0.5rem;
 }
@@ -72,6 +78,21 @@
   border-radius: 18px;
   background-color: #1f3741;
   aspect-ratio: 425 / 371;
+}
+
+.imageContainerWithBackground {
+  justify-content: flex-end;
+}
+
+.imageBackground {
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.imageContainer > *:not(.imageBackground) {
+  position: relative;
+  z-index: 1;
 }
 
 .imageContainerWithChartToggle {
@@ -186,7 +207,7 @@
   position: relative;
   box-sizing: border-box;
   width: 90%;
-  max-width: 800px;
+  max-width: var(--focus-inline-svg-max-width, 800px);
   aspect-ratio: 740 / 645;
   flex: 0 1 auto;
   max-height: 100%;
@@ -237,6 +258,12 @@
 /* X Shore chart state motion (accordion index 1 = Split screen view). */
 .inlineWireRoot :global([id="split screen"]) {
   pointer-events: none;
+}
+
+.inlineWireRoot :global([id="full-ring"]),
+.inlineWireRoot :global([id="1hr-ring"]),
+.inlineWireRoot :global([id="now-ring"]) {
+  vector-effect: non-scaling-stroke;
 }
 
 

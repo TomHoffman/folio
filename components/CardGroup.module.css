@@ -57,6 +57,12 @@
   padding-bottom: 0.75em;
 }
 
+@media (min-width: 1024px) {
+  .headingRailWithDescription {
+    padding-top: 3rem;
+  }
+}
+
 .headingRail h2.cardGroupHeadingWithDescription {
   margin-bottom: 0.5rem;
 }

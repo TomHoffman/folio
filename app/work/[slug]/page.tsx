@@ -85,6 +85,12 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             {...group}
           />
         ))}
+        {(project.focusLayerBlocksAfterFocus ?? []).map((block, index) => (
+          <FocusLayerBlock
+            key={block.headingId ?? `focus-layer-block-after-focus-${index}`}
+            {...block}
+          />
+        ))}
         {project.testimonial ? <Testimonial {...project.testimonial} /> : null}
         <MoreProjects currentProject={project} />
       </div>

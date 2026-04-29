@@ -32,6 +32,12 @@
   padding-top: 2em;
 }
 
+@media (min-width: 1024px) {
+  .description {
+    padding-top: 3rem;
+  }
+}
+
 .description > .descriptionHeading {
   margin-bottom: 0.5rem;
 }

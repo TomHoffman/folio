@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import {
@@ -99,14 +100,25 @@ export function FocusLayerBlock({
   headingId,
   indicatorColor = "powderBlue",
   items,
+  imageBackgroundSrc,
+  imageBackgroundAlt,
+  imageBackgroundOpacity,
   visualVariant = "illustration",
   inlineSvgSrc,
+  inlineSvgSrcByIndex,
   inlineSvgUiSrc,
+  disableInlineSvgMotion = false,
+  inlineSvgMaxWidth,
+  boatMarkerOffsetYPercent,
+  boatMarkerBottomGapEm,
+  boatMarkerBottomGapRatio,
+  animateNowRingOnIndex,
   className,
 }: FocusLayerBlockProps) {
   const safeItems = useMemo(() => items.slice(0, 4), [items]);
   const chartGraphicRef = useRef<HTMLDivElement | null>(null);
   const chartMotionRafRef = useRef<number | null>(null);
+  const nowRingRafRef = useRef<number | null>(null);
   const chartMotionDelayTimeoutRef = useRef<number | null>(null);
   const chartModeSwitchRafRef = useRef<number | null>(null);
   const previousActiveIndexRef = useRef(0);
@@ -151,7 +163,10 @@ export function FocusLayerBlock({
   const [isChartWiping, setIsChartWiping] = useState(false);
   const isDemoSquare = visualVariant === "demo-square";
   const isEmptyVisual = visualVariant === "empty";
-  const wireSrc = inlineSvgSrc?.trim() ?? "";
+  const wireSrc =
+    inlineSvgSrcByIndex?.[activeIndex]?.trim() ??
+    inlineSvgSrc?.trim() ??
+    "";
   const uiSrc = inlineSvgUiSrc?.trim() ?? "";
   const hasChartViewToggle = Boolean(wireSrc && uiSrc);
   const wireHasMotionTargets = useMemo(
@@ -246,6 +261,7 @@ export function FocusLayerBlock({
   }, [activeIndex, safeItems.length]);
 
   useEffect(() => {
+    if (disableInlineSvgMotion) return;
     if (!wireSrc) return;
     const mode: ChartSvgMode = chartSvgMode;
     const previousActiveIndex = previousActiveIndexRef.current;
@@ -619,6 +635,7 @@ export function FocusLayerBlock({
   }, [
     activeIndex,
     wireSrc,
+    disableInlineSvgMotion,
     inlineWireMarkup,
     inlineUiMarkup,
     wireHasMotionTargets,
@@ -628,6 +645,214 @@ export function FocusLayerBlock({
     styles.wipeLayerBase,
     styles.wipeLayerUi,
   ]);
+
+  useEffect(() => {
+    if (typeof boatMarkerBottomGapEm === "number") return;
+    if (typeof boatMarkerOffsetYPercent !== "number") return;
+    if (!wireSrc) return;
+
+    const root = chartGraphicRef.current;
+    if (!root) return;
+    const markers = root.querySelectorAll<SVGGraphicsElement>('[id="Boat-marker"]');
+    if (!markers.length) return;
+
+    markers.forEach((marker) => {
+      marker.style.transformBox = "fill-box";
+      marker.style.transformOrigin = "50% 50%";
+      marker.style.transform = `translateY(${boatMarkerOffsetYPercent}%)`;
+    });
+
+    return () => {
+      markers.forEach((marker) => {
+        marker.style.transform = "";
+      });
+    };
+  }, [boatMarkerOffsetYPercent, wireSrc]);
+
+  useEffect(() => {
+    if (
+      typeof boatMarkerBottomGapEm !== "number" &&
+      typeof boatMarkerBottomGapRatio !== "number"
+    ) {
+      return;
+    }
+    if (!wireSrc) return;
+
+    const root = chartGraphicRef.current;
+    if (!root) return;
+    const marker = root.querySelector<SVGGraphicsElement>('[id="Boat-marker"]');
+    const ring = root.querySelector<SVGGraphicsElement>('[id="now-ring"]');
+    if (!marker || !ring) return;
+
+    const placeMarker = () => {
+      const svgRoot = marker.ownerSVGElement;
+      if (!svgRoot) return;
+      const markerBox = marker.getBBox();
+      const ringBox = ring.getBBox();
+      const viewBox = svgRoot.viewBox.baseVal;
+      if (!markerBox.height || !ringBox.height || !viewBox.height || !svgRoot.clientHeight) return;
+
+      const fontSizePx = Number.parseFloat(getComputedStyle(root).fontSize || "16");
+      const gapPx =
+        (boatMarkerBottomGapEm ?? 0) *
+        (Number.isFinite(fontSizePx) ? fontSizePx : 16);
+      const pxPerUserUnit = svgRoot.clientHeight / viewBox.height;
+      if (!pxPerUserUnit) return;
+      const gapUserUnits = gapPx / pxPerUserUnit;
+
+      const ringBottom = ringBox.y + ringBox.height;
+      const markerBottom = markerBox.y + markerBox.height;
+      const measuredGap = ringBottom - markerBottom;
+      const ratioAdjustedGap =
+        typeof boatMarkerBottomGapRatio === "number"
+          ? measuredGap * boatMarkerBottomGapRatio
+          : gapUserUnits;
+      const deltaY = ringBottom - ratioAdjustedGap - markerBottom;
+
+      marker.setAttribute("transform", `translate(0 ${deltaY})`);
+    };
+
+    placeMarker();
+    const rafId = requestAnimationFrame(placeMarker);
+    window.addEventListener("resize", placeMarker);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", placeMarker);
+      marker.removeAttribute("transform");
+    };
+  }, [boatMarkerBottomGapEm, boatMarkerBottomGapRatio, wireSrc]);
+
+  useEffect(() => {
+    if (!wireSrc) return;
+    if (typeof animateNowRingOnIndex !== "number") return;
+    if (!inlineWireMarkup) return;
+
+    const root = chartGraphicRef.current;
+    if (!root) return;
+    const nowRing = root.querySelector<SVGGraphicsElement>('[id="now-ring"]');
+    const nowLabel = root.querySelector<SVGGraphicsElement>('[id="now-label"]');
+    const oneHourRing = root.querySelector<SVGGraphicsElement>('[id="1hr-ring"]');
+    const oneHourLabel = root.querySelector<SVGGraphicsElement>('[id="1hr-label"]');
+    if (!nowRing || !nowLabel || !oneHourRing || !oneHourLabel) return;
+
+    const reset = () => {
+      nowRing.style.transformBox = "fill-box";
+      nowRing.style.transformOrigin = "50% 100%";
+      nowRing.style.transform = "scale(1)";
+      nowLabel.style.transform = "translateY(0px)";
+      oneHourRing.style.transformBox = "fill-box";
+      oneHourRing.style.transformOrigin = "50% 100%";
+      oneHourRing.style.transform = "scale(1)";
+      oneHourLabel.style.transform = "translateY(0px)";
+    };
+
+    if (activeIndex !== animateNowRingOnIndex) {
+      if (nowRingRafRef.current !== null) {
+        cancelAnimationFrame(nowRingRafRef.current);
+        nowRingRafRef.current = null;
+      }
+      reset();
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      reset();
+      return;
+    }
+
+    const ringBox = nowRing.getBBox();
+    const oneHourRingBox = oneHourRing.getBBox();
+    const ringHeight = ringBox.height;
+    const oneHourRingHeight = oneHourRingBox.height;
+    const durationMs = 20000;
+    const minScale = 0.6;
+    const maxScale = 1.2;
+    const startedAt = performance.now();
+
+    const step = (now: number) => {
+      const elapsed = (now - startedAt) % durationMs;
+      const t = elapsed / durationMs;
+      const scale = minScale + (maxScale - minScale) * t;
+      const labelOffsetY = (1 - scale) * ringHeight;
+      const oneHourLabelOffsetY = (1 - scale) * oneHourRingHeight;
+
+      nowRing.style.transformBox = "fill-box";
+      nowRing.style.transformOrigin = "50% 100%";
+      nowRing.style.transform = `scale(${scale})`;
+      nowLabel.style.transform = `translateY(${labelOffsetY}px)`;
+      oneHourRing.style.transformBox = "fill-box";
+      oneHourRing.style.transformOrigin = "50% 100%";
+      oneHourRing.style.transform = `scale(${scale})`;
+      oneHourLabel.style.transform = `translateY(${oneHourLabelOffsetY}px)`;
+
+      nowRingRafRef.current = requestAnimationFrame(step);
+    };
+
+    nowRingRafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (nowRingRafRef.current !== null) {
+        cancelAnimationFrame(nowRingRafRef.current);
+        nowRingRafRef.current = null;
+      }
+      reset();
+    };
+  }, [activeIndex, animateNowRingOnIndex, inlineWireMarkup, wireSrc]);
+
+  useEffect(() => {
+    if (!wireSrc) return;
+    const root = chartGraphicRef.current;
+    if (!root) return;
+
+    const fullRing = root.querySelector<SVGGraphicsElement>('[id="full-ring"]');
+    const fullLabel = root.querySelector<SVGGraphicsElement>('[id="full-label"]');
+    const oneHourRing = root.querySelector<SVGGraphicsElement>('[id="1hr-ring"]');
+    const oneHourLabel = root.querySelector<SVGGraphicsElement>('[id="1hr-label"]');
+    const nowRing = root.querySelector<SVGGraphicsElement>('[id="now-ring"]');
+    const nowLabel = root.querySelector<SVGGraphicsElement>('[id="now-label"]');
+    if (!fullRing || !fullLabel || !oneHourRing || !oneHourLabel || !nowRing || !nowLabel) {
+      return;
+    }
+
+    const hasOpenWaterSvgOverride = Boolean(inlineSvgSrcByIndex?.[0]?.trim());
+    const isOpenWater = activeIndex === 0 && !hasOpenWaterSvgOverride;
+    if (!isOpenWater) {
+      fullRing.style.opacity = "";
+      fullLabel.style.opacity = "";
+      oneHourRing.style.opacity = "";
+      oneHourLabel.style.opacity = "";
+      nowRing.style.strokeDasharray = "";
+      if (typeof animateNowRingOnIndex !== "number" || activeIndex !== animateNowRingOnIndex) {
+        nowRing.style.transformBox = "fill-box";
+        nowRing.style.transformOrigin = "50% 100%";
+        nowRing.style.transform = "scale(1)";
+        nowLabel.style.transform = "translateY(0px)";
+      }
+      return;
+    }
+
+    fullRing.style.opacity = "0";
+    fullLabel.style.opacity = "0";
+    oneHourRing.style.opacity = "0";
+    oneHourLabel.style.opacity = "0";
+    nowRing.style.strokeDasharray = "none";
+    const nowRingBox = nowRing.getBBox();
+    const openWaterScale = 1.8;
+    const openWaterLabelOffsetY = (1 - openWaterScale) * nowRingBox.height;
+    nowRing.style.transformBox = "fill-box";
+    nowRing.style.transformOrigin = "50% 100%";
+    nowRing.style.transform = `scale(${openWaterScale})`;
+    nowLabel.style.transform = `translateY(${openWaterLabelOffsetY}px)`;
+
+    return () => {
+      fullRing.style.opacity = "";
+      fullLabel.style.opacity = "";
+      oneHourRing.style.opacity = "";
+      oneHourLabel.style.opacity = "";
+      nowRing.style.strokeDasharray = "";
+    };
+  }, [activeIndex, animateNowRingOnIndex, inlineSvgSrcByIndex, wireSrc]);
 
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
   const headingText = title?.trim() ?? "";
@@ -694,12 +919,23 @@ export function FocusLayerBlock({
             <div
               className={[
                 styles.imageContainer,
+                imageBackgroundSrc ? styles.imageContainerWithBackground : "",
                 hasChartViewToggle ? styles.imageContainerWithChartToggle : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
               aria-hidden={isEmptyVisual && !wireSrc ? true : undefined}
             >
+              {imageBackgroundSrc ? (
+                <Image
+                  src={imageBackgroundSrc}
+                  alt={imageBackgroundAlt ?? ""}
+                  fill
+                  className={styles.imageBackground}
+                  style={{ opacity: imageBackgroundOpacity ?? 1 }}
+                  sizes="(max-width: 1023px) 100vw, 67vw"
+                />
+              ) : null}
               {isDemoSquare ? (
                 <div className={styles.demoSquareMount}>
                   <div
@@ -719,6 +955,13 @@ export function FocusLayerBlock({
                   <div className={styles.imageContainerGraphic} ref={chartGraphicRef}>
                     <div
                       className={`${styles.svgFrame} ${styles.svgFrameChart}`}
+                      style={
+                        typeof inlineSvgMaxWidth === "number"
+                          ? ({
+                              ["--focus-inline-svg-max-width" as string]: `${inlineSvgMaxWidth}px`,
+                            } as CSSProperties)
+                          : undefined
+                      }
                     >
                       {hasChartViewToggle &&
                       inlineWireMarkup &&

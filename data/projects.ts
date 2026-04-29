@@ -55,6 +55,8 @@ export type Project = {
   imageGrids?: ImageGridData[];
   /** Optional focus layer explainer blocks. */
   focusLayerBlocks?: FocusLayerBlockData[];
+  /** Optional focus layer blocks rendered late in the page flow. */
+  focusLayerBlocksAfterFocus?: FocusLayerBlockData[];
   /** Optional image blocks rendered below focus layer content. */
   imageBlocksAfterFocus?: ImageBlockData[];
   /** Optional testimonial module. */
@@ -579,6 +581,38 @@ export const projects: Project[] = [
             imageAlt: "Dial view for tracking mode",
             imageLayout: "bottomContain448",
             imageBgColor: "#414F57",
+          },
+        ],
+      },
+    ],
+    focusLayerBlocksAfterFocus: [
+      {
+        title: "Range anxiety on the water",
+        description:
+          "For an electric boat, range isn't just a technical spec - it's central to the entire experience. The interface needed to clearly show how far they could get without added stress, so they could focus on enjoying the water.",
+        headingId: "xshore-range-anxiety-focus-heading",
+        indicatorColor: "powderBlue",
+        imageBackgroundSrc: "/images/xshore/chart2.jpg",
+        imageBackgroundAlt: "",
+        imageBackgroundOpacity: 0.9,
+        visualVariant: "empty",
+        inlineSvgSrc: "/images/xshore/range_charge.svg?v=4",
+        inlineSvgSrcByIndex: {
+          0: "/images/xshore/range_open-water.svg?v=2",
+        },
+        disableInlineSvgMotion: true,
+        inlineSvgMaxWidth: 780,
+        boatMarkerBottomGapEm: 0,
+        boatMarkerBottomGapRatio: 0.5,
+        animateNowRingOnIndex: 1,
+        items: [
+          {
+            title: "Open water",
+            body: "Range is shown as a map layer directly on the chart, so you can see exactly where you can reach in any direction - not just a number, but a clear boundary.",
+          },
+          {
+            title: "Charge mode",
+            body: "While charging, the range ring grows in real time on the chart. A second ring shows how far you could get with one more hour of charge helping you to understand how much more charge you need for your journey.",
           },
         ],
       },

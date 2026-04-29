@@ -41,6 +41,12 @@
   padding-top: 2em;
 }
 
+@media (min-width: 1024px) {
+  .description {
+    padding-top: 3rem;
+  }
+}
+
 /* Tighter than shared `SectionHeading` margins — title → body only for this block. */
 .description > .descriptionHeading {
   margin-bottom: 0.5rem;
