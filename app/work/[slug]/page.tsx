@@ -50,7 +50,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
         {project.overview ? (
           <ProjectOverview overview={project.overview} category={project.industry} />
         ) : null}
-        {project.cardGroup ? (
+        {project.cardGroup && !project.cardGroup.hidden ? (
           <CardGroup
             {...project.cardGroup}
             className={
@@ -79,12 +79,14 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
             {...block}
           />
         ))}
-        {(project.cardGroupsAfterFocus ?? []).map((group, index) => (
-          <CardGroup
-            key={group.headingId ?? `card-group-after-focus-${index}`}
-            {...group}
-          />
-        ))}
+        {(project.cardGroupsAfterFocus ?? [])
+          .filter((group) => !group.hidden)
+          .map((group, index) => (
+            <CardGroup
+              key={group.headingId ?? `card-group-after-focus-${index}`}
+              {...group}
+            />
+          ))}
         {(project.focusLayerBlocksAfterFocus ?? []).map((block, index) => (
           <FocusLayerBlock
             key={block.headingId ?? `focus-layer-block-after-focus-${index}`}

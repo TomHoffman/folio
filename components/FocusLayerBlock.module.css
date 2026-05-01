@@ -76,7 +76,7 @@
   padding: 0;
   overflow: hidden;
   border-radius: 18px;
-  background-color: #1f3741;
+  background-color: var(--focus-image-container-bg, #1f3741);
   aspect-ratio: 425 / 371;
 }
 

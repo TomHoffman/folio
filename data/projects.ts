@@ -158,6 +158,15 @@ export const projects: Project[] = [
               },
             ],
           },
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                src: "/images/licel/future-state.jpg",
+                alt: "Licel future state vision",
+              },
+            ],
+          },
         ],
       },
       {
@@ -234,19 +243,6 @@ export const projects: Project[] = [
                 bgColor: "#0C232C",
                 mobileBgColor: "#172E37",
                 fit: "containWide",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        contained: true,
-        rows: [
-          {
-            rowHeight: "short",
-            cells: [
-              {
-                alt: "",
               },
             ],
           },
@@ -548,6 +544,7 @@ export const projects: Project[] = [
         description:
           "Anchoring critical information to a single consistent location means drivers can rely on peripheral vision rather than focused attention - reducing glance time and keeping eyes on the water. The dial adapts automatically based on speed and context, prioritising safety and speed of interpretation.",
         headingId: "xshore-adaptive-dial-cards-heading",
+        hidden: true,
         indicatorColor: "powderBlue",
         columnCount: 3,
         mobileLayout: "stack",
@@ -586,6 +583,35 @@ export const projects: Project[] = [
       },
     ],
     focusLayerBlocksAfterFocus: [
+      {
+        title: "One adaptive dial",
+        description:
+          "Anchoring critical information to a single consistent location means drivers can rely on peripheral vision rather than focused attention - reducing glance time and keeping eyes on the water. The dial adapts automatically based on speed and context, prioritising safety and speed of interpretation.",
+        headingId: "xshore-adaptive-dial-focus-heading",
+        indicatorColor: "powderBlue",
+        visualVariant: "empty",
+        imageContainerBgColor: "#E1DFD7",
+        inlineSvgMaxWidth: 650,
+        inlineSvgSrcByIndex: {
+          0: "/images/xshore/dial1.svg",
+          1: "/images/xshore/dial2.svg",
+          2: "/images/xshore/dial3.svg",
+        },
+        items: [
+          {
+            title: "0-17 knots",
+            body: "When travelling at slow speeds or docking it is crucial to display speed, range and depth. The dial also displays energy usage, rpm, and heading with the outer compass.",
+          },
+          {
+            title: "18+ knots",
+            body: "Above 18 knots, depth readings show what\u2019s already beneath you so too late to make any decisions. The dial removes depth and emphasises speed, keeping focus on the chart where you can see what\u2019s ahead.",
+          },
+          {
+            title: "Tracking",
+            body: "When you start a route the dial transitions to give finer details around the compass and highlights the next waypoint on an additional ring. We also introduce a progress indicator to show journey completion.",
+          },
+        ],
+      },
       {
         title: "Range anxiety on the water",
         description:
@@ -691,8 +717,16 @@ export const projects: Project[] = [
                 alt: "Making a payment in the AIB app",
               },
               {
-                src: "/images/aib/making-payment.jpg",
-                alt: "Making a payment in the AIB app",
+                src: "/images/aib/application.jpg",
+                alt: "Application flow in the AIB app",
+              },
+            ],
+          },
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                alt: "",
               },
             ],
           },
@@ -768,6 +802,12 @@ export const projects: Project[] = [
     status: "active",
     cursorColor: "#FFB134",
     cursorTextColor: "#000000",
+    overview: {
+      introText:
+        "Zeppelin Rental is one of Europe's largest construction equipment rental providers, supplying machinery to construction sites across Germany and beyond. Working with a technology partner Irdeto, I led the product design for a mobile app that helped construction workers locate, access and manage equipment without physical keys, from initial discovery through to delivery of a hardware-integrated MVP for on-site testing.",
+      role: "Lead Product Designer",
+      duration: "4 months",
+    },
     cardBottomGradient:
       "linear-gradient(360deg, #282828 0%, rgba(41, 41, 41, 0) 100%)",
     cardGroup: {
@@ -778,6 +818,122 @@ export const projects: Project[] = [
       mobileLayout: "carousel",
       items: outcomesPlaceholderItems.map((item) => ({ ...item })),
     },
+    imageBlocks: [
+      {
+        contained: true,
+        rows: [
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                src: "/images/zeppelin/equipment-details.jpg",
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Real-time equipment visibility",
+        description:
+          "Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus. Eligendi doloribus vitae quo corrupti inventore veritatis eveniet reprehenderit minus magni rerum eos distinctio non. Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus.",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Keyless access",
+        description:
+          "Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus. Eligendi doloribus vitae quo corrupti inventore veritatis eveniet reprehenderit minus magni rerum eos distinctio non. Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus.",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Check-in and out",
+        description:
+          "Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus. Eligendi doloribus vitae quo corrupti inventore veritatis eveniet reprehenderit minus magni rerum eos distinctio non. Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus.",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+              {
+                alt: "",
+                fit: "contain",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "The sharing economy",
+        description:
+          "Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus. Eligendi doloribus vitae quo corrupti inventore veritatis eveniet reprehenderit minus magni rerum eos distinctio non. Qui molestiae iure qui voluptas ea culpa officia hic distinctio quisquam ducimus.",
+        contained: true,
+        rows: [
+          {
+            rowHeight: "medium",
+            cells: [
+              {
+                alt: "",
+              },
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "volta-zero",

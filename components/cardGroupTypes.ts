@@ -37,6 +37,8 @@ export type CardGroupData = {
   mobileLayout?: CardGroupMobileLayout;
   /** Unique `id` for the section heading when multiple card groups exist on one page. */
   headingId?: string;
+  /** When true, the group is omitted from the page (keep in data to restore later). */
+  hidden?: boolean;
   items: CardGroupItem[];
 };
 

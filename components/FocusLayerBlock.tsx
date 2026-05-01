@@ -103,6 +103,7 @@ export function FocusLayerBlock({
   imageBackgroundSrc,
   imageBackgroundAlt,
   imageBackgroundOpacity,
+  imageContainerBgColor,
   visualVariant = "illustration",
   inlineSvgSrc,
   inlineSvgSrcByIndex,
@@ -157,16 +158,28 @@ export function FocusLayerBlock({
   const [illustrationEndSvg, setIllustrationEndSvg] = useState<string | null>(
     null,
   );
-  const [inlineWireMarkup, setInlineWireMarkup] = useState<string | null>(null);
+  const [inlineWireMarkupBySrc, setInlineWireMarkupBySrc] = useState<
+    Record<string, string>
+  >({});
   const [inlineUiMarkup, setInlineUiMarkup] = useState<string | null>(null);
   const [chartSvgMode, setChartSvgMode] = useState<ChartSvgMode>("wireframe");
   const [isChartWiping, setIsChartWiping] = useState(false);
   const isDemoSquare = visualVariant === "demo-square";
   const isEmptyVisual = visualVariant === "empty";
+  const availableWireSources = useMemo(() => {
+    const fromIndex = Object.values(inlineSvgSrcByIndex ?? {})
+      .map((src) => src.trim())
+      .filter(Boolean);
+    const base = inlineSvgSrc?.trim();
+    return Array.from(
+      new Set(base ? [base, ...fromIndex] : fromIndex),
+    );
+  }, [inlineSvgSrc, inlineSvgSrcByIndex]);
   const wireSrc =
     inlineSvgSrcByIndex?.[activeIndex]?.trim() ??
     inlineSvgSrc?.trim() ??
     "";
+  const inlineWireMarkup = wireSrc ? (inlineWireMarkupBySrc[wireSrc] ?? null) : null;
   const uiSrc = inlineSvgUiSrc?.trim() ?? "";
   const hasChartViewToggle = Boolean(wireSrc && uiSrc);
   const wireHasMotionTargets = useMemo(
@@ -208,32 +221,52 @@ export function FocusLayerBlock({
     if (isDemoSquare) return;
     let cancelled = false;
 
-    const load = (url: string, setMarkup: (s: string | null) => void) => {
-      void fetch(url)
+    if (availableWireSources.length > 0) {
+      void Promise.all(
+        availableWireSources.map(async (src) => {
+          try {
+            const response = await fetch(src);
+            if (!response.ok) return [src, ""] as const;
+            const text = await response.text();
+            return [src, text] as const;
+          } catch {
+            return [src, ""] as const;
+          }
+        }),
+      ).then((entries) => {
+        if (cancelled) return;
+        setInlineWireMarkupBySrc((prev) => {
+          const next = { ...prev };
+          for (const [src, text] of entries) {
+            if (text) next[src] = text;
+          }
+          return next;
+        });
+      });
+    }
+
+    if (uiSrc) {
+      void fetch(uiSrc)
         .then((res) => res.text())
         .then((text) => {
           if (cancelled) return;
-          setMarkup(text || null);
+          setInlineUiMarkup(text || null);
         })
         .catch(() => {
           if (cancelled) return;
-          setMarkup(null);
+          setInlineUiMarkup(null);
         });
-    };
+    } else {
+      setInlineUiMarkup(null);
+    }
 
-    if (wireSrc) load(wireSrc, setInlineWireMarkup);
-    else setInlineWireMarkup(null);
-
-    if (uiSrc) load(uiSrc, setInlineUiMarkup);
-    else setInlineUiMarkup(null);
-
-    if (wireSrc || uiSrc) {
+    if (availableWireSources.length > 0 || uiSrc) {
       return () => {
         cancelled = true;
       };
     }
 
-    setInlineWireMarkup(null);
+    setInlineWireMarkupBySrc({});
     setInlineUiMarkup(null);
     if (isEmptyVisual) return;
 
@@ -252,7 +285,7 @@ export function FocusLayerBlock({
     return () => {
       cancelled = true;
     };
-  }, [isDemoSquare, isEmptyVisual, wireSrc, uiSrc]);
+  }, [availableWireSources, isDemoSquare, isEmptyVisual, uiSrc]);
 
   useEffect(() => {
     if (activeIndex > safeItems.length - 1) {
@@ -924,6 +957,14 @@ export function FocusLayerBlock({
               ]
                 .filter(Boolean)
                 .join(" ")}
+              style={
+                imageContainerBgColor
+                  ? ({
+                      ["--focus-image-container-bg" as string]:
+                        imageContainerBgColor,
+                    } as CSSProperties)
+                  : undefined
+              }
               aria-hidden={isEmptyVisual && !wireSrc ? true : undefined}
             >
               {imageBackgroundSrc ? (
@@ -1088,7 +1129,7 @@ export function FocusLayerBlock({
                       </div>
                       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG icon */}
                       <img
-                        className={`${styles.accordionIcon} ${isActive ? styles.accordionIconOpen : ""}`}
+                        className={`${styles.accordionIcon} ${!isActive ? styles.accordionIconOpen : ""}`}
                         src={ACCORDION_CONTROLLER_SRC}
                         alt=""
                         aria-hidden

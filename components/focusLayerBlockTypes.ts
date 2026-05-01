@@ -19,6 +19,8 @@ export type FocusLayerBlockProps = {
   imageBackgroundAlt?: string;
   /** Optional opacity for `imageBackgroundSrc` from 0 to 1. */
   imageBackgroundOpacity?: number;
+  /** Optional background color for the image container panel (default dark teal). */
+  imageContainerBgColor?: string;
   /**
    * `illustration` (default): layered SVG in the standard image frame.
    * `demo-square`: same frame size as illustration; 150×150 centred square (red / green / blue by active item).

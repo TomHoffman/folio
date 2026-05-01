@@ -272,7 +272,7 @@
  */
 .cardImage {
   box-sizing: border-box;
-  padding: 0.5rem 0.5rem 0.75rem;
+  padding: 0.5rem 0.5rem calc(0.75rem + 1em);
 }
 
 .cardImage .cardContent {
