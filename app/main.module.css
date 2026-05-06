@@ -18,6 +18,11 @@
   gap: 0;
 }
 
+/* Home hero should sit directly under the header divider. */
+.main.mainHome {
+  margin-top: 1.5em;
+}
+
 @media (min-width: 768px) {
   .main {
     margin-top: 200px;
@@ -70,10 +75,10 @@
   }
 }
 
-/* Home masthead hidden below 1024px — match inner-route top rhythm */
-@media (max-width: 1023px) {
+/* Home keeps zero top gap at all breakpoints. */
+@media (min-width: 1024px) {
   .main.mainHome {
-    margin-top: 98px;
+    margin-top: 3em;
   }
 }
 

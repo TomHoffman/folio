@@ -158,15 +158,6 @@ export const projects: Project[] = [
               },
             ],
           },
-          {
-            rowHeight: "full-width",
-            cells: [
-              {
-                src: "/images/licel/future-state.jpg",
-                alt: "Licel future state vision",
-              },
-            ],
-          },
         ],
       },
       {

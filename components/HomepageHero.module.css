@@ -1,14 +1,294 @@
-.root {
+.hero {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  height: 80vh;
+  width: 100%;
+  padding-bottom: 3em;
+}
+
+.row1 {
+  --hero-gap: 8px;
+  --hero-card-bg: #172e37;
+  --hero-inner-bg: #1c3640;
+  --hero-text-primary: #c1e0ed;
+  --hero-text-secondary: #7ea6b7;
+  --hero-square: clamp(148px, 22vw, 248px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--hero-gap);
+}
+
+.cluster1 {
+  display: grid;
+  gap: var(--hero-gap);
+}
+
+.cluster2 {
+  background: var(--hero-card-bg);
+  border-radius: 24px;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.panelHero {
+  background: var(--hero-inner-bg);
+  border-radius: 20px;
+  aspect-ratio: 361 / 400;
+  width: 100%;
+}
+
+.availabilityContact {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.availability {
+  min-height: 48px;
+  border-radius: 88px;
+  background: var(--hero-inner-bg);
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--hero-text-primary);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: #f1d32c;
+}
+
+.contactPills {
+  display: none;
+  gap: 4px;
+}
+
+.contactPill {
+  width: 56px;
+  min-height: 48px;
+  border-radius: 88px;
+  background: var(--hero-inner-bg);
+  display: grid;
+  place-items: center;
+}
+
+.cluster3 {
+  display: grid;
+  gap: var(--hero-gap);
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "contact profile"
+    "location location";
+  align-items: stretch;
+}
+
+.contactMobile {
+  grid-area: contact;
+  border-radius: 24px;
+  background: var(--hero-card-bg);
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.contactMobileItem {
+  border-radius: 20px;
+  background: var(--hero-inner-bg);
+  min-height: 72px;
+  display: grid;
+  place-items: center;
+}
+
+.contactIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.profile {
+  grid-area: profile;
+  border-radius: 24px;
+  background: var(--hero-card-bg);
+  padding: 8px;
+  min-height: 160px;
+  aspect-ratio: 1 / 1;
+  display: grid;
+}
+
+.profileImageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: var(--hero-inner-bg);
+  overflow: hidden;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+}
+
+.location {
+  grid-area: location;
+  border-radius: 24px;
+  background: var(--hero-card-bg);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 45%) minmax(0, 55%);
+  align-items: start;
+  gap: 8px;
+}
+
+.locationCard {
+  border-radius: 16px;
+  background: transparent;
+  padding: 10px 12px;
+  flex: 1 1 auto;
   min-height: 0;
 }
 
-.toggleRow {
-  display: flex;
+.locationPrimary {
+  margin: 0;
+  color: var(--hero-text-primary);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.locationSecondary {
+  margin: 0;
+  color: var(--hero-text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.timePill {
+  border-radius: 73px;
   width: 100%;
-  justify-content: flex-start;
-  padding-top: 0.25rem;
+  height: 110px;
+  min-height: 110px;
+  padding: 0 28px;
+  background: #ea5f3c;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.timeWeatherIcon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.cluster4 {
+  border-radius: 24px;
+  background: var(--hero-card-bg);
+  padding: 8px;
+}
+
+.cluster4Inner {
+  border-radius: 16px;
+  background: var(--hero-inner-bg);
+  width: 100%;
+  min-height: 300px;
+  aspect-ratio: 361 / 400;
+}
+
+@media (min-width: 768px) {
+  .panelHero,
+  .cluster4Inner {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* Tablet landscape and up switches to desktop structure. */
+@media (min-width: 1024px) {
+  .hero {
+    padding-bottom: 5em;
+  }
+
+  .row1 {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: stretch;
+    min-height: clamp(460px, 55vw, 720px);
+  }
+
+  .cluster1 {
+    width: calc((2 * var(--hero-square)) + var(--hero-gap));
+    min-width: 420px;
+    max-width: 560px;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .cluster2 {
+    min-height: 0;
+    height: 100%;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .panelHero {
+    aspect-ratio: auto;
+    min-height: 220px;
+    height: 100%;
+  }
+
+  .availabilityContact {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .contactPills {
+    display: inline-flex;
+  }
+
+  .cluster3 {
+    grid-template-columns: var(--hero-square) var(--hero-square);
+    grid-template-areas: "profile location";
+    justify-content: stretch;
+  }
+
+  .contactMobile {
+    display: none;
+  }
+
+  .profile,
+  .location {
+    min-height: var(--hero-square);
+    width: var(--hero-square);
+    aspect-ratio: 1 / 1;
+  }
+
+  .location {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .locationCard {
+    padding: 14px 16px;
+    background: var(--hero-inner-bg);
+  }
+
+  .cluster4 {
+    min-width: 0;
+  }
+
+  .cluster4Inner {
+    height: 100%;
+    min-height: 100%;
+    aspect-ratio: auto;
+  }
 }
