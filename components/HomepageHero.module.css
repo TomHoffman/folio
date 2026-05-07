@@ -1,19 +1,44 @@
 .hero {
-  box-sizing: border-box;
-  width: 100%;
-  padding-bottom: 3em;
-}
-
-.row1 {
   --hero-gap: 8px;
   --hero-card-bg: #172e37;
   --hero-inner-bg: #1c3640;
   --hero-text-primary: #c1e0ed;
   --hero-text-secondary: #7ea6b7;
   --hero-square: clamp(148px, 22vw, 248px);
+  /* Desktop bento: fixed tracks; pan centers active tile. Gap 8px + card radius 10px unchanged. */
+  --cluster4-desktop-col: 302.4px;
+  --cluster4-desktop-row: 402px;
+  box-sizing: border-box;
+  width: 100%;
+  padding-bottom: 3em;
+}
+
+.row1 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--hero-gap);
+}
+
+.row2 {
+  margin-top: var(--hero-gap);
+  border-radius: 24px;
+  background: var(--hero-card-bg);
+  padding: 8px;
+}
+
+.row2Inner {
+  border-radius: 16px;
+  background: var(--hero-inner-bg);
+  padding: 1.25em 1em;
+  font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
+}
+
+.row2Text {
+  margin: 0;
+  font-size: 1.75em;
+  font-weight: 300;
+  line-height: 1.42;
+  color: var(--hero-text-primary);
 }
 
 .cluster1 {
@@ -32,14 +57,15 @@
 .panelHero {
   background: var(--hero-inner-bg);
   border-radius: 20px;
-  aspect-ratio: 361 / 400;
   width: 100%;
+  height: 100%;
 }
 
 .availabilityContact {
   display: grid;
   gap: 4px;
   grid-template-columns: minmax(0, 1fr);
+  display: none;
 }
 
 .availability {
@@ -172,19 +198,32 @@
 .timePill {
   border-radius: 73px;
   width: 100%;
-  height: 110px;
-  min-height: 110px;
-  padding: 0 28px;
+  height: 102px;
+  min-height: 102px;
+  padding: 16px 28px;
   background: #ea5f3c;
   color: #fff;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: 16px;
+  gap: 10px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 24px;
   line-height: 1;
   white-space: nowrap;
+}
+
+.timeReadout {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.timePillTopRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 .timeWeatherIcon {
@@ -193,21 +232,239 @@
   flex: 0 0 auto;
 }
 
+.timeProgressTrack {
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: #bc4629;
+  overflow: hidden;
+}
+
+.timeProgressFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #ffddd5;
+}
+
 .cluster4 {
   border-radius: 24px;
   background: var(--hero-card-bg);
   padding: 8px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
 }
 
 .cluster4Inner {
+  position: relative;
   border-radius: 16px;
-  background: var(--hero-inner-bg);
   width: 100%;
   min-height: 300px;
   aspect-ratio: 361 / 400;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.cluster4Inner:active {
+  cursor: grabbing;
+}
+
+.cluster4MobileCarousel {
+  display: block;
+  min-height: 0;
+}
+
+.cluster4DesktopGrid {
+  display: none;
+  min-height: 0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cluster4DesktopGridInner {
+  box-sizing: border-box;
+}
+
+.cluster4DesktopCard {
+  border-radius: 10px;
+  background: var(--hero-inner-bg);
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  color: var(--hero-text-primary);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.cluster4DesktopCard:is(button) {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  transition: background-color 0.25s ease-in-out;
+}
+
+.cluster4DesktopCard:is(button):focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+}
+
+.cluster4DesktopCardAccent {
+  background: #48befa;
+  color: #0a1e26;
+}
+
+.cluster4DesktopCard:is(button):hover {
+  background: #244350;
+}
+
+.cluster4DesktopCardLabel {
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.cluster4MobileViewport {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.cluster4MobileTrack {
+  display: flex;
+  width: calc(var(--carousel-count, 1) * 100%);
+  transform: translateX(
+    calc((var(--carousel-index, 0) * -100%) / var(--carousel-count, 1))
+  );
+  transition: transform 320ms ease-in-out;
+}
+
+.cluster4MobileTrack[data-animate="false"] {
+  transition: none;
+}
+
+.cluster4MobileCard {
+  flex: 0 0 calc(100% / var(--carousel-count, 1));
+  min-height: 300px;
+  background: var(--hero-inner-bg);
+  display: grid;
+  place-items: center;
+  color: var(--hero-text-primary);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.cluster4MobileControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+}
+
+.cluster4AutoplayToggle {
+  box-sizing: border-box;
+  display: none;
+  height: 48px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 88px;
+  background: var(--hero-inner-bg);
+  color: var(--hero-text-primary);
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.cluster4AutoplayToggle:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .cluster4AutoplayToggle {
+    display: flex;
+  }
+}
+
+.cluster4MobileIndicators {
+  display: none;
+}
+
+.cluster4MobileNav {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.cluster4MobileNavButton {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 88px;
+  background: var(--hero-inner-bg);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cluster4MobileNavButton img {
+  width: 24px;
+  height: 24px;
+}
+
+.cluster4MobileNavButton:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cluster4MobileTrack {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    --hero-mobile-primary-panel-height: clamp(300px, 105vw, 400px);
+  }
+
+  .panelHero {
+    height: var(--hero-mobile-primary-panel-height);
+  }
+
+  .cluster4Inner {
+    display: none;
+  }
+
+  .cluster4MobileViewport {
+    min-height: var(--hero-mobile-primary-panel-height);
+  }
+
+  .cluster4MobileCard {
+    min-height: var(--hero-mobile-primary-panel-height);
+  }
 }
 
 @media (min-width: 768px) {
+  .row2Text {
+    font-size: 1.25em;
+  }
+
   .panelHero,
   .cluster4Inner {
     aspect-ratio: 16 / 10;
@@ -217,13 +474,21 @@
 /* Tablet landscape and up switches to desktop structure. */
 @media (min-width: 1024px) {
   .hero {
-    padding-bottom: 5em;
+    padding-bottom: 6em;
   }
 
   .row1 {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: stretch;
-    min-height: clamp(460px, 55vw, 720px);
+    min-height: clamp(460px, 55vw, 820px);
+  }
+
+  .row2Inner {
+    padding: 2em;
+  }
+
+  .row2Text {
+    max-width: 65ch;
   }
 
   .cluster1 {
@@ -282,13 +547,74 @@
     background: var(--hero-inner-bg);
   }
 
-  .cluster4 {
-    min-width: 0;
+  .timePill {
+    width: 100%;
+    align-self: stretch;
   }
 
-  .cluster4Inner {
+  .timeReadout {
+    width: max-content;
+    margin: 0 auto;
+  }
+
+  .timeProgressTrack {
+    width: calc(100% + 1em);
+    margin-left: -0.5em;
+  }
+
+  .cluster4 {
+    min-width: 0;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .cluster4MobileCarousel {
+    display: none;
+  }
+
+  .cluster4MobileControls {
+    display: none;
+  }
+
+  .cluster4DesktopGrid {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
     height: 100%;
-    min-height: 100%;
-    aspect-ratio: auto;
+  }
+
+  .cluster4DesktopGridInner {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: max-content;
+    height: max-content;
+    display: grid;
+    grid-template-columns: repeat(10, var(--cluster4-desktop-col));
+    grid-template-rows: repeat(5, var(--cluster4-desktop-row));
+    gap: 8px;
+    box-sizing: border-box;
+    transform-origin: 0 0;
+    will-change: transform;
+    transition: transform 0.45s ease-in-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cluster4DesktopGridInner {
+    transition: none;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .row2Text {
+    font-size: 1.5em;
+  }
+}
+
+@media (min-width: 1280px) {
+  .row2Text {
+    font-size: 1.5em;
   }
 }

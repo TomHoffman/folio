@@ -109,6 +109,12 @@ html {
   background-color: var(--color-background);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 html.dark {
   color-scheme: dark;
   --color-background: #081f28;
