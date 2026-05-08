@@ -26,10 +26,9 @@ function getMinuteProgressPercent() {
   return (new Date().getSeconds() / 60) * 100;
 }
 
-const MOBILE_CARD_LABELS = Array.from(
-  { length: 10 },
-  (_, idx) => `card ${idx + 1}`,
-);
+const MOBILE_CARD_LABELS = ["card 1", "card 2"];
+const CARD_1_BODY_TEXT =
+  "I led the redesign the BHF website to optimise key journeys, contributing to a 67% increase in regular donations in the first 3 months after launch.";
 const MOBILE_GRID_COLS = 6;
 const MOBILE_GRID_ROWS = 6;
 const MOBILE_GRID_CELLS = MOBILE_GRID_COLS * MOBILE_GRID_ROWS;
@@ -63,12 +62,6 @@ function shouldEnableDesktopGridCursor(): boolean {
 const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
 const DESKTOP_GRID_CURSOR_OFFSET_X = 6;
 const DESKTOP_GRID_CURSOR_OFFSET_Y = 6;
-
-function getCardDebugLabel(label: string): string {
-  const match = label.match(/\d+/);
-  if (!match) return "Card";
-  return `Card ${match[0]}`;
-}
 
 function shuffleArray<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -594,11 +587,12 @@ export function HomepageHero() {
                   const dCol = Math.abs(col - mobileGridActive.col);
                   const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
                   const pulseIndex = (row - mobileGridActive.row + 1) * 3 + (col - mobileGridActive.col + 1);
+                  const isBlueTheme = isActive && label === "card 1";
                   return (
                     <button
                       key={`mobile-grid-card-${idx}`}
                       type="button"
-                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4MobileCardInactive}` : ""}`}
+                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4MobileCardInactive}` : ""}`}
                       style={
                         isPulseCandidate
                           ? ({
@@ -612,11 +606,17 @@ export function HomepageHero() {
                     >
                       {isActive ? (
                         <>
-                          <div className={styles.cluster4PanelImage} />
+                          <div
+                            className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                          >
+                            <img
+                              src="/images/home/hero-grid/bhf-phone.jpg"
+                              alt=""
+                              className={styles.cluster4PanelImageAsset}
+                            />
+                          </div>
                           <div className={styles.cluster4PanelText}>
-                            <p className={styles.cluster4PanelBody}>
-                              {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
-                            </p>
+                            <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
                           </div>
                         </>
                       ) : null}
@@ -670,12 +670,13 @@ export function HomepageHero() {
                     (rowIdx - desktopBentoActive.row + 1) * 3 +
                     (cardIdx - desktopBentoActive.card + 1);
                   const isWide = desktopWideEnabled && colSpan === 2;
+                  const isBlueTheme = isActive && label === "card 1";
                   return (
                     <button
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
                       type="button"
                       ref={isActive ? desktopBentoActivePanelRef : undefined}
-                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
+                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
                       style={
                         {
                           gridColumn: `span ${isWide ? 2 : 1}`,
@@ -692,20 +693,32 @@ export function HomepageHero() {
                       {isActive ? (
                         isWide ? (
                           <>
-                            <div className={styles.cluster4PanelImage} />
+                            <div
+                              className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                            >
+                              <img
+                                src="/images/home/hero-grid/bhf-phone.jpg"
+                                alt=""
+                                className={styles.cluster4PanelImageAsset}
+                              />
+                            </div>
                             <div className={styles.cluster4PanelTextWide}>
-                              <p className={styles.cluster4PanelBody}>
-                                {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
-                              </p>
+                              <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
                             </div>
                           </>
                         ) : (
                           <>
-                            <div className={styles.cluster4PanelImage} />
+                            <div
+                              className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                            >
+                              <img
+                                src="/images/home/hero-grid/bhf-phone.jpg"
+                                alt=""
+                                className={styles.cluster4PanelImageAsset}
+                              />
+                            </div>
                             <div className={styles.cluster4PanelText}>
-                              <p className={styles.cluster4PanelBody}>
-                                {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
-                              </p>
+                              <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
                             </div>
                           </>
                         )

@@ -398,6 +398,18 @@
   background: #244350;
 }
 
+.cluster4DesktopCardAccent:is(button):hover {
+  background: #244350;
+}
+
+.cluster4DesktopCardAccent.cluster4CardThemeBlue {
+  background: #0c53be;
+}
+
+.cluster4DesktopCardAccent.cluster4CardThemeBlue:is(button):hover {
+  background: #0c53be;
+}
+
 .cluster4DesktopCardInactive,
 .cluster4MobileCardInactive {
   animation: cluster4-inactive-pulse-onload 1.6s ease-in-out 1;
@@ -461,6 +473,22 @@
   min-height: 0;
   border-radius: 12px;
   background: #305565;
+  overflow: hidden;
+}
+
+.cluster4MobileCardActive.cluster4CardThemeBlue {
+  background: #0c53be;
+}
+
+.cluster4PanelImageThemeBlue {
+  background: #2169d7;
+}
+
+.cluster4PanelImageAsset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .cluster4PanelText {
