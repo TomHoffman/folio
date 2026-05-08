@@ -1,12 +1,17 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import RiveCanvas, { Alignment, Fit, Layout } from "@rive-app/react-canvas";
 import {
   HOME_HERO_GRID_IMAGE_ROTATION_MS_DEFAULT,
   type HomeHeroGridCardMedia,
 } from "@/data/homeHeroGridCards";
 import styles from "./HomepageHero.module.css";
+
+const Cluster4PanelRiveLazy = dynamic(
+  () => import("@/components/Cluster4PanelRiveLazy"),
+  { ssr: false },
+);
 
 function normalizeImageSources(sources: string | string[]): string[] {
   if (Array.isArray(sources)) {
@@ -106,34 +111,6 @@ function Cluster4PanelVideo({
   );
 }
 
-function Cluster4PanelRive({
-  media,
-  wrapClassName,
-}: {
-  media: Extract<HomeHeroGridCardMedia, { kind: "rive" }>;
-  wrapClassName: string;
-}) {
-  const layout = new Layout({
-    fit: Fit.Cover,
-    alignment: Alignment.Center,
-  });
-
-  return (
-    <div className={wrapClassName}>
-      <div className={styles.cluster4PanelRiveInner}>
-        <RiveCanvas
-          src={media.src}
-          artboard={media.artboard}
-          animations={media.animations}
-          stateMachines={media.stateMachines}
-          layout={layout}
-          shouldResizeCanvasToContainer
-        />
-      </div>
-    </div>
-  );
-}
-
 export function Cluster4PanelMedia({
   cardId,
   media,
@@ -167,7 +144,7 @@ export function Cluster4PanelMedia({
         />
       );
     case "rive":
-      return <Cluster4PanelRive media={media} wrapClassName={wrapClassName} />;
+      return <Cluster4PanelRiveLazy media={media} wrapClassName={wrapClassName} />;
     default:
       return null;
   }

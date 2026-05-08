@@ -44,7 +44,7 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
     id: "bhf-redesign",
     label: "BHF Redesign",
     body:
-      "I led the redesign the BHF website and set up a flexible design system, contributing to a 67% increase in regular donations in the first 3 months after launch.",
+      "I have designed the regular donations flows for 2 of the UK's biggest charities on sites getting millions of visitors every month.",
     theme: "default",
     media: {
       kind: "image",

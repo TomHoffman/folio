@@ -32,16 +32,20 @@ const MOBILE_GRID_COLS = 6;
 const MOBILE_GRID_ROWS = 6;
 const MOBILE_GRID_CELLS = MOBILE_GRID_COLS * MOBILE_GRID_ROWS;
 
-/** Figma home-grid pattern — one band (8 tiles / 10 col-units per row). */
+/**
+ * Figma `5189:215821` — one band = 11 col-units × 7 tiles (more desktop-wide than prior 10-col band).
+ * Horizontally doubled → 22 tracks; block duplicated vertically → 12 rows (see DESKTOP_BENTO_ROW_SPANS).
+ */
 const DESKTOP_BENTO_BASE_ROW_SPANS = [
-  [1, 2, 1, 1, 2, 1, 1, 1],
-  [1, 1, 2, 1, 2, 1, 1, 1],
-  [1, 1, 1, 2, 1, 2, 1, 1],
-  [1, 1, 2, 1, 2, 1, 1, 1],
-  [1, 2, 1, 1, 1, 2, 1, 1],
+  [1, 2, 2, 1, 2, 2, 1],
+  [1, 1, 2, 2, 1, 2, 2],
+  [1, 2, 2, 2, 1, 2, 1],
+  [1, 1, 2, 2, 1, 2, 2],
+  [1, 2, 2, 1, 2, 2, 1],
+  [1, 1, 2, 2, 1, 2, 2],
 ] as const;
 
-/** 2× horizontally + 2× vertically: 10 rows × 16 tiles, 20 col track (same rhythm, more canvas). */
+/** 2× each row horizontally + 2× the block vertically: 12 rows × 22 col track. */
 const DESKTOP_BENTO_ROW_SPANS: ReadonlyArray<ReadonlyArray<1 | 2>> = [
   ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),
   ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),

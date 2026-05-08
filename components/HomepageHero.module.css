@@ -792,8 +792,8 @@
     width: max-content;
     height: max-content;
     display: grid;
-    grid-template-columns: repeat(20, var(--cluster4-desktop-col));
-    grid-template-rows: repeat(10, var(--cluster4-desktop-row));
+    grid-template-columns: repeat(22, var(--cluster4-desktop-col));
+    grid-template-rows: repeat(12, var(--cluster4-desktop-row));
     gap: 8px;
     box-sizing: border-box;
     transform-origin: 0 0;
@@ -809,10 +809,6 @@
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
-  .cluster4DesktopGridInner {
-    grid-template-columns: repeat(16, var(--cluster4-desktop-col));
-  }
-
   .row2Text {
     font-size: 1.5em;
   }
