@@ -394,6 +394,11 @@
   color: var(--hero-text-primary);
 }
 
+.cluster4DesktopCard:not(.cluster4DesktopCardAccent),
+.cluster4MobileCard:not(.cluster4MobileCardActive) {
+  opacity: 0.8;
+}
+
 .cluster4DesktopCard:is(button):hover {
   background: #244350;
 }
@@ -474,6 +479,7 @@
   border-radius: 12px;
   background: #305565;
   overflow: hidden;
+  position: relative;
 }
 
 .cluster4MobileCardActive.cluster4CardThemeBlue {
@@ -488,6 +494,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.cluster4PanelRiveInner {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+
+.cluster4PanelRiveInner canvas {
   display: block;
 }
 
@@ -593,7 +609,7 @@
 
 @media (max-width: 767px) {
   .hero {
-    --hero-mobile-primary-panel-height: clamp(300px, 105vw, 400px);
+    --hero-mobile-primary-panel-height: clamp(150px, 52.5vw, 200px);
   }
 
   .panelHero {

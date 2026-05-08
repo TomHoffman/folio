@@ -798,6 +798,7 @@ export const projects: Project[] = [
         "Zeppelin Rental is one of Europe's largest construction equipment rental providers, supplying machinery to construction sites across Germany and beyond. Working with a technology partner Irdeto, I led the product design for a mobile app that helped construction workers locate, access and manage equipment without physical keys, from initial discovery through to delivery of a hardware-integrated MVP for on-site testing.",
       role: "Lead Product Designer",
       duration: "4 months",
+      team: "Zeppelin Rental and Irdeto",
     },
     cardBottomGradient:
       "linear-gradient(360deg, #282828 0%, rgba(41, 41, 41, 0) 100%)",

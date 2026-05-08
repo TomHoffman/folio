@@ -23,7 +23,8 @@ export function Testimonial({
     safeCompany.length > 0;
   if (!hasRequiredFields) return null;
 
-  const hasImage = Boolean(imageSrc?.trim());
+  const trimmedImageSrc = imageSrc?.trim() ?? "";
+  const hasImage = trimmedImageSrc.length > 0;
   const sectionClass = [styles.section, className].filter(Boolean).join(" ");
   return (
     <section className={sectionClass} aria-label="Testimonial">
@@ -39,8 +40,8 @@ export function Testimonial({
         {hasImage ? (
           <div className={styles.imageFrame}>
             <Image
-              src={imageSrc}
-              alt={imageAlt}
+              src={trimmedImageSrc}
+              alt={imageAlt ?? ""}
               fill
               className={styles.image}
               sizes="(max-width: 767px) 120px, 176px"

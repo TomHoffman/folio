@@ -11,7 +11,9 @@ import {
   type MouseEvent as ReactMouseEvent,
   type TouchEvent as ReactTouchEvent,
 } from "react";
+import { Cluster4PanelMedia } from "@/components/Cluster4PanelMedia";
 import projectGridStyles from "@/components/ProjectGrid.module.css";
+import { getHomeHeroGridCardById, HOME_HERO_GRID_CARD_IDS } from "@/data/homeHeroGridCards";
 import styles from "./HomepageHero.module.css";
 
 function getCurrentTimeLabel() {
@@ -26,9 +28,6 @@ function getMinuteProgressPercent() {
   return (new Date().getSeconds() / 60) * 100;
 }
 
-const MOBILE_CARD_LABELS = ["card 1", "card 2"];
-const CARD_1_BODY_TEXT =
-  "I led the redesign the BHF website to optimise key journeys, contributing to a 67% increase in regular donations in the first 3 months after launch.";
 const MOBILE_GRID_COLS = 6;
 const MOBILE_GRID_ROWS = 6;
 const MOBILE_GRID_CELLS = MOBILE_GRID_COLS * MOBILE_GRID_ROWS;
@@ -146,8 +145,7 @@ export function HomepageHero() {
   const [desktopWideEnabled, setDesktopWideEnabled] = useState(false);
   const [showOneTimePanelPulse, setShowOneTimePanelPulse] = useState(true);
 
-  const [mobileCarouselCards, setMobileCarouselCards] =
-    useState(MOBILE_CARD_LABELS);
+  const [mobileCarouselCards, setMobileCarouselCards] = useState(HOME_HERO_GRID_CARD_IDS);
 
   const mobileCarouselTrackCards = useMemo(() => {
     const first = mobileCarouselCards[0];
@@ -191,7 +189,29 @@ export function HomepageHero() {
   }, []);
 
   useEffect(() => {
-    setMobileCarouselCards(shuffleArray(MOBILE_CARD_LABELS));
+    setMobileCarouselCards(shuffleArray(HOME_HERO_GRID_CARD_IDS));
+
+    setMobileGridActive({
+      row: Math.floor(Math.random() * MOBILE_GRID_ROWS),
+      col: Math.floor(Math.random() * MOBILE_GRID_COLS),
+    });
+
+    const wideSlots: Array<{ row: number; card: number }> = [];
+    DESKTOP_BENTO_ROW_SPANS.forEach((rowSpans, row) => {
+      rowSpans.forEach((span, card) => {
+        if (span === 2) wideSlots.push({ row, card });
+      });
+    });
+    if (wideSlots.length > 0) {
+      const slot = wideSlots[Math.floor(Math.random() * wideSlots.length)];
+      setDesktopBentoActive(slot);
+      return;
+    }
+    const randomDesktopRow = Math.floor(Math.random() * DESKTOP_BENTO_ROW_SPANS.length);
+    const randomDesktopCol = Math.floor(
+      Math.random() * DESKTOP_BENTO_ROW_SPANS[randomDesktopRow].length,
+    );
+    setDesktopBentoActive({ row: randomDesktopRow, card: randomDesktopCol });
   }, []);
 
   useEffect(() => {
@@ -419,7 +439,7 @@ export function HomepageHero() {
   useEffect(() => {
     const CAROUSEL_AUTOPLAY_MS = 3500;
     const mq = window.matchMedia("(max-width: 1023px)");
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let intervalId: number | undefined;
 
     const tick = () => {
       stepForwardRef.current();
@@ -579,7 +599,8 @@ export function HomepageHero() {
                   } as CSSProperties
                 }
               >
-                {mobileGridCards.map((label, idx) => {
+                {mobileGridCards.map((cardId, idx) => {
+                  const card = getHomeHeroGridCardById(cardId);
                   const row = Math.floor(idx / MOBILE_GRID_COLS);
                   const col = idx % MOBILE_GRID_COLS;
                   const isActive = row === mobileGridActive.row && col === mobileGridActive.col;
@@ -587,7 +608,7 @@ export function HomepageHero() {
                   const dCol = Math.abs(col - mobileGridActive.col);
                   const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
                   const pulseIndex = (row - mobileGridActive.row + 1) * 3 + (col - mobileGridActive.col + 1);
-                  const isBlueTheme = isActive && label === "card 1";
+                  const isBlueTheme = isActive && card.theme === "blue";
                   return (
                     <button
                       key={`mobile-grid-card-${idx}`}
@@ -602,21 +623,27 @@ export function HomepageHero() {
                       }
                       onClick={() => onMobileGridPanelClick(row, col)}
                       aria-current={isActive ? "true" : undefined}
-                      aria-label={label}
+                      aria-label={card.label}
                     >
                       {isActive ? (
                         <>
-                          <div
-                            className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
-                          >
-                            <img
-                              src="/images/home/hero-grid/bhf-phone.jpg"
-                              alt=""
-                              className={styles.cluster4PanelImageAsset}
-                            />
-                          </div>
+                          <Cluster4PanelMedia
+                            cardId={card.id}
+                            media={card.media}
+                            wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                            assetClassName={styles.cluster4PanelImageAsset}
+                          />
                           <div className={styles.cluster4PanelText}>
-                            <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
+                            <p
+                              className={styles.cluster4PanelBody}
+                              style={
+                                card.textMaxChars
+                                  ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
+                                  : undefined
+                              }
+                            >
+                              {card.body}
+                            </p>
                           </div>
                         </>
                       ) : null}
@@ -658,8 +685,9 @@ export function HomepageHero() {
               {DESKTOP_BENTO_ROW_SPANS.flatMap((spans, rowIdx) =>
                 spans.map((colSpan, cardIdx) => {
                   const flatIdx = rowIdx * spans.length + cardIdx;
-                  const label =
+                  const cardId =
                     mobileCarouselCards[flatIdx % mobileCarouselCards.length] ?? "";
+                  const card = getHomeHeroGridCardById(cardId);
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
                     cardIdx === desktopBentoActive.card;
@@ -670,7 +698,7 @@ export function HomepageHero() {
                     (rowIdx - desktopBentoActive.row + 1) * 3 +
                     (cardIdx - desktopBentoActive.card + 1);
                   const isWide = desktopWideEnabled && colSpan === 2;
-                  const isBlueTheme = isActive && label === "card 1";
+                  const isBlueTheme = isActive && card.theme === "blue";
                   return (
                     <button
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
@@ -687,38 +715,50 @@ export function HomepageHero() {
                       }
                       data-active={isActive ? "true" : undefined}
                       aria-current={isActive ? "true" : undefined}
-                      aria-label={label}
+                      aria-label={card.label}
                       onClick={() => setDesktopBentoActive({ row: rowIdx, card: cardIdx })}
                     >
                       {isActive ? (
                         isWide ? (
                           <>
-                            <div
-                              className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
-                            >
-                              <img
-                                src="/images/home/hero-grid/bhf-phone.jpg"
-                                alt=""
-                                className={styles.cluster4PanelImageAsset}
-                              />
-                            </div>
+                            <Cluster4PanelMedia
+                              cardId={card.id}
+                              media={card.media}
+                              wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                              assetClassName={styles.cluster4PanelImageAsset}
+                            />
                             <div className={styles.cluster4PanelTextWide}>
-                              <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
+                              <p
+                                className={styles.cluster4PanelBody}
+                                style={
+                                  card.textMaxChars
+                                    ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
+                                    : undefined
+                                }
+                              >
+                                {card.body}
+                              </p>
                             </div>
                           </>
                         ) : (
                           <>
-                            <div
-                              className={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
-                            >
-                              <img
-                                src="/images/home/hero-grid/bhf-phone.jpg"
-                                alt=""
-                                className={styles.cluster4PanelImageAsset}
-                              />
-                            </div>
+                            <Cluster4PanelMedia
+                              cardId={card.id}
+                              media={card.media}
+                              wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
+                              assetClassName={styles.cluster4PanelImageAsset}
+                            />
                             <div className={styles.cluster4PanelText}>
-                              <p className={styles.cluster4PanelBody}>{CARD_1_BODY_TEXT}</p>
+                              <p
+                                className={styles.cluster4PanelBody}
+                                style={
+                                  card.textMaxChars
+                                    ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
+                                    : undefined
+                                }
+                              >
+                                {card.body}
+                              </p>
                             </div>
                           </>
                         )
