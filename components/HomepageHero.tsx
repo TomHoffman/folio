@@ -130,6 +130,9 @@ export function HomepageHero() {
     useState(false);
   const [carouselAutoplayPaused, setCarouselAutoplayPaused] = useState(false);
   const [mobileGridActive, setMobileGridActive] = useState({ row: 0, col: 0 });
+  const [mobileGridPan, setMobileGridPan] = useState({ x: 0, y: 0 });
+  const mobileGridViewportRef = useRef<HTMLDivElement | null>(null);
+  const mobileGridRef = useRef<HTMLDivElement | null>(null);
   const mobileTouchStartXRef = useRef<number | null>(null);
   const desktopBentoViewportRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoInnerRef = useRef<HTMLDivElement | null>(null);
@@ -214,6 +217,50 @@ export function HomepageHero() {
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+
+    const syncMobileGridPan = () => {
+      if (!mq.matches) {
+        setMobileGridPan({ x: 0, y: 0 });
+        return;
+      }
+
+      const viewport = mobileGridViewportRef.current;
+      const grid = mobileGridRef.current;
+      if (!viewport || !grid) return;
+
+      const firstCard = grid.firstElementChild as HTMLElement | null;
+      if (!firstCard) return;
+
+      const gap = Number.parseFloat(window.getComputedStyle(grid).columnGap || "8") || 8;
+      const stepX = firstCard.offsetWidth + gap;
+      const stepY = firstCard.offsetHeight + gap;
+
+      const desiredX = -mobileGridActive.col * stepX;
+      const desiredY = -mobileGridActive.row * stepY;
+
+      const minX = Math.min(0, viewport.clientWidth - grid.scrollWidth);
+      const minY = Math.min(0, viewport.clientHeight - grid.scrollHeight);
+
+      const clampedX = Math.min(0, Math.max(minX, desiredX));
+      const clampedY = Math.min(0, Math.max(minY, desiredY));
+
+      setMobileGridPan({ x: clampedX, y: clampedY });
+    };
+
+    syncMobileGridPan();
+
+    const ro = new ResizeObserver(() => syncMobileGridPan());
+    if (mobileGridViewportRef.current) ro.observe(mobileGridViewportRef.current);
+    if (mobileGridRef.current) ro.observe(mobileGridRef.current);
+    window.addEventListener("resize", syncMobileGridPan);
+    return () => {
+      window.removeEventListener("resize", syncMobileGridPan);
+      ro.disconnect();
+    };
+  }, [mobileGridActive.row, mobileGridActive.col]);
 
   const commitDesktopGridCursorPosition = useCallback((clientX: number, clientY: number) => {
     lastDesktopGridPointerRef.current = { x: clientX, y: clientY };
@@ -521,13 +568,13 @@ export function HomepageHero() {
             onTouchStart={onMobileCarouselTouchStart}
             onTouchEnd={onMobileCarouselTouchEnd}
           >
-            <div className={styles.cluster4MobileViewport}>
+            <div ref={mobileGridViewportRef} className={styles.cluster4MobileViewport}>
               <div
+                ref={mobileGridRef}
                 className={styles.cluster4MobileGrid}
                 style={
                   {
-                    "--mobile-active-col": mobileGridActive.col,
-                    "--mobile-active-row": mobileGridActive.row,
+                    transform: `translate(${mobileGridPan.x}px, ${mobileGridPan.y}px)`,
                   } as CSSProperties
                 }
               >

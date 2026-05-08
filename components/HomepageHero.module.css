@@ -192,7 +192,7 @@
 .locationPrimary {
   margin: 0;
   color: var(--hero-text-primary);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.4;
   grid-column: 1;
   grid-row: 2;
@@ -341,7 +341,7 @@
 }
 
 .cluster4DesktopCard {
-  border-radius: 10px;
+  border-radius: 20px;
   background: var(--hero-inner-bg);
   padding: 8px;
   display: flex;
@@ -355,8 +355,17 @@
 
 .cluster4DesktopCardWide {
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
+}
+
+.cluster4DesktopCardWide .cluster4PanelImage {
+  flex: 0 0 310px;
+  height: 100%;
+}
+
+.cluster4DesktopCardWide .cluster4PanelTextWide {
+  align-self: flex-end;
 }
 
 .cluster4DesktopCard:is(button) {
@@ -408,10 +417,6 @@
   grid-template-rows: repeat(6, var(--cluster4-mobile-panel-h));
   gap: 8px;
   width: max-content;
-  transform: translate(
-    calc(var(--mobile-active-col, 0) * -1 * (var(--cluster4-mobile-panel-w) + 8px)),
-    calc(var(--mobile-active-row, 0) * -1 * (var(--cluster4-mobile-panel-h) + 8px))
-  );
   transition: transform 320ms ease-in-out;
 }
 
@@ -444,12 +449,14 @@
 
 .cluster4PanelText {
   padding: 0 8px 12px;
+  text-align: left;
 }
 
 .cluster4PanelTextWide {
   width: 314px;
   max-width: 100%;
   padding: 0 24px 12px 8px;
+  text-align: left;
 }
 
 .cluster4PanelBody {
@@ -564,6 +571,10 @@
       "cluster2"
       "cluster4"
       "cluster3";
+  }
+
+  .cluster4 {
+    grid-template-rows: minmax(0, 1fr);
   }
 
   .cluster1 {
