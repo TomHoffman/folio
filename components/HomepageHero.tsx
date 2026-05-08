@@ -31,14 +31,20 @@ const MOBILE_CARD_LABELS = Array.from(
   (_, idx) => `card ${idx + 1}`,
 );
 
-/** Figma home-grid 5022:212081 — 5 rows × 8 tiles on a 10-column track (283px ≈ 1fr, 552px ≈ 2fr). */
-const DESKTOP_BENTO_ROW_SPANS = [
+/** Figma home-grid pattern — one band (8 tiles / 10 col-units per row). */
+const DESKTOP_BENTO_BASE_ROW_SPANS = [
   [1, 2, 1, 1, 2, 1, 1, 1],
   [1, 1, 2, 1, 2, 1, 1, 1],
   [1, 1, 1, 2, 1, 2, 1, 1],
   [1, 1, 2, 1, 2, 1, 1, 1],
   [1, 2, 1, 1, 1, 2, 1, 1],
 ] as const;
+
+/** 2× horizontally + 2× vertically: 10 rows × 16 tiles, 20 col track (same rhythm, more canvas). */
+const DESKTOP_BENTO_ROW_SPANS: ReadonlyArray<ReadonlyArray<1 | 2>> = [
+  ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),
+  ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),
+];
 
 const DESKTOP_BENTO_INITIAL_ACTIVE = { row: 3, card: 2 } as const;
 
@@ -440,8 +446,14 @@ export function HomepageHero() {
             </div>
             <div className={styles.location}>
               <div className={styles.locationCard}>
-                <p className={styles.locationPrimary}>Based in London</p>
-                <p className={styles.locationSecondary}>Working globally</p>
+                <p className={styles.locationSecondary}>Based in</p>
+                <p className={styles.locationPrimary}>London, UK</p>
+                <img
+                  src="/svg/icons/map-pin.svg"
+                  alt=""
+                  aria-hidden
+                  className={styles.locationPinIcon}
+                />
               </div>
               <div className={styles.timePill}>
                 <div className={styles.timeReadout}>

@@ -6,7 +6,7 @@
   --hero-text-secondary: #7ea6b7;
   --hero-square: clamp(148px, 22vw, 248px);
   /* Desktop bento: fixed tracks; pan centers active tile. Gap 8px + card radius 10px unchanged. */
-  --cluster4-desktop-col: 302.4px;
+  --cluster4-desktop-col: 317.52px; /* +5% vs 302.4px */
   --cluster4-desktop-row: 402px;
   box-sizing: border-box;
   width: 100%;
@@ -180,6 +180,13 @@
   padding: 10px 12px;
   flex: 1 1 auto;
   min-height: 0;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 0;
+  align-content: start;
 }
 
 .locationPrimary {
@@ -187,6 +194,8 @@
   color: var(--hero-text-primary);
   font-size: 15px;
   line-height: 1.4;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .locationSecondary {
@@ -194,6 +203,24 @@
   color: var(--hero-text-secondary);
   font-size: 14px;
   line-height: 1.4;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.locationPinIcon {
+  width: 32px;
+  height: 32px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+  transform: translateY(6px);
+}
+
+@media (max-width: 1023px) {
+  .locationPinIcon {
+    transform: translateY(3px);
+  }
 }
 
 .timePill {
@@ -212,6 +239,7 @@
   font-size: 24px;
   line-height: 1;
   white-space: nowrap;
+  display: none;
 }
 
 .timeReadout {
@@ -344,8 +372,8 @@
 }
 
 .cluster4DesktopCardAccent {
-  background: #48befa;
-  color: #0a1e26;
+  background: #244350;
+  color: var(--hero-text-primary);
 }
 
 .cluster4DesktopCard:is(button):hover {
@@ -615,8 +643,8 @@
     width: max-content;
     height: max-content;
     display: grid;
-    grid-template-columns: repeat(10, var(--cluster4-desktop-col));
-    grid-template-rows: repeat(5, var(--cluster4-desktop-row));
+    grid-template-columns: repeat(20, var(--cluster4-desktop-col));
+    grid-template-rows: repeat(10, var(--cluster4-desktop-row));
     gap: 8px;
     box-sizing: border-box;
     transform-origin: 0 0;
