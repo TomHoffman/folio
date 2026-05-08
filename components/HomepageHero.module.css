@@ -5,9 +5,10 @@
   --hero-text-primary: #c1e0ed;
   --hero-text-secondary: #7ea6b7;
   --hero-square: clamp(148px, 22vw, 248px);
-  /* Desktop bento: fixed tracks; pan centers active tile. Gap 8px + card radius 10px unchanged. */
-  --cluster4-desktop-col: 317.52px; /* +5% vs 302.4px */
-  --cluster4-desktop-row: 402px;
+  --cluster4-mobile-panel-w: min(300px, 85vw);
+  --cluster4-mobile-panel-h: 380px;
+  --cluster4-desktop-col: 320px;
+  --cluster4-desktop-row: 400px;
   box-sizing: border-box;
   width: 100%;
   padding-bottom: 3em;
@@ -49,8 +50,7 @@
 .cluster2 {
   background: var(--hero-card-bg);
   border-radius: 24px;
-  /* No bottom padding — avoids empty strip under panelHero while availability row is hidden */
-  padding: 8px 8px 0 8px;
+  padding: 8px;
   display: grid;
   gap: 8px;
 }
@@ -303,6 +303,7 @@
 .cluster4MobileCarousel {
   display: block;
   min-height: 0;
+  overflow: hidden;
 }
 
 .cluster4DesktopGrid {
@@ -342,19 +343,27 @@
 .cluster4DesktopCard {
   border-radius: 10px;
   background: var(--hero-inner-bg);
-  display: grid;
-  place-items: center;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   min-height: 0;
   color: var(--hero-text-primary);
   font-size: 14px;
   letter-spacing: 0.02em;
 }
 
+.cluster4DesktopCardWide {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
 .cluster4DesktopCard:is(button) {
   appearance: none;
   border: 0;
   margin: 0;
-  padding: 0;
+  padding: 8px;
   cursor: pointer;
   width: 100%;
   height: 100%;
@@ -389,34 +398,70 @@
 .cluster4MobileViewport {
   overflow: hidden;
   border-radius: 20px;
+  height: calc(var(--cluster4-mobile-panel-h) + 88px);
+  min-height: var(--cluster4-mobile-panel-h);
 }
 
-.cluster4MobileTrack {
-  display: flex;
-  width: calc(var(--carousel-count, 1) * 100%);
-  transform: translateX(
-    calc((var(--carousel-index, 0) * -100%) / var(--carousel-count, 1))
+.cluster4MobileGrid {
+  display: grid;
+  grid-template-columns: repeat(6, var(--cluster4-mobile-panel-w));
+  grid-template-rows: repeat(6, var(--cluster4-mobile-panel-h));
+  gap: 8px;
+  width: max-content;
+  transform: translate(
+    calc(var(--mobile-active-col, 0) * -1 * (var(--cluster4-mobile-panel-w) + 8px)),
+    calc(var(--mobile-active-row, 0) * -1 * (var(--cluster4-mobile-panel-h) + 8px))
   );
   transition: transform 320ms ease-in-out;
 }
 
-.cluster4MobileTrack[data-animate="false"] {
-  transition: none;
+.cluster4MobileCard {
+  width: var(--cluster4-mobile-panel-w);
+  height: var(--cluster4-mobile-panel-h);
+  background: var(--hero-inner-bg);
+  border: 0;
+  border-radius: 20px;
+  padding: 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  text-align: left;
+  cursor: pointer;
 }
 
-.cluster4MobileCard {
-  flex: 0 0 calc(100% / var(--carousel-count, 1));
-  min-height: 300px;
-  background: var(--hero-inner-bg);
-  display: grid;
-  place-items: center;
+.cluster4MobileCardActive {
+  background: #244350;
+}
+
+.cluster4PanelImage {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 12px;
+  background: #305565;
+}
+
+.cluster4PanelText {
+  padding: 0 8px 12px;
+}
+
+.cluster4PanelTextWide {
+  width: 314px;
+  max-width: 100%;
+  padding: 0 24px 12px 8px;
+}
+
+.cluster4PanelBody {
+  margin: 0;
   color: var(--hero-text-primary);
   font-size: 14px;
+  line-height: 1.4;
   letter-spacing: 0.02em;
 }
 
 .cluster4MobileControls {
-  display: grid;
+  display: none;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 4px;
 }
@@ -485,7 +530,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cluster4MobileTrack {
+  .cluster4MobileGrid {
     transition: none;
   }
 }
@@ -504,11 +549,37 @@
   }
 
   .cluster4MobileViewport {
-    min-height: var(--hero-mobile-primary-panel-height);
+    min-height: var(--cluster4-mobile-panel-h);
   }
 
   .cluster4MobileCard {
-    min-height: var(--hero-mobile-primary-panel-height);
+    height: var(--cluster4-mobile-panel-h);
+  }
+}
+
+@media (max-width: 1023px) {
+  .row1 {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "cluster2"
+      "cluster4"
+      "cluster3";
+  }
+
+  .cluster1 {
+    display: contents;
+  }
+
+  .cluster2 {
+    grid-area: cluster2;
+  }
+
+  .cluster3 {
+    grid-area: cluster3;
+  }
+
+  .cluster4 {
+    grid-area: cluster4;
   }
 }
 
@@ -553,6 +624,8 @@
   .cluster2 {
     min-height: 0;
     height: 100%;
+    /* Keep prior desktop behavior while mobile gets even padding. */
+    padding: 8px 8px 0 8px;
     grid-template-rows: minmax(0, 1fr) auto;
   }
 
@@ -660,6 +733,10 @@
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
+  .cluster4DesktopGridInner {
+    grid-template-columns: repeat(16, var(--cluster4-desktop-col));
+  }
+
   .row2Text {
     font-size: 1.5em;
   }

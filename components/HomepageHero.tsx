@@ -30,6 +30,9 @@ const MOBILE_CARD_LABELS = Array.from(
   { length: 10 },
   (_, idx) => `card ${idx + 1}`,
 );
+const MOBILE_GRID_COLS = 6;
+const MOBILE_GRID_ROWS = 6;
+const MOBILE_GRID_CELLS = MOBILE_GRID_COLS * MOBILE_GRID_ROWS;
 
 /** Figma home-grid pattern — one band (8 tiles / 10 col-units per row). */
 const DESKTOP_BENTO_BASE_ROW_SPANS = [
@@ -60,6 +63,12 @@ function shouldEnableDesktopGridCursor(): boolean {
 const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
 const DESKTOP_GRID_CURSOR_OFFSET_X = 6;
 const DESKTOP_GRID_CURSOR_OFFSET_Y = 6;
+
+function getCardDebugLabel(label: string): string {
+  const match = label.match(/\d+/);
+  if (!match) return "Card";
+  return `Card ${match[0]}`;
+}
 
 function shuffleArray<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -120,6 +129,7 @@ export function HomepageHero() {
   const [mobileCluster4IsTransitioning, setMobileCluster4IsTransitioning] =
     useState(false);
   const [carouselAutoplayPaused, setCarouselAutoplayPaused] = useState(false);
+  const [mobileGridActive, setMobileGridActive] = useState({ row: 0, col: 0 });
   const mobileTouchStartXRef = useRef<number | null>(null);
   const desktopBentoViewportRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoInnerRef = useRef<HTMLDivElement | null>(null);
@@ -137,6 +147,7 @@ export function HomepageHero() {
   const [desktopGridCustomCursorEnabled, setDesktopGridCustomCursorEnabled] =
     useState(false);
   const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
+  const [desktopWideEnabled, setDesktopWideEnabled] = useState(false);
 
   const [mobileCarouselCards, setMobileCarouselCards] =
     useState(MOBILE_CARD_LABELS);
@@ -146,6 +157,14 @@ export function HomepageHero() {
     const last = mobileCarouselCards[mobileCarouselCards.length - 1];
     return [last, ...mobileCarouselCards, first];
   }, [mobileCarouselCards]);
+  const mobileGridCards = useMemo(
+    () =>
+      Array.from(
+        { length: MOBILE_GRID_CELLS },
+        (_, idx) => mobileCarouselCards[idx % mobileCarouselCards.length] ?? "",
+      ),
+    [mobileCarouselCards],
+  );
 
   useEffect(() => {
     let rafId = 0;
@@ -186,6 +205,14 @@ export function HomepageHero() {
     const onChange = () => sync();
     mqs.forEach((mq) => mq.addEventListener("change", onChange));
     return () => mqs.forEach((mq) => mq.removeEventListener("change", onChange));
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const sync = () => setDesktopWideEnabled(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   const commitDesktopGridCursorPosition = useCallback((clientX: number, clientY: number) => {
@@ -253,10 +280,11 @@ export function HomepageHero() {
       const activeBottomInner = acy + activeHalfH;
 
       let idealTy: number;
-      if (cluster2El) {
+      if (desktopWideEnabled && cluster2El) {
         const c2Bottom = cluster2El.getBoundingClientRect().bottom;
         idealTy = c2Bottom - vpRect.top - activeBottomInner;
       } else {
+        /* Tablet/desktop: center active panel within cluster4 viewport. */
         idealTy = vh / 2 - acy;
       }
 
@@ -283,7 +311,12 @@ export function HomepageHero() {
       window.removeEventListener("scroll", onScroll, { capture: true });
       ro.disconnect();
     };
-  }, [mobileCarouselCards, desktopBentoActive.row, desktopBentoActive.card]);
+  }, [
+    mobileCarouselCards,
+    desktopBentoActive.row,
+    desktopBentoActive.card,
+    desktopWideEnabled,
+  ]);
 
   const stepForwardRef = useRef(() => {});
 
@@ -328,6 +361,11 @@ export function HomepageHero() {
     const threshold = 30;
     if (deltaX <= -threshold) stepMobileCarousel(1);
     if (deltaX >= threshold) stepMobileCarousel(-1);
+  };
+
+  const onMobileGridPanelClick = (row: number, col: number) => {
+    if (row === mobileGridActive.row && col === mobileGridActive.col) return;
+    setMobileGridActive({ row, col });
   };
 
   useEffect(() => {
@@ -485,21 +523,40 @@ export function HomepageHero() {
           >
             <div className={styles.cluster4MobileViewport}>
               <div
-                className={styles.cluster4MobileTrack}
+                className={styles.cluster4MobileGrid}
                 style={
                   {
-                    "--carousel-count": mobileCarouselTrackCards.length,
-                    "--carousel-index": mobileCluster4TrackIndex,
+                    "--mobile-active-col": mobileGridActive.col,
+                    "--mobile-active-row": mobileGridActive.row,
                   } as CSSProperties
                 }
-                data-animate={mobileCluster4Animate ? "true" : "false"}
-                onTransitionEnd={onMobileCarouselTrackTransitionEnd}
               >
-                {mobileCarouselTrackCards.map((label, idx) => (
-                  <div key={`track-card-${idx}`} className={styles.cluster4MobileCard}>
-                    {label}
-                  </div>
-                ))}
+                {mobileGridCards.map((label, idx) => {
+                  const row = Math.floor(idx / MOBILE_GRID_COLS);
+                  const col = idx % MOBILE_GRID_COLS;
+                  const isActive = row === mobileGridActive.row && col === mobileGridActive.col;
+                  return (
+                    <button
+                      key={`mobile-grid-card-${idx}`}
+                      type="button"
+                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}`}
+                      onClick={() => onMobileGridPanelClick(row, col)}
+                      aria-current={isActive ? "true" : undefined}
+                      aria-label={label}
+                    >
+                      {isActive ? (
+                        <>
+                          <div className={styles.cluster4PanelImage} />
+                          <div className={styles.cluster4PanelText}>
+                            <p className={styles.cluster4PanelBody}>
+                              {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
+                            </p>
+                          </div>
+                        </>
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -540,22 +597,39 @@ export function HomepageHero() {
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
                     cardIdx === desktopBentoActive.card;
+                  const isWide = desktopWideEnabled && colSpan === 2;
                   return (
                     <button
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
                       type="button"
                       ref={isActive ? desktopBentoActivePanelRef : undefined}
-                      className={`${styles.cluster4DesktopCard}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}`}
-                      style={{ gridColumn: `span ${colSpan}` }}
+                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}`}
+                      style={{ gridColumn: `span ${isWide ? 2 : 1}` }}
                       data-active={isActive ? "true" : undefined}
                       aria-current={isActive ? "true" : undefined}
                       aria-label={label}
                       onClick={() => setDesktopBentoActive({ row: rowIdx, card: cardIdx })}
                     >
                       {isActive ? (
-                        <span className={styles.cluster4DesktopCardLabel} aria-hidden>
-                          {label}
-                        </span>
+                        isWide ? (
+                          <>
+                            <div className={styles.cluster4PanelImage} />
+                            <div className={styles.cluster4PanelTextWide}>
+                              <p className={styles.cluster4PanelBody}>
+                                {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className={styles.cluster4PanelImage} />
+                            <div className={styles.cluster4PanelText}>
+                              <p className={styles.cluster4PanelBody}>
+                                {`${getCardDebugLabel(label)}. Maiores ut voluptas nihil est totam voluptatem dolorem quam error et dolorem ratione. Sint minus in`}
+                              </p>
+                            </div>
+                          </>
+                        )
                       ) : null}
                     </button>
                   );
