@@ -398,6 +398,22 @@
   background: #244350;
 }
 
+.cluster4DesktopCardInactive,
+.cluster4MobileCardInactive {
+  animation: cluster4-inactive-pulse-onload 1.6s ease-in-out 1;
+  animation-delay: var(--cluster4-pulse-delay, 0s);
+}
+
+@keyframes cluster4-inactive-pulse-onload {
+  0%,
+  100% {
+    background: var(--hero-inner-bg);
+  }
+  55% {
+    background: #244350;
+  }
+}
+
 .cluster4DesktopCardLabel {
   font: inherit;
   font-size: inherit;
@@ -537,6 +553,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cluster4DesktopCardInactive,
+  .cluster4MobileCardInactive {
+    animation: none;
+  }
+
   .cluster4MobileGrid {
     transition: none;
   }

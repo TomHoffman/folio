@@ -151,6 +151,7 @@ export function HomepageHero() {
     useState(false);
   const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
   const [desktopWideEnabled, setDesktopWideEnabled] = useState(false);
+  const [showOneTimePanelPulse, setShowOneTimePanelPulse] = useState(true);
 
   const [mobileCarouselCards, setMobileCarouselCards] =
     useState(MOBILE_CARD_LABELS);
@@ -216,6 +217,13 @@ export function HomepageHero() {
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShowOneTimePanelPulse(false);
+    }, 2200);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   useLayoutEffect(() => {
@@ -319,7 +327,7 @@ export function HomepageHero() {
       if (!vw || !vh || !innerW || !innerH) return;
 
       const { x: acx, y: acy } = activePanelCenterInInner(activeEl, inner);
-      const idealTx = vw / 2 - acx;
+      const idealTx = vw / 2 - acx + (desktopWideEnabled ? -100 : 0);
 
       const cluster2El = cluster2Ref.current;
       const vpRect = vp.getBoundingClientRect();
@@ -582,11 +590,22 @@ export function HomepageHero() {
                   const row = Math.floor(idx / MOBILE_GRID_COLS);
                   const col = idx % MOBILE_GRID_COLS;
                   const isActive = row === mobileGridActive.row && col === mobileGridActive.col;
+                  const dRow = Math.abs(row - mobileGridActive.row);
+                  const dCol = Math.abs(col - mobileGridActive.col);
+                  const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
+                  const pulseIndex = (row - mobileGridActive.row + 1) * 3 + (col - mobileGridActive.col + 1);
                   return (
                     <button
                       key={`mobile-grid-card-${idx}`}
                       type="button"
-                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}`}
+                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4MobileCardInactive}` : ""}`}
+                      style={
+                        isPulseCandidate
+                          ? ({
+                              "--cluster4-pulse-delay": `${pulseIndex * 0.08}s`,
+                            } as CSSProperties)
+                          : undefined
+                      }
                       onClick={() => onMobileGridPanelClick(row, col)}
                       aria-current={isActive ? "true" : undefined}
                       aria-label={label}
@@ -644,14 +663,27 @@ export function HomepageHero() {
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
                     cardIdx === desktopBentoActive.card;
+                  const dRow = Math.abs(rowIdx - desktopBentoActive.row);
+                  const dCol = Math.abs(cardIdx - desktopBentoActive.card);
+                  const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
+                  const pulseIndex =
+                    (rowIdx - desktopBentoActive.row + 1) * 3 +
+                    (cardIdx - desktopBentoActive.card + 1);
                   const isWide = desktopWideEnabled && colSpan === 2;
                   return (
                     <button
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
                       type="button"
                       ref={isActive ? desktopBentoActivePanelRef : undefined}
-                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}`}
-                      style={{ gridColumn: `span ${isWide ? 2 : 1}` }}
+                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
+                      style={
+                        {
+                          gridColumn: `span ${isWide ? 2 : 1}`,
+                          ...(isPulseCandidate
+                            ? { "--cluster4-pulse-delay": `${pulseIndex * 0.08}s` }
+                            : {}),
+                        } as CSSProperties
+                      }
                       data-active={isActive ? "true" : undefined}
                       aria-current={isActive ? "true" : undefined}
                       aria-label={label}
