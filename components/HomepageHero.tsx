@@ -1,12 +1,14 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
   type TouchEvent as ReactTouchEvent,
 } from "react";
 import projectGridStyles from "@/components/ProjectGrid.module.css";
@@ -39,6 +41,19 @@ const DESKTOP_BENTO_ROW_SPANS = [
 ] as const;
 
 const DESKTOP_BENTO_INITIAL_ACTIVE = { row: 3, card: 2 } as const;
+
+/** Match `ProjectGrid` custom cursor — fine pointer + hover only. */
+function shouldEnableDesktopGridCursor(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(pointer: coarse)").matches) return false;
+  if (window.matchMedia("(hover: none)").matches) return false;
+  return window.matchMedia("(pointer: fine)").matches;
+}
+
+/** Desktop bento cursor — white fill alpha (Project grid uses 0.9). */
+const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
+const DESKTOP_GRID_CURSOR_OFFSET_X = 6;
+const DESKTOP_GRID_CURSOR_OFFSET_Y = 6;
 
 function shuffleArray<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -103,11 +118,19 @@ export function HomepageHero() {
   const desktopBentoViewportRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoInnerRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoActivePanelRef = useRef<HTMLButtonElement | null>(null);
+  const cluster2Ref = useRef<HTMLDivElement | null>(null);
   const [desktopBentoPan, setDesktopBentoPan] = useState({ x: 0, y: 0 });
   const [desktopBentoActive, setDesktopBentoActive] = useState<{
     row: number;
     card: number;
   }>(() => ({ ...DESKTOP_BENTO_INITIAL_ACTIVE }));
+
+  const desktopGridCursorWrapRef = useRef<HTMLDivElement | null>(null);
+  const desktopGridPointerInsideRef = useRef(false);
+  const lastDesktopGridPointerRef = useRef({ x: 0, y: 0 });
+  const [desktopGridCustomCursorEnabled, setDesktopGridCustomCursorEnabled] =
+    useState(false);
+  const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
 
   const [mobileCarouselCards, setMobileCarouselCards] =
     useState(MOBILE_CARD_LABELS);
@@ -149,6 +172,53 @@ export function HomepageHero() {
     setMobileCarouselCards(shuffleArray(MOBILE_CARD_LABELS));
   }, []);
 
+  useEffect(() => {
+    const sync = () => setDesktopGridCustomCursorEnabled(shouldEnableDesktopGridCursor());
+    sync();
+    const queries = ["(pointer: coarse)", "(hover: none)", "(pointer: fine)"];
+    const mqs = queries.map((q) => window.matchMedia(q));
+    const onChange = () => sync();
+    mqs.forEach((mq) => mq.addEventListener("change", onChange));
+    return () => mqs.forEach((mq) => mq.removeEventListener("change", onChange));
+  }, []);
+
+  const commitDesktopGridCursorPosition = useCallback((clientX: number, clientY: number) => {
+    lastDesktopGridPointerRef.current = { x: clientX, y: clientY };
+    const wrap = desktopGridCursorWrapRef.current;
+    if (wrap) {
+      wrap.style.left = `${clientX + DESKTOP_GRID_CURSOR_OFFSET_X}px`;
+      wrap.style.top = `${clientY + DESKTOP_GRID_CURSOR_OFFSET_Y}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!desktopGridCustomCursorEnabled) return;
+    const onScroll = () => {
+      if (!desktopGridPointerInsideRef.current) return;
+      const { x, y } = lastDesktopGridPointerRef.current;
+      commitDesktopGridCursorPosition(x, y);
+    };
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    return () => window.removeEventListener("scroll", onScroll, { capture: true });
+  }, [desktopGridCustomCursorEnabled, commitDesktopGridCursorPosition]);
+
+  const onDesktopGridMouseEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    desktopGridPointerInsideRef.current = true;
+    setDesktopGridCursorVisible(true);
+    commitDesktopGridCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onDesktopGridMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    commitDesktopGridCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onDesktopGridMouseLeave = () => {
+    desktopGridPointerInsideRef.current = false;
+    setDesktopGridCursorVisible(false);
+  };
+
   useLayoutEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
 
@@ -170,7 +240,20 @@ export function HomepageHero() {
 
       const { x: acx, y: acy } = activePanelCenterInInner(activeEl, inner);
       const idealTx = vw / 2 - acx;
-      const idealTy = vh / 2 - acy;
+
+      const cluster2El = cluster2Ref.current;
+      const vpRect = vp.getBoundingClientRect();
+      const activeHalfH = activeEl.offsetHeight / 2;
+      const activeBottomInner = acy + activeHalfH;
+
+      let idealTy: number;
+      if (cluster2El) {
+        const c2Bottom = cluster2El.getBoundingClientRect().bottom;
+        idealTy = c2Bottom - vpRect.top - activeBottomInner;
+      } else {
+        idealTy = vh / 2 - acy;
+      }
+
       setDesktopBentoPan(clampDesktopBentoPan(idealTx, idealTy, innerW, innerH, vw, vh));
     };
 
@@ -179,14 +262,19 @@ export function HomepageHero() {
     const ro = new ResizeObserver(() => syncDesktopBentoPan());
     const vp = desktopBentoViewportRef.current;
     const inner = desktopBentoInnerRef.current;
+    const c2 = cluster2Ref.current;
     if (vp) ro.observe(vp);
     if (inner) ro.observe(inner);
+    if (c2) ro.observe(c2);
 
     mq.addEventListener("change", syncDesktopBentoPan);
     window.addEventListener("resize", syncDesktopBentoPan);
+    const onScroll = () => syncDesktopBentoPan();
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => {
       mq.removeEventListener("change", syncDesktopBentoPan);
       window.removeEventListener("resize", syncDesktopBentoPan);
+      window.removeEventListener("scroll", onScroll, { capture: true });
       ro.disconnect();
     };
   }, [mobileCarouselCards, desktopBentoActive.row, desktopBentoActive.card]);
@@ -298,7 +386,7 @@ export function HomepageHero() {
     >
       <div className={styles.row1}>
         <div className={styles.cluster1}>
-          <div className={styles.cluster2}>
+          <div ref={cluster2Ref} className={styles.cluster2}>
             <div className={styles.panelHero} />
             <div className={styles.availabilityContact}>
               <div className={styles.availability}>
@@ -405,7 +493,23 @@ export function HomepageHero() {
           </div>
           <div
             ref={desktopBentoViewportRef}
-            className={styles.cluster4DesktopGrid}
+            className={[
+              styles.cluster4DesktopGrid,
+              desktopGridCustomCursorEnabled && desktopGridCursorVisible
+                ? styles.cluster4DesktopGridCursorHide
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            onMouseEnter={
+              desktopGridCustomCursorEnabled ? onDesktopGridMouseEnter : undefined
+            }
+            onMouseMove={
+              desktopGridCustomCursorEnabled ? onDesktopGridMouseMove : undefined
+            }
+            onMouseLeave={
+              desktopGridCustomCursorEnabled ? onDesktopGridMouseLeave : undefined
+            }
           >
             <div
               ref={desktopBentoInnerRef}
@@ -446,6 +550,30 @@ export function HomepageHero() {
                 }),
               )}
             </div>
+            {desktopGridCustomCursorEnabled ? (
+              <div
+                ref={desktopGridCursorWrapRef}
+                className={styles.cluster4DesktopCursorWrap}
+                style={
+                  {
+                    left: 0,
+                    top: 0,
+                    transform: "translate(-50%, -50%)",
+                    opacity: desktopGridCursorVisible ? 1 : 0,
+                  } as CSSProperties
+                }
+                aria-hidden
+              >
+                <div
+                  className={styles.cluster4DesktopCursorBubble}
+                  style={
+                    {
+                      backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                    } as CSSProperties
+                  }
+                />
+              </div>
+            ) : null}
           </div>
           <div className={styles.cluster4MobileControls}>
             <button
