@@ -11,7 +11,7 @@
 }
 
 :global(html.dark) .section {
-  --image-grid-shell-bg: #172e37;
+  --image-grid-shell-bg: #122a35;
 }
 
 .sectionInner {

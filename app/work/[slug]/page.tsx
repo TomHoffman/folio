@@ -11,7 +11,6 @@ import { MoreProjects } from "@/components/MoreProjects";
 import { Testimonial } from "@/components/Testimonial";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
-import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 import { getProjectBySlug } from "@/data/projects";
 import mainStyles from "../../main.module.css";
 
@@ -44,7 +43,6 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
   const main = (
     <main className={`${mainStyles.main} ${mainStyles.mainProject}`}>
       <div className={mainStyles.mainProjectInner}>
-        <ScrollToTopOnMount />
         <ProjectHero project={project} />
         <ProjectImageContainer project={project} />
         {project.overview ? (

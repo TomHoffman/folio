@@ -5,6 +5,6 @@
   border-top: 1px solid var(--color-divider);
 }
 
-.section :global(#project-grid-title) {
+.section :global(.project-grid-title) {
   padding-top: 2em;
 }

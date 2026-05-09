@@ -19,7 +19,6 @@ export function MoreProjects({ currentProject }: MoreProjectsProps) {
         indicatorColor="powderBlue"
         projects={projects}
         usePageInset={false}
-        enableScrollAnchor={false}
       />
     </section>
   );

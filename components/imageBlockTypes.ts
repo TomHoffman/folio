@@ -82,7 +82,7 @@ export type ImageBlockProps = {
   description?: string;
   headingId?: string;
   indicatorColor?: SectionHeadingIndicatorColor;
-  /** When true, images sit in the rounded panel (`#172e37`, 8px pad) from Figma. */
+  /** When true, images sit in the rounded panel (`#122a35`, 8px pad) from Figma. */
   contained: boolean;
   /** When false, remove container shell on mobile (`<768px`) even if `contained` is true. */
   mobileContained?: boolean;

@@ -19,7 +19,7 @@
 }
 
 :global(html.dark) .logoSection {
-  --logo-grid-panel: #172e37;
+  --logo-grid-panel: #122a35;
   --logo-grid-cell: #0b222c;
   --logo-grid-logo-filter: none;
 }

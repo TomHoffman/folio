@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
   type CSSProperties,
@@ -223,8 +224,6 @@ export type ProjectGridProps = {
   projects?: Project[];
   /** Horizontal page inset wrapper. Default `true`. */
   usePageInset?: boolean;
-  /** Apply scroll anchor offset class. Default `true`. */
-  enableScrollAnchor?: boolean;
 };
 
 export function ProjectGrid({
@@ -233,8 +232,8 @@ export function ProjectGrid({
   indicatorColor = "orange",
   projects,
   usePageInset = true,
-  enableScrollAnchor = true,
 }: ProjectGridProps = {}) {
+  const gridTitleId = useId();
   const visibleTitle = showTitle && Boolean(title?.trim());
   const displayedProjects = projects?.length ? projects : visibleProjects;
 
@@ -323,32 +322,24 @@ export function ProjectGrid({
     .join(" ");
 
   return (
-    <div
-      id="project-grid"
-      className={[
-        usePageInset ? styles.pageInset : "",
-        enableScrollAnchor ? styles.scrollAnchor : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    <div className={[usePageInset ? styles.pageInset : ""].filter(Boolean).join(" ")}>
       {visibleTitle ? (
         <h2
-          id="project-grid-title"
-          className={`${sectionHeadingStyles.heading} ${styles.title}`}
+          id={gridTitleId}
+          className={`${sectionHeadingStyles.heading} ${styles.title} project-grid-title`}
           style={sectionHeadingIndicatorStyle(indicatorColor)}
         >
           {title?.trim()}
         </h2>
       ) : (
-        <h2 id="project-grid-title" className="sr-only">
+        <h2 id={gridTitleId} className="sr-only">
           Projects
         </h2>
       )}
       <ul
         ref={gridRef}
         className={gridClass}
-        aria-labelledby="project-grid-title"
+        aria-labelledby={gridTitleId}
         onMouseEnter={customCursorEnabled ? onGridMouseEnter : undefined}
         onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
         onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}

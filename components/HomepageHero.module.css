@@ -1,6 +1,6 @@
 .hero {
   --hero-gap: 8px;
-  --hero-card-bg: #172e37;
+  --hero-card-bg: #122a35;
   --hero-inner-bg: #1c3640;
   --hero-text-primary: #c1e0ed;
   --hero-text-secondary: #7ea6b7;
@@ -36,7 +36,7 @@
 
 .row2Text {
   margin: 0;
-  font-size: 1.75em;
+  font-size: 1.4em;
   font-weight: 300;
   line-height: 1.42;
   color: var(--hero-text-primary);
@@ -638,6 +638,10 @@
       "cluster3";
   }
 
+  .row2 {
+    background: var(--hero-inner-bg);
+  }
+
   .cluster4 {
     grid-template-rows: minmax(0, 1fr);
   }
@@ -660,10 +664,6 @@
 }
 
 @media (min-width: 768px) {
-  .row2Text {
-    font-size: 1.25em;
-  }
-
   .panelHero,
   .cluster4Inner {
     aspect-ratio: 16 / 10;
@@ -684,10 +684,13 @@
 
   .row2Inner {
     padding: 2em;
+    /* Stable basis so 1.25em on row2Text = 20px when root is 16px. */
+    font-size: 1rem;
   }
 
   .row2Text {
     max-width: 65ch;
+    font-size: 1.25em;
   }
 
   .cluster1 {
@@ -808,14 +811,3 @@
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .row2Text {
-    font-size: 1.5em;
-  }
-}
-
-@media (min-width: 1280px) {
-  .row2Text {
-    font-size: 1.5em;
-  }
-}

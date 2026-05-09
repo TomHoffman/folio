@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Footer } from "@/components/Footer";
 import { HeaderMinimal } from "@/components/HeaderMinimal";
+import { NavigationScrollReset } from "@/components/NavigationScrollReset";
 import { ThemeDocumentSync } from "@/components/ThemeDocumentSync";
 import layoutStyles from "./layout.module.css";
 import "./globals.css";
@@ -63,7 +64,7 @@ export default function RootLayout({
             __html: `(function(){var header=document.getElementById('main-header');if(!header)return;var last=window.pageYOffset||0;function setDir(dir){header.setAttribute('data-dir',dir);}function onScroll(){var current=window.pageYOffset||0;if(current<=0){setDir('up');last=0;return;}if(current===last)return;setDir(current<last?'up':'down');last=current;}setDir('up');window.addEventListener('scroll',onScroll,{passive:true});})();`,
           }}
         />
-        {children}
+        <NavigationScrollReset>{children}</NavigationScrollReset>
         <Footer />
       </body>
     </html>

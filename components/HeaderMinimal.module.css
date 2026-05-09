@@ -110,7 +110,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .headerBack:hover {
-    background-color: #172e37;
+    background-color: #122a35;
   }
 
   .headerBack.headerBackDisabled:hover {

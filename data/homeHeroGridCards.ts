@@ -45,7 +45,8 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
     label: "BHF Redesign",
     body:
       "I have designed the regular donations flows for 2 of the UK's biggest charities on sites getting millions of visitors every month.",
-    theme: "default",
+      textMaxChars: 28,
+      theme: "default",
     media: {
       kind: "image",
       sources: "/images/home/hero-grid/bhf-phone.jpg",
@@ -70,8 +71,8 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
     id: "hero-example-video",
     label: "Video (example)",
     body:
-      "Example looping video in the panel slot — replace `media.src` with your file under `public/` (or a URL) when ready.",
-    textMaxChars: 42,
+      "Example looping video in the panel slot - replace `media.src` with your file under `public/` (or a URL) when ready.",
+    textMaxChars: 25,
     theme: "default",
     media: {
       kind: "video",
@@ -82,8 +83,8 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
     id: "hero-example-rive",
     label: "Rive (example)",
     body:
-      "Example Rive runtime file — swap `public/rive/home-hero-example.riv` (or `media.src`) for your animation.",
-    textMaxChars: 42,
+      "Example Rive runtime file - swap `public/rive/home-hero-example.riv` (or `media.src`) for your animation.",
+    textMaxChars: 25,
     theme: "default",
     media: {
       kind: "rive",

@@ -17,3 +17,8 @@
   color: var(--color-text-secondary);
   text-align: center;
 }
+
+.sep {
+  margin: 0 0.2em;
+  user-select: none;
+}
