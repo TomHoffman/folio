@@ -26,9 +26,9 @@
 }
 
 .link {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 13px;
   font-size: 1.25em;
   font-weight: 400;
   line-height: 1.2;
@@ -48,9 +48,15 @@
 }
 
 .dot {
-  flex-shrink: 0;
-  width: 8px;
-  height: 8px;
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  margin-right: 0.5em;
+  transform: translateY(-50%);
+  /* Out of flow so label position matches inactive state; size matches `SectionHeading` dot. */
+  font-size: var(--section-heading-font-size);
+  width: 0.5em;
+  height: 0.5em;
   border-radius: 50%;
   background-color: var(--color-text-primary);
 }

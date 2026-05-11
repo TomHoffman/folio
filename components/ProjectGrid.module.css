@@ -222,3 +222,129 @@
 .cursorLabel {
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.12));
 }
+
+/*
+ * Home “Featured projects”: max 5 cards; desktop mosaic on 6 columns so a 2+3 layout
+ * shares equal-height rows (`repeat(2, 1fr)` + `aspect-ratio` on the grid).
+ */
+@media (min-width: 1024px) {
+  .gridHomeFeatured {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .gridHomeFeatured .gridItem {
+    min-height: 0;
+  }
+
+  .gridHomeFeatured .card {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* 5 → row of 2 + row of 3 (same row height). */
+  .gridHomeFeatured[data-featured-count="5"] {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    aspect-ratio: 1 / 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="5"] > .gridItem:nth-child(1) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="5"] > .gridItem:nth-child(2) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="5"] > .gridItem:nth-child(3) {
+    grid-column: span 2;
+    grid-row: 2;
+  }
+
+  .gridHomeFeatured[data-featured-count="5"] > .gridItem:nth-child(4) {
+    grid-column: span 2;
+    grid-row: 2;
+  }
+
+  .gridHomeFeatured[data-featured-count="5"] > .gridItem:nth-child(5) {
+    grid-column: span 2;
+    grid-row: 2;
+  }
+
+  /* 4 → 2×2 */
+  .gridHomeFeatured[data-featured-count="4"] {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    aspect-ratio: 1 / 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="4"] > .gridItem:nth-child(1) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="4"] > .gridItem:nth-child(2) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="4"] > .gridItem:nth-child(3) {
+    grid-column: span 3;
+    grid-row: 2;
+  }
+
+  .gridHomeFeatured[data-featured-count="4"] > .gridItem:nth-child(4) {
+    grid-column: span 3;
+    grid-row: 2;
+  }
+
+  /* 3 → 2 + full-width (equal row heights). */
+  .gridHomeFeatured[data-featured-count="3"] {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    aspect-ratio: 1 / 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="3"] > .gridItem:nth-child(1) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="3"] > .gridItem:nth-child(2) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="3"] > .gridItem:nth-child(3) {
+    grid-column: span 6;
+    grid-row: 2;
+  }
+
+  /* 2 → one row */
+  .gridHomeFeatured[data-featured-count="2"] {
+    grid-template-rows: minmax(0, 1fr);
+    aspect-ratio: 2 / 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="2"] > .gridItem:nth-child(1) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="2"] > .gridItem:nth-child(2) {
+    grid-column: span 3;
+    grid-row: 1;
+  }
+
+  /* 1 → banner */
+  .gridHomeFeatured[data-featured-count="1"] {
+    grid-template-rows: minmax(0, 1fr);
+    aspect-ratio: 2.2 / 1;
+  }
+
+  .gridHomeFeatured[data-featured-count="1"] > .gridItem:nth-child(1) {
+    grid-column: span 6;
+    grid-row: 1;
+  }
+}

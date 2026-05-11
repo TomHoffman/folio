@@ -12,6 +12,7 @@ import { Testimonial } from "@/components/Testimonial";
 import { ProjectOverview } from "@/components/ProjectOverview";
 import { ProtectedWorkShell } from "@/components/ProtectedWorkShell";
 import { getProjectBySlug } from "@/data/projects";
+import { PROTECTED_WORK_GATE_ENABLED } from "@/lib/protectedWorkGate";
 import mainStyles from "../../main.module.css";
 
 type WorkProjectPageProps = {
@@ -97,7 +98,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
     </main>
   );
 
-  if (project.status === "protected") {
+  if (PROTECTED_WORK_GATE_ENABLED && project.status === "protected") {
     return <ProtectedWorkShell slug={project.slug}>{main}</ProtectedWorkShell>;
   }
 

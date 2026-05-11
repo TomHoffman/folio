@@ -8,12 +8,18 @@ export default function HomePage() {
   return (
     <main className={`${mainStyles.main} ${mainStyles.mainHome}`} key="route-home">
       <HomepageHero />
-      <LogoGrid title="Selected clients" indicatorColor="secondary" />
+      <LogoGrid
+        title="Clients"
+        indicatorColor="secondary"
+        className={mainStyles.homeLogoGridBeforeProjects}
+      />
       <ProjectGrid
-        title="Projects"
+        title="Featured projects"
         showTitle={true}
         indicatorColor="secondary"
         animateOnScroll
+        maxProjects={5}
+        desktopHomeFeaturedGrid
       />
       <p className={mainStyles.mainHomeFooterLink}>
         <Link href="/ds">DS — component playground</Link>

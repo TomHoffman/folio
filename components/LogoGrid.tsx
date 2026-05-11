@@ -229,7 +229,7 @@ export function LogoGrid({
           </div>
         ) : (
           <h2 id="logo-grid-title" className="sr-only">
-            Selected client logos
+            Client logos
           </h2>
         )}
       </div>

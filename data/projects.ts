@@ -652,7 +652,7 @@ export const projects: Project[] = [
     heroImage: "/images/aib/aib-hero3.jpg",
     heroImageSecondary: "/images/aib/aib-hero2.jpg",
     heroImageCount: 2,
-    status: "active",
+    status: "protected",
     cursorColor: "#811C81",
     assetVersion: "2",
     overview: {

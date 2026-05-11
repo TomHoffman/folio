@@ -56,19 +56,6 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
     },
   },
   {
-    id: "hero-example-video",
-    label: "Video (example)",
-    body:
-      "Example looping video in the panel slot - replace `media.src` with your file under `public/` (or a URL) when ready.",
-    textMaxChars: 25,
-    theme: "default",
-    media: {
-      kind: "video",
-      src: "/videos/home-hero-example.webm",
-    },
-  },
-  
-  {
     id: "hero-example-rive",
     label: "Rive (example)",
     body:

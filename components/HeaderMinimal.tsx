@@ -4,15 +4,12 @@ import styles from "./HeaderMinimal.module.css";
 
 export function HeaderMinimal() {
   const headerContent = (
-    <>
-      <div className={styles.inner}>
-        <div className={styles.lead}>
-          <HeaderProjectNav />
-        </div>
-        <HeaderNav />
+    <div className={styles.inner}>
+      <div className={styles.lead}>
+        <HeaderProjectNav />
       </div>
-      <div className={styles.bottomRule} aria-hidden />
-    </>
+      <HeaderNav />
+    </div>
   );
 
   return (

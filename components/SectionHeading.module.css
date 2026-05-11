@@ -1,4 +1,4 @@
-/* Shared section labels (e.g. Selected clients, Projects) — one source for typography + horizontal inset. */
+/* Shared section labels (e.g. Clients, Featured projects) — one source for typography + horizontal inset. */
 
 /* Align LogoGrid titles with ProjectGrid `.pageInset` at each band. */
 .headingGutter {
@@ -39,8 +39,8 @@
 .heading::before {
   content: "";
   flex-shrink: 0;
-  width: 8px;
-  height: 8px;
+  width: 0.5em;
+  height: 0.5em;
   border-radius: 50%;
   background-color: var(
     --section-heading-indicator,

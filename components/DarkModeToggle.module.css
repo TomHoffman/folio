@@ -1,4 +1,4 @@
-/* Circle top-left; +2px top nudge. Reserved for future toggle — not mounted in header. */
+/* Default: slight top nudge for DS / inline rows. Header passes a class to bottom-align. */
 .themeToggle {
   position: relative;
   z-index: 1;

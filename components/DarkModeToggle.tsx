@@ -8,7 +8,11 @@ import {
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./DarkModeToggle.module.css";
 
-export function DarkModeToggle() {
+type DarkModeToggleProps = {
+  className?: string;
+};
+
+export function DarkModeToggle({ className }: DarkModeToggleProps) {
   const [dark, setDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -63,7 +67,7 @@ export function DarkModeToggle() {
     <button
       ref={buttonRef}
       type="button"
-      className={styles.themeToggle}
+      className={[styles.themeToggle, className].filter(Boolean).join(" ")}
       role="switch"
       aria-checked={dark}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}

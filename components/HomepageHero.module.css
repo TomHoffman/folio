@@ -4,7 +4,7 @@
   --hero-inner-bg: #1c3640;
   --hero-text-primary: #c1e0ed;
   --hero-text-secondary: #7ea6b7;
-  /* Inactive hero-grid panels — same as LogoGrid `--logo-grid-cell` / `.cell`. */
+  /* Inactive hero-grid panels — light: LogoGrid cell; dark: `--hero-inner-bg` (#1c3640). */
   --hero-grid-inactive-panel: #f9f6ed;
   --hero-square: clamp(148px, 22vw, 248px);
   --cluster4-mobile-panel-w: min(300px, 85vw);
@@ -17,7 +17,7 @@
 }
 
 :global(html.dark) .hero {
-  --hero-grid-inactive-panel: #0b222c;
+  --hero-grid-inactive-panel: var(--hero-inner-bg);
 }
 
 .row1 {

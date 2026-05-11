@@ -61,18 +61,6 @@
   justify-content: flex-start;
   margin: 0;
   min-width: 0;
-  gap: 0.5em;
-}
-
-.leadTheme {
-  display: flex;
-  align-items: flex-end;
-  flex-shrink: 0;
-}
-
-.headerThemeToggle {
-  margin: 0;
-  align-items: flex-end;
 }
 
 .projectNav {

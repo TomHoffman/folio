@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -19,6 +20,7 @@ import {
 import enterStyles from "./ProjectPageEnter.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ProjectGrid.module.css";
+import { PROTECTED_WORK_GATE_ENABLED } from "@/lib/protectedWorkGate";
 import {
   scrollRevealTriggerEarlier,
   useScrollRevealElement,
@@ -72,6 +74,7 @@ function findProjectUnderPointer(
   grid: HTMLElement,
   clientX: number,
   clientY: number,
+  projectList: readonly Project[],
 ): Project | null {
   let best: { project: Project; dist: number } | null = null;
 
@@ -79,7 +82,7 @@ function findProjectUnderPointer(
     const hit = li.querySelector("[data-project-slug]");
     if (!(hit instanceof HTMLElement)) continue;
     const slug = hit.dataset.projectSlug;
-    const project = visibleProjects.find((p) => p.slug === slug);
+    const project = projectList.find((p) => p.slug === slug);
     if (!project) continue;
 
     const r = hit.getBoundingClientRect();
@@ -190,7 +193,7 @@ function ProjectCard({ project }: { project: Project }) {
         <p className={styles.cardIndustry}>{project.industry}</p>
       </div>
 
-      {project.status === "protected" ? (
+      {PROTECTED_WORK_GATE_ENABLED && project.status === "protected" ? (
         <ProjectStatusPill label="Password protected" />
       ) : null}
 
@@ -201,11 +204,11 @@ function ProjectCard({ project }: { project: Project }) {
   );
 
   const href =
-    project.status === "protected"
+    PROTECTED_WORK_GATE_ENABLED && project.status === "protected"
       ? `/work/${project.slug}/access`
       : `/work/${project.slug}`;
   const ariaLabel =
-    project.status === "protected"
+    PROTECTED_WORK_GATE_ENABLED && project.status === "protected"
       ? `${project.title} — password protected`
       : project.status === "coming-soon"
         ? `${project.title} — coming soon`
@@ -242,6 +245,13 @@ export type ProjectGridProps = {
    * Prefer this OR `animateCardsOnMount`, not both.
    */
   animateOnScroll?: boolean;
+  /** Cap how many cards render (e.g. home featured list). */
+  maxProjects?: number;
+  /**
+   * Desktop (≥1024px): 6-column mosaic — 5 cards as 2+3 with equal row heights, 4 as 2+2, etc.
+   * Use with `maxProjects` for the home featured block.
+   */
+  desktopHomeFeaturedGrid?: boolean;
 };
 
 export function ProjectGrid({
@@ -252,10 +262,15 @@ export function ProjectGrid({
   usePageInset = true,
   animateCardsOnMount = false,
   animateOnScroll = false,
+  maxProjects,
+  desktopHomeFeaturedGrid = false,
 }: ProjectGridProps = {}) {
   const gridTitleId = useId();
   const visibleTitle = showTitle && Boolean(title?.trim());
-  const displayedProjects = projects?.length ? projects : visibleProjects;
+  const displayedProjects = useMemo(() => {
+    const base = projects?.length ? projects : visibleProjects;
+    return maxProjects != null ? base.slice(0, maxProjects) : base;
+  }, [projects, maxProjects]);
 
   const { ref: scrollRevealRef, isVisible: isProjectGridRevealed } =
     useScrollRevealElement<HTMLDivElement>({
@@ -300,7 +315,12 @@ export function ProjectGrid({
     }
     const grid = gridRef.current;
     if (!grid) return;
-    const project = findProjectUnderPointer(grid, clientX, clientY);
+    const project = findProjectUnderPointer(
+      grid,
+      clientX,
+      clientY,
+      displayedProjects,
+    );
     const nextSlug = project?.slug ?? null;
     const prevTracked = pointerSlugRef.current;
     if (
@@ -316,7 +336,7 @@ export function ProjectGrid({
       if (prevSlug === nextSlug) return prev;
       return project;
     });
-  }, []);
+  }, [displayedProjects]);
 
   useEffect(() => {
     if (!customCursorEnabled) return;
@@ -345,6 +365,7 @@ export function ProjectGrid({
 
   const gridClass = [
     styles.grid,
+    desktopHomeFeaturedGrid ? styles.gridHomeFeatured : "",
     customCursorEnabled && pointerProject ? styles.gridCursorHide : "",
   ]
     .filter(Boolean)
@@ -400,6 +421,9 @@ export function ProjectGrid({
       <ul
         ref={gridRef}
         className={gridClass}
+        data-featured-count={
+          desktopHomeFeaturedGrid ? String(displayedProjects.length) : undefined
+        }
         aria-labelledby={gridTitleId}
         onMouseEnter={customCursorEnabled ? onGridMouseEnter : undefined}
         onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
