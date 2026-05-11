@@ -41,7 +41,7 @@ export default async function WorkProjectPage({ params }: WorkProjectPageProps) 
   }
 
   const main = (
-    <main className={`${mainStyles.main} ${mainStyles.mainProject}`}>
+    <main className={`${mainStyles.main} ${mainStyles.mainProject}`} key={`route-work-${slug}`}>
       <div className={mainStyles.mainProjectInner}>
         <ProjectHero project={project} />
         <ProjectImageContainer project={project} />

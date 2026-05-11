@@ -1,7 +1,11 @@
 /* Visible title uses `SectionHeading.module.css` (shared with ProjectGrid). */
 
+.revealSegment {
+  width: 100%;
+}
+
 .logoSection {
-  --logo-grid-panel: #f1ede3;
+  --logo-grid-panel: #e2dfd9;
   --logo-grid-cell: #f9f6ed;
   --logo-grid-logo-filter: brightness(0) saturate(100%) opacity(82.8%);
   --logo-grid-gap: 8px;
@@ -13,7 +17,8 @@
   --logo-section-inline-margin: 3rem;
 
   width: 100%;
-  margin-bottom: 2rem;
+  /* Keep section-to-section rhythm consistent with Hero -> LogoGrid. */
+  margin-bottom: 2em;
   padding-top: 1em;
   box-sizing: border-box;
 }
@@ -47,12 +52,6 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .logoSection {
-    margin-bottom: 2.5rem;
-  }
-}
-
 @media (min-width: 1024px) and (max-width: 1279px) {
   .logoSection {
     --logo-section-inline-margin: 1rem;
@@ -70,7 +69,7 @@
   }
 
   .logoSection {
-    margin-bottom: 120px;
+    margin-bottom: 6em;
     margin-left: var(--logo-section-inline-margin);
     margin-right: var(--logo-section-inline-margin);
     width: auto;

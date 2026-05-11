@@ -9,7 +9,7 @@ import {
   useState,
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
-  type TouchEvent as ReactTouchEvent,
+  type TransitionEvent as ReactTransitionEvent,
 } from "react";
 import { Cluster4PanelMedia } from "@/components/Cluster4PanelMedia";
 import projectGridStyles from "@/components/ProjectGrid.module.css";
@@ -53,6 +53,13 @@ const DESKTOP_BENTO_ROW_SPANS: ReadonlyArray<ReadonlyArray<1 | 2>> = [
 
 const DESKTOP_BENTO_INITIAL_ACTIVE = { row: 3, card: 2 } as const;
 
+/** Horizontal pan nudge (px) for desktop bento — only at very wide widths so tablet landscape is not clipped. */
+const DESKTOP_BENTO_PAN_NUDGE_X = -100;
+/** Wide 2-column tiles start here (matches layout breakpoint intent). */
+const DESKTOP_WIDE_LAYOUT_MQ = "(min-width: 1280px)";
+/** Extra left pan only here — above typical tablet landscape (e.g. iPad Pro ~1366 CSS px). */
+const DESKTOP_BENTO_PAN_NUDGE_MQ = "(min-width: 1440px)";
+
 /** Match `ProjectGrid` custom cursor — fine pointer + hover only. */
 function shouldEnableDesktopGridCursor(): boolean {
   if (typeof window === "undefined") return false;
@@ -61,10 +68,10 @@ function shouldEnableDesktopGridCursor(): boolean {
   return window.matchMedia("(pointer: fine)").matches;
 }
 
-/** Desktop bento cursor — white fill alpha (Project grid uses 0.9). */
-const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
 const DESKTOP_GRID_CURSOR_OFFSET_X = 6;
 const DESKTOP_GRID_CURSOR_OFFSET_Y = 6;
+/** Desktop bento cursor — white fill alpha (Project grid uses 0.9). */
+const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
 
 function shuffleArray<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -73,6 +80,51 @@ function shuffleArray<T>(items: readonly T[]): T[] {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
+}
+
+type DesktopBentoSlot = { row: number; card: number };
+
+/**
+ * Pick an initial active card away from outer edges so first-load panning can center it.
+ * Falls back to wide slots anywhere, then any slot, if the center window is empty.
+ */
+function pickInitialDesktopBentoSlot(
+  rowSpansGrid: ReadonlyArray<ReadonlyArray<1 | 2>>,
+): DesktopBentoSlot | null {
+  if (rowSpansGrid.length === 0) return null;
+  const totalRows = rowSpansGrid.length;
+  const totalCards = rowSpansGrid[0]?.length ?? 0;
+  if (totalCards === 0) return null;
+
+  const rowInset = Math.max(1, Math.floor(totalRows * 0.2));
+  const cardInset = Math.max(1, Math.floor(totalCards * 0.2));
+
+  const wideSlots: DesktopBentoSlot[] = [];
+  const centerWideSlots: DesktopBentoSlot[] = [];
+  const allSlots: DesktopBentoSlot[] = [];
+
+  rowSpansGrid.forEach((rowSpans, row) => {
+    rowSpans.forEach((span, card) => {
+      const slot = { row, card };
+      allSlots.push(slot);
+      if (span !== 2) return;
+      wideSlots.push(slot);
+      const isInCenterBand =
+        row >= rowInset &&
+        row < totalRows - rowInset &&
+        card >= cardInset &&
+        card < totalCards - cardInset;
+      if (isInCenterBand) centerWideSlots.push(slot);
+    });
+  });
+
+  const from = centerWideSlots.length
+    ? centerWideSlots
+    : wideSlots.length
+      ? wideSlots
+      : allSlots;
+  if (from.length === 0) return null;
+  return from[Math.floor(Math.random() * from.length)] ?? null;
 }
 
 /** Pan so inner top-left is (tx,ty); keep grid flush with viewport (no background gutters). */
@@ -116,6 +168,61 @@ function activePanelCenterInInner(panel: HTMLElement, inner: HTMLElement) {
   };
 }
 
+function mobileNeighborDirectionRotation(
+  from: { row: number; col: number },
+  to: { row: number; col: number },
+): number | null {
+  const dr = to.row - from.row;
+  const dc = to.col - from.col;
+  if (dr === 0 && dc === 0) return null;
+  const angle = (Math.atan2(dr, dc) * 180) / Math.PI;
+  return angle;
+}
+
+function mobileNeighborHintPlacement(
+  from: { row: number; col: number },
+  to: { row: number; col: number },
+): { left: string; top: string; rotation: number } | null {
+  const dr = to.row - from.row;
+  const dc = to.col - from.col;
+  const rotation = mobileNeighborDirectionRotation(from, to);
+  if (rotation == null) return null;
+
+  // Place hint on the edge/corner closest to the active card.
+  const left = dc === 1 ? "8%" : dc === -1 ? "92%" : "50%";
+  const top = dr === 1 ? "8%" : dr === -1 ? "92%" : "50%";
+  return { left, top, rotation };
+}
+
+function mobileNeighborHintDelayIndex(
+  from: { row: number; col: number },
+  to: { row: number; col: number },
+): number | null {
+  const dr = to.row - from.row;
+  const dc = to.col - from.col;
+  if (dr === 0 && dc === 1) return 0; // right
+  if (dr === 1 && dc === 1) return 1; // bottom-right
+  if (dr === 1 && dc === 0) return 2; // below
+  return null;
+}
+
+function clockwiseAdjacentPulseDelayIndex(
+  from: { row: number; col: number },
+  to: { row: number; col: number },
+): number | null {
+  const dr = to.row - from.row;
+  const dc = to.col - from.col;
+  if (dr === 0 && dc === 1) return 0; // right
+  if (dr === 1 && dc === 1) return 1; // bottom-right
+  if (dr === 1 && dc === 0) return 2; // bottom
+  if (dr === 1 && dc === -1) return 3; // bottom-left
+  if (dr === 0 && dc === -1) return 4; // left
+  if (dr === -1 && dc === -1) return 5; // top-left
+  if (dr === -1 && dc === 0) return 6; // top
+  if (dr === -1 && dc === 1) return 7; // top-right
+  return null;
+}
+
 export function HomepageHero() {
   const [timeLabel, setTimeLabel] = useState("00:00");
   const [minuteProgress, setMinuteProgress] = useState(0);
@@ -124,12 +231,10 @@ export function HomepageHero() {
   const [mobileCluster4Animate, setMobileCluster4Animate] = useState(true);
   const [mobileCluster4IsTransitioning, setMobileCluster4IsTransitioning] =
     useState(false);
-  const [carouselAutoplayPaused, setCarouselAutoplayPaused] = useState(false);
   const [mobileGridActive, setMobileGridActive] = useState({ row: 0, col: 0 });
   const [mobileGridPan, setMobileGridPan] = useState({ x: 0, y: 0 });
   const mobileGridViewportRef = useRef<HTMLDivElement | null>(null);
   const mobileGridRef = useRef<HTMLDivElement | null>(null);
-  const mobileTouchStartXRef = useRef<number | null>(null);
   const desktopBentoViewportRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoInnerRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoActivePanelRef = useRef<HTMLButtonElement | null>(null);
@@ -143,11 +248,19 @@ export function HomepageHero() {
   const desktopGridCursorWrapRef = useRef<HTMLDivElement | null>(null);
   const desktopGridPointerInsideRef = useRef(false);
   const lastDesktopGridPointerRef = useRef({ x: 0, y: 0 });
+  const desktopHoveredBentoKeyRef = useRef<string | null>(null);
   const [desktopGridCustomCursorEnabled, setDesktopGridCustomCursorEnabled] =
     useState(false);
   const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
+  const [desktopCursorCrossGeneration, setDesktopCursorCrossGeneration] = useState(0);
   const [desktopWideEnabled, setDesktopWideEnabled] = useState(false);
-  const [showOneTimePanelPulse, setShowOneTimePanelPulse] = useState(true);
+  const [desktopBentoPanNudge, setDesktopBentoPanNudge] = useState(false);
+  /** Neighbor panel pulse — one-time on page load. */
+  const [showOneTimePanelPulse, setShowOneTimePanelPulse] = useState(false);
+  /** Longer transform transition only for the first pan after load (see CSS `*PanBoot`). */
+  const [cluster4MobilePanBoot, setCluster4MobilePanBoot] = useState(true);
+  const [cluster4DesktopPanBoot, setCluster4DesktopPanBoot] = useState(true);
+  const [showMobileHintsOnLoad, setShowMobileHintsOnLoad] = useState(true);
 
   const [mobileCarouselCards, setMobileCarouselCards] = useState(HOME_HERO_GRID_CARD_IDS);
 
@@ -195,19 +308,10 @@ export function HomepageHero() {
   useEffect(() => {
     setMobileCarouselCards(shuffleArray(HOME_HERO_GRID_CARD_IDS));
 
-    setMobileGridActive({
-      row: Math.floor(Math.random() * MOBILE_GRID_ROWS),
-      col: Math.floor(Math.random() * MOBILE_GRID_COLS),
-    });
+    setMobileGridActive({ row: 0, col: 0 });
 
-    const wideSlots: Array<{ row: number; card: number }> = [];
-    DESKTOP_BENTO_ROW_SPANS.forEach((rowSpans, row) => {
-      rowSpans.forEach((span, card) => {
-        if (span === 2) wideSlots.push({ row, card });
-      });
-    });
-    if (wideSlots.length > 0) {
-      const slot = wideSlots[Math.floor(Math.random() * wideSlots.length)];
+    const slot = pickInitialDesktopBentoSlot(DESKTOP_BENTO_ROW_SPANS);
+    if (slot) {
       setDesktopBentoActive(slot);
       return;
     }
@@ -229,7 +333,7 @@ export function HomepageHero() {
   }, []);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1280px)");
+    const mq = window.matchMedia(DESKTOP_WIDE_LAYOUT_MQ);
     const sync = () => setDesktopWideEnabled(mq.matches);
     sync();
     mq.addEventListener("change", sync);
@@ -237,11 +341,100 @@ export function HomepageHero() {
   }, []);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setShowOneTimePanelPulse(false);
-    }, 2200);
-    return () => window.clearTimeout(timeoutId);
+    const mq = window.matchMedia(DESKTOP_BENTO_PAN_NUDGE_MQ);
+    const sync = () => setDesktopBentoPanNudge(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setShowOneTimePanelPulse(true);
+    }, 500);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (!showOneTimePanelPulse) return;
+    /* cluster4-inactive-pulse-onload 1.6s + stagger (--cluster4-pulse-delay up to ~0.64s). */
+    const id = window.setTimeout(() => setShowOneTimePanelPulse(false), 2300);
+    return () => window.clearTimeout(id);
+  }, [showOneTimePanelPulse]);
+
+  useLayoutEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCluster4MobilePanBoot(false);
+      setCluster4DesktopPanBoot(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!cluster4MobilePanBoot) return;
+    const id = window.setTimeout(() => setCluster4MobilePanBoot(false), 750);
+    return () => window.clearTimeout(id);
+  }, [cluster4MobilePanBoot]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setShowMobileHintsOnLoad(false), 2300);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    let timeoutId: number | undefined;
+    const PERIOD_MS = 7000;
+
+    const replay = () => {
+      setShowOneTimePanelPulse(false);
+      window.requestAnimationFrame(() => setShowOneTimePanelPulse(true));
+    };
+
+    const clearTimer = () => {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+        timeoutId = undefined;
+      }
+    };
+
+    const scheduleNext = () => {
+      if (!mq.matches) return;
+      timeoutId = window.setTimeout(() => {
+        replay();
+        scheduleNext();
+      }, PERIOD_MS);
+    };
+
+    const sync = () => {
+      clearTimer();
+      scheduleNext();
+    };
+
+    sync();
+    mq.addEventListener("change", sync);
+    return () => {
+      mq.removeEventListener("change", sync);
+      clearTimer();
+    };
+  }, [mobileGridActive.row, mobileGridActive.col]);
+
+  useEffect(() => {
+    if (!cluster4DesktopPanBoot) return;
+    const id = window.setTimeout(() => setCluster4DesktopPanBoot(false), 750);
+    return () => window.clearTimeout(id);
+  }, [cluster4DesktopPanBoot]);
+
+  const onMobileGridPanTransitionEnd = (e: ReactTransitionEvent<HTMLDivElement>) => {
+    if (e.propertyName !== "transform" || e.target !== e.currentTarget) return;
+    setCluster4MobilePanBoot(false);
+    setShowOneTimePanelPulse(false);
+    window.requestAnimationFrame(() => setShowOneTimePanelPulse(true));
+  };
+
+  const onDesktopGridPanTransitionEnd = (e: ReactTransitionEvent<HTMLDivElement>) => {
+    if (e.propertyName !== "transform" || e.target !== e.currentTarget) return;
+    setCluster4DesktopPanBoot(false);
+  };
 
   useLayoutEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
@@ -280,8 +473,10 @@ export function HomepageHero() {
     const ro = new ResizeObserver(() => syncMobileGridPan());
     if (mobileGridViewportRef.current) ro.observe(mobileGridViewportRef.current);
     if (mobileGridRef.current) ro.observe(mobileGridRef.current);
+    mq.addEventListener("change", syncMobileGridPan);
     window.addEventListener("resize", syncMobileGridPan);
     return () => {
+      mq.removeEventListener("change", syncMobileGridPan);
       window.removeEventListener("resize", syncMobileGridPan);
       ro.disconnect();
     };
@@ -317,10 +512,21 @@ export function HomepageHero() {
   const onDesktopGridMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!desktopGridCustomCursorEnabled) return;
     commitDesktopGridCursorPosition(e.clientX, e.clientY);
+    const nextKey =
+      e.target instanceof Element
+        ? (e.target.closest("[data-bento-key]") as HTMLElement | null)?.dataset.bentoKey ??
+          null
+        : null;
+    const prevKey = desktopHoveredBentoKeyRef.current;
+    if (prevKey !== null && nextKey !== null && prevKey !== nextKey) {
+      setDesktopCursorCrossGeneration((v) => v + 1);
+    }
+    desktopHoveredBentoKeyRef.current = nextKey;
   };
 
   const onDesktopGridMouseLeave = () => {
     desktopGridPointerInsideRef.current = false;
+    desktopHoveredBentoKeyRef.current = null;
     setDesktopGridCursorVisible(false);
   };
 
@@ -344,7 +550,8 @@ export function HomepageHero() {
       if (!vw || !vh || !innerW || !innerH) return;
 
       const { x: acx, y: acy } = activePanelCenterInInner(activeEl, inner);
-      const idealTx = vw / 2 - acx + (desktopWideEnabled ? -100 : 0);
+      const idealTx =
+        vw / 2 - acx + (desktopBentoPanNudge ? DESKTOP_BENTO_PAN_NUDGE_X : 0);
 
       const cluster2El = cluster2Ref.current;
       const vpRect = vp.getBoundingClientRect();
@@ -388,6 +595,7 @@ export function HomepageHero() {
     desktopBentoActive.row,
     desktopBentoActive.card,
     desktopWideEnabled,
+    desktopBentoPanNudge,
   ]);
 
   const stepForwardRef = useRef(() => {});
@@ -420,24 +628,11 @@ export function HomepageHero() {
     stepMobileCarousel(1);
   };
 
-  const onMobileCarouselTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
-    mobileTouchStartXRef.current = event.changedTouches[0]?.clientX ?? null;
-  };
-
-  const onMobileCarouselTouchEnd = (event: ReactTouchEvent<HTMLDivElement>) => {
-    const startX = mobileTouchStartXRef.current;
-    mobileTouchStartXRef.current = null;
-    if (startX == null) return;
-    const endX = event.changedTouches[0]?.clientX ?? startX;
-    const deltaX = endX - startX;
-    const threshold = 30;
-    if (deltaX <= -threshold) stepMobileCarousel(1);
-    if (deltaX >= threshold) stepMobileCarousel(-1);
-  };
-
   const onMobileGridPanelClick = (row: number, col: number) => {
-    if (row === mobileGridActive.row && col === mobileGridActive.col) return;
-    setMobileGridActive({ row, col });
+    setMobileGridActive((prev) => {
+      if (row === prev.row && col === prev.col) return prev;
+      return { row, col };
+    });
   };
 
   useEffect(() => {
@@ -454,7 +649,7 @@ export function HomepageHero() {
         window.clearInterval(intervalId);
         intervalId = undefined;
       }
-      if (!mq.matches || carouselAutoplayPaused) return;
+      if (!mq.matches) return;
       intervalId = window.setInterval(tick, CAROUSEL_AUTOPLAY_MS);
     };
 
@@ -464,7 +659,7 @@ export function HomepageHero() {
       mq.removeEventListener("change", sync);
       if (intervalId !== undefined) window.clearInterval(intervalId);
     };
-  }, [carouselAutoplayPaused]);
+  }, []);
 
   const onMobileCarouselTrackTransitionEnd = () => {
     const count = mobileCarouselCards.length;
@@ -503,7 +698,15 @@ export function HomepageHero() {
       <div className={styles.row1}>
         <div className={styles.cluster1}>
           <div ref={cluster2Ref} className={styles.cluster2}>
-            <div className={styles.panelHero} />
+            <div className={styles.panelHero}>
+              <h1 className={styles.panelHeroTitle}>
+                I design
+                <br />
+                websites, apps
+                <br />
+                and interfaces
+              </h1>
+            </div>
             <div className={styles.availabilityContact}>
               <div className={styles.availability}>
                 <span className={styles.dot} aria-hidden />
@@ -588,20 +791,22 @@ export function HomepageHero() {
         </div>
 
         <div className={styles.cluster4}>
-          <div
-            className={styles.cluster4MobileCarousel}
-            onTouchStart={onMobileCarouselTouchStart}
-            onTouchEnd={onMobileCarouselTouchEnd}
-          >
+          <div className={styles.cluster4MobileCarousel}>
             <div ref={mobileGridViewportRef} className={styles.cluster4MobileViewport}>
               <div
                 ref={mobileGridRef}
-                className={styles.cluster4MobileGrid}
+                className={[
+                  styles.cluster4MobileGrid,
+                  cluster4MobilePanBoot ? styles.cluster4MobileGridPanBoot : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 style={
                   {
                     transform: `translate(${mobileGridPan.x}px, ${mobileGridPan.y}px)`,
                   } as CSSProperties
                 }
+                onTransitionEnd={onMobileGridPanTransitionEnd}
               >
                 {mobileGridCards.map((cardId, idx) => {
                   const card = getHomeHeroGridCardById(cardId);
@@ -610,18 +815,35 @@ export function HomepageHero() {
                   const isActive = row === mobileGridActive.row && col === mobileGridActive.col;
                   const dRow = Math.abs(row - mobileGridActive.row);
                   const dCol = Math.abs(col - mobileGridActive.col);
-                  const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
-                  const pulseIndex = (row - mobileGridActive.row + 1) * 3 + (col - mobileGridActive.col + 1);
                   const isBlueTheme = isActive && card.theme === "blue";
+                  const isNeighbor = Math.max(dRow, dCol) === 1;
+                  const neighborHint = mobileNeighborHintPlacement(
+                    mobileGridActive,
+                    { row, col },
+                  );
+                  const neighborHintDelayIndex = mobileNeighborHintDelayIndex(
+                    mobileGridActive,
+                    { row, col },
+                  );
+                  const neighborHintDelay =
+                    neighborHintDelayIndex != null
+                      ? `${neighborHintDelayIndex * 0.22}s`
+                      : undefined;
+                  const pulseDelayIndex = clockwiseAdjacentPulseDelayIndex(
+                    mobileGridActive,
+                    { row, col },
+                  );
+                  const pulseDelay =
+                    pulseDelayIndex != null ? `${pulseDelayIndex * 0.08}s` : undefined;
                   return (
                     <button
                       key={`mobile-grid-card-${idx}`}
                       type="button"
-                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4MobileCardInactive}` : ""}`}
+                      className={`${styles.cluster4MobileCard}${isActive ? ` ${styles.cluster4MobileCardActive}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && pulseDelay != null ? ` ${styles.cluster4MobileCardInactive}` : ""}`}
                       style={
-                        isPulseCandidate
+                        pulseDelay != null
                           ? ({
-                              "--cluster4-pulse-delay": `${pulseIndex * 0.08}s`,
+                              "--cluster4-pulse-delay": pulseDelay,
                             } as CSSProperties)
                           : undefined
                       }
@@ -650,6 +872,23 @@ export function HomepageHero() {
                             </p>
                           </div>
                         </>
+                      ) : showMobileHintsOnLoad && isNeighbor && neighborHint != null ? (
+                        <span
+                          className={styles.cluster4MobileCardHint}
+                          style={
+                            {
+                              left: neighborHint.left,
+                              top: neighborHint.top,
+                              transform: `translate(-50%, -50%) rotate(${neighborHint.rotation}deg)`,
+                              ...(neighborHintDelay
+                                ? { ["--cluster4-hint-delay" as string]: neighborHintDelay }
+                                : {}),
+                            } as CSSProperties
+                          }
+                          aria-hidden
+                        >
+                          <img src="/svg/icons/arrow-right.svg" alt="" />
+                        </span>
                       ) : null}
                     </button>
                   );
@@ -679,12 +918,18 @@ export function HomepageHero() {
           >
             <div
               ref={desktopBentoInnerRef}
-              className={styles.cluster4DesktopGridInner}
+              className={[
+                styles.cluster4DesktopGridInner,
+                cluster4DesktopPanBoot ? styles.cluster4DesktopGridInnerPanBoot : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               style={
                 {
                   transform: `translate(${desktopBentoPan.x}px, ${desktopBentoPan.y}px)`,
                 } as CSSProperties
               }
+              onTransitionEnd={onDesktopGridPanTransitionEnd}
             >
               {DESKTOP_BENTO_ROW_SPANS.flatMap((spans, rowIdx) =>
                 spans.map((colSpan, cardIdx) => {
@@ -695,12 +940,10 @@ export function HomepageHero() {
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
                     cardIdx === desktopBentoActive.card;
-                  const dRow = Math.abs(rowIdx - desktopBentoActive.row);
-                  const dCol = Math.abs(cardIdx - desktopBentoActive.card);
-                  const isPulseCandidate = !isActive && dRow <= 1 && dCol <= 1;
-                  const pulseIndex =
-                    (rowIdx - desktopBentoActive.row + 1) * 3 +
-                    (cardIdx - desktopBentoActive.card + 1);
+                  const pulseDelayIndex = clockwiseAdjacentPulseDelayIndex(
+                    { row: desktopBentoActive.row, col: desktopBentoActive.card },
+                    { row: rowIdx, col: cardIdx },
+                  );
                   const isWide = desktopWideEnabled && colSpan === 2;
                   const isBlueTheme = isActive && card.theme === "blue";
                   return (
@@ -708,12 +951,13 @@ export function HomepageHero() {
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
                       type="button"
                       ref={isActive ? desktopBentoActivePanelRef : undefined}
-                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && isPulseCandidate ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
+                      data-bento-key={`${rowIdx}-${cardIdx}`}
+                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && pulseDelayIndex != null ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
                       style={
                         {
                           gridColumn: `span ${isWide ? 2 : 1}`,
-                          ...(isPulseCandidate
-                            ? { "--cluster4-pulse-delay": `${pulseIndex * 0.08}s` }
+                          ...(pulseDelayIndex != null
+                            ? { "--cluster4-pulse-delay": `${pulseDelayIndex * 0.08}s` }
                             : {}),
                         } as CSSProperties
                       }
@@ -787,46 +1031,22 @@ export function HomepageHero() {
                 aria-hidden
               >
                 <div
+                  key={desktopCursorCrossGeneration}
                   className={styles.cluster4DesktopCursorBubble}
                   style={
                     {
                       backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                      animation:
+                        desktopCursorCrossGeneration > 0
+                          ? "project-cursor-cross 0.5s ease-in-out"
+                          : "none",
                     } as CSSProperties
                   }
-                />
+                >
+                  
+                </div>
               </div>
             ) : null}
-          </div>
-          <div className={styles.cluster4MobileControls}>
-            <button
-              type="button"
-              className={styles.cluster4AutoplayToggle}
-              onClick={() => setCarouselAutoplayPaused((p) => !p)}
-              aria-pressed={carouselAutoplayPaused}
-              aria-label={
-                carouselAutoplayPaused ? "Play carousel autoplay" : "Pause carousel autoplay"
-              }
-            >
-              {carouselAutoplayPaused ? "play" : "pause"}
-            </button>
-            <div className={styles.cluster4MobileNav}>
-              <button
-                type="button"
-                className={styles.cluster4MobileNavButton}
-                onClick={() => stepMobileCarousel(-1)}
-                aria-label="Previous card"
-              >
-                <img src="/svg/icons/arrow-left.svg" alt="" />
-              </button>
-              <button
-                type="button"
-                className={styles.cluster4MobileNavButton}
-                onClick={() => stepMobileCarousel(1)}
-                aria-label="Next card"
-              >
-                <img src="/svg/icons/arrow-right.svg" alt="" />
-              </button>
-            </div>
           </div>
         </div>
       </div>

@@ -3,11 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 
-type UseScrollRevealOptions = {
+export type UseScrollRevealOptions = {
   enabled?: boolean;
   once?: boolean;
   threshold?: number;
   rootMargin?: string;
+};
+
+/**
+ * Fires a little earlier than the default hook settings, but not as early as
+ * before. This keeps home section reveals from triggering too soon.
+ * (Defaults use threshold 0.18 and a negative bottom margin, which waits longer.)
+ */
+export const scrollRevealTriggerEarlier: Pick<
+  UseScrollRevealOptions,
+  "threshold" | "rootMargin"
+> = {
+  threshold: 0.08,
+  rootMargin: "0px 0px 5% 0px",
 };
 
 export function useScrollReveal({

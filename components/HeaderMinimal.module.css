@@ -54,15 +54,6 @@
   padding-bottom: 1.5em;
 }
 
-/* Same horizontal inset as `ProjectGrid` / `--page-gutter-x` */
-.bottomRule {
-  box-sizing: border-box;
-  height: 1px;
-  margin-left: var(--page-gutter-x);
-  margin-right: var(--page-gutter-x);
-  background-color: #516978;
-}
-
 .lead {
   flex-shrink: 0;
   display: flex;
@@ -70,6 +61,18 @@
   justify-content: flex-start;
   margin: 0;
   min-width: 0;
+  gap: 0.5em;
+}
+
+.leadTheme {
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.headerThemeToggle {
+  margin: 0;
+  align-items: flex-end;
 }
 
 .projectNav {
@@ -78,7 +81,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 0.3em;
   transform: translateY(4px);
 }
 

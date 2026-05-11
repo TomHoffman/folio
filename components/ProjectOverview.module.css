@@ -154,11 +154,17 @@
   }
 
   .intro {
-    font-size: 1.75em;
+    font-size: 1.6em;
   }
 
   .meta {
     padding-right: 4em;
     font-size: 1em;
+  }
+}
+
+@media (min-width: 1920px) {
+  .intro {
+    font-size: var(--project-overview-intro-font-size);
   }
 }

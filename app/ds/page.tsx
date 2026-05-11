@@ -156,7 +156,7 @@ const imageBlockRows: ImageBlockRow[] = [
 
 export default function DsPage() {
   return (
-    <main className={`${mainStyles.main} ${mainStyles.mainHome}`}>
+    <main className={`${mainStyles.main} ${mainStyles.mainHome}`} key="route-ds">
       <div className={dsStyles.stack}>
         <section className={dsStyles.block} aria-labelledby="ds-label-logo-grid">
           <h2

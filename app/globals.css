@@ -1,4 +1,8 @@
 /* Theming tokens + global base. No Tailwind. */
+/*
+ * Layout breakpoints (use literal widths in @media for support):
+ * 768 sm, 1024 md, 1280 lg, 1920 xl
+ */
 :root {
   --font-sans: var(--font-matter), ui-sans-serif, system-ui, sans-serif;
   --color-background: #faf7f1;
@@ -102,11 +106,18 @@
   }
 }
 
+@media (min-width: 1920px) {
+  :root {
+    --project-overview-intro-font-size: 1.7em;
+  }
+}
+
 html {
   height: 100%;
   min-height: 100dvh;
   color-scheme: light;
   background-color: var(--color-background);
+  overflow-anchor: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -154,6 +165,12 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  /*
+   * Client navigations shrink the sticky header (project prev/next unmount). Scroll anchoring
+   * can nudge `scrollTop` to “stabilize” the viewport, which leaves the wrong offset vs a
+   * full load of `/` or `/projects` (different space above the first section).
+   */
+  overflow-anchor: none;
 }
 
 img,

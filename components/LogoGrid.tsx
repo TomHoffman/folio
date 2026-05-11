@@ -9,8 +9,13 @@ import {
   type SectionHeadingIndicatorColor,
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
+import enterStyles from "./ProjectPageEnter.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./LogoGrid.module.css";
+import {
+  scrollRevealTriggerEarlier,
+  useScrollRevealElement,
+} from "./useScrollReveal";
 
 const REDUCED_MOTION_MQ = "(prefers-reduced-motion: reduce)";
 
@@ -173,6 +178,12 @@ export function LogoGrid({
   const visibleTitle =
     showTitle && Boolean(title?.trim());
 
+  const { ref: revealRef, isVisible: isLogoGridRevealed } =
+    useScrollRevealElement<HTMLElement>({
+      enabled: true,
+      ...scrollRevealTriggerEarlier,
+    });
+
   useEffect(() => {
     if (items.length < DESKTOP_LOGO_MAX) {
       console.warn(
@@ -181,34 +192,60 @@ export function LogoGrid({
     }
   }, [items.length]);
 
+  const titleEnterClass = [
+    styles.revealSegment,
+    !isLogoGridRevealed ? enterStyles.revealPending : "",
+    isLogoGridRevealed ? enterStyles.fadeInUp : "",
+    isLogoGridRevealed ? enterStyles.offset0 : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const gridEnterClass = [
+    styles.revealSegment,
+    !isLogoGridRevealed ? enterStyles.revealPending : "",
+    isLogoGridRevealed ? enterStyles.fadeInUp : "",
+    isLogoGridRevealed ? enterStyles.offset2 : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <section className={sectionClass} aria-labelledby="logo-grid-title">
-      {visibleTitle ? (
-        <div className={sectionHeadingStyles.headingGutter}>
-          <h2
-            id="logo-grid-title"
-            className={sectionHeadingStyles.heading}
-            style={sectionHeadingIndicatorStyle(indicatorColor)}
-          >
-            {title?.trim()}
+    <section
+      ref={revealRef}
+      className={sectionClass}
+      aria-labelledby="logo-grid-title"
+    >
+      <div className={titleEnterClass}>
+        {visibleTitle ? (
+          <div className={sectionHeadingStyles.headingGutter}>
+            <h2
+              id="logo-grid-title"
+              className={sectionHeadingStyles.heading}
+              style={sectionHeadingIndicatorStyle(indicatorColor)}
+            >
+              {title?.trim()}
+            </h2>
+          </div>
+        ) : (
+          <h2 id="logo-grid-title" className="sr-only">
+            Selected client logos
           </h2>
-        </div>
-      ) : (
-        <h2 id="logo-grid-title" className="sr-only">
-          Selected client logos
-        </h2>
-      )}
+        )}
+      </div>
       {/*
        * Tickertape vs static grid is CSS-only (`.staticGridRoot` / `.tickerRoot`).
        * Breakpoint 1024px: iPad portrait & phones get ticker; iPad landscape+ get static grid.
        */}
-      <div className={styles.staticGridRoot}>
-        <div className={styles.gridWrap}>
-          <DesktopGrid items={desktopItems} />
+      <div className={gridEnterClass}>
+        <div className={styles.staticGridRoot}>
+          <div className={styles.gridWrap}>
+            <DesktopGrid items={desktopItems} />
+          </div>
         </div>
-      </div>
-      <div className={styles.tickerRoot}>
-        <MobileTicker items={items} reducedMotion={reducedMotion} />
+        <div className={styles.tickerRoot}>
+          <MobileTicker items={items} reducedMotion={reducedMotion} />
+        </div>
       </div>
     </section>
   );

@@ -6,13 +6,14 @@ import mainStyles from "./main.module.css";
 
 export default function HomePage() {
   return (
-    <main className={`${mainStyles.main} ${mainStyles.mainHome}`}>
+    <main className={`${mainStyles.main} ${mainStyles.mainHome}`} key="route-home">
       <HomepageHero />
       <LogoGrid title="Selected clients" indicatorColor="secondary" />
       <ProjectGrid
         title="Projects"
         showTitle={true}
         indicatorColor="secondary"
+        animateOnScroll
       />
       <p className={mainStyles.mainHomeFooterLink}>
         <Link href="/ds">DS — component playground</Link>

@@ -41,29 +41,17 @@ export const HOME_HERO_GRID_IMAGE_ROTATION_MS_DEFAULT = 2000;
 
 export const homeHeroGridCards: HomeHeroGridCard[] = [
   {
-    id: "bhf-redesign",
-    label: "BHF Redesign",
+    id: "non-profit",
+    label: "Non-profit",
     body:
-      "I have designed the regular donations flows for 2 of the UK's biggest charities on sites getting millions of visitors every month.",
-      textMaxChars: 28,
+      "I’ve worked with some of the world’s biggest non-profits on projects ranging from design systems, websites and donation flows.",
+      textMaxChars: 23,
       theme: "default",
     media: {
       kind: "image",
-      sources: "/images/home/hero-grid/bhf-phone.jpg",
-    },
-  },
-  {
-    id: "licel-design",
-    label: "Licel design",
-    body:
-      "Working directly with the founders, I defined the brand and design language to take a pioneer in app security from start-up to scale up.",
-    textMaxChars: 25,
-    theme: "default",
-    media: {
-      kind: "image",
       sources: [
-        "/images/home/hero-grid/licel-menu.jpg",
-        "/images/home/hero-grid/licel-authenticator.jpg",
+        "/images/home/hero-grid/bhf-phone.jpg",
+        "/images/home/hero-grid/bhf-laptop.jpg",
       ],
     },
   },
@@ -79,12 +67,13 @@ export const homeHeroGridCards: HomeHeroGridCard[] = [
       src: "/videos/home-hero-example.webm",
     },
   },
+  
   {
     id: "hero-example-rive",
     label: "Rive (example)",
     body:
-      "Example Rive runtime file - swap `public/rive/home-hero-example.riv` (or `media.src`) for your animation.",
-    textMaxChars: 25,
+      "I've worked as the sole designer at early stage start-ups and as a design lead in multi-squad teams at global brands.",
+    textMaxChars: 26,
     theme: "default",
     media: {
       kind: "rive",

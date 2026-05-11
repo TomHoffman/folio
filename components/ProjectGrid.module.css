@@ -7,6 +7,10 @@
   padding-right: var(--page-gutter-x);
 }
 
+.scrollRevealSegment {
+  width: 100%;
+}
+
 .title {
   margin-top: 2em;
 }

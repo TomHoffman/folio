@@ -16,8 +16,19 @@ import {
   type SectionHeadingIndicatorColor,
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
+import enterStyles from "./ProjectPageEnter.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ProjectGrid.module.css";
+import {
+  scrollRevealTriggerEarlier,
+  useScrollRevealElement,
+} from "./useScrollReveal";
+
+/** Matches `ProjectPageEnter` offset steps (e.g. `.offset1` = 0.08s). */
+const CARD_ENTER_STAGGER_S = 0.08;
+
+/** First card starts after visible title (same as LogoGrid title → grid). */
+const SCROLL_REVEAL_AFTER_TITLE_S = 0.16;
 
 /** Custom “view” bubble — only real mouse/trackpad UIs; never on touch-first devices. */
 function shouldEnableCustomCursor(): boolean {
@@ -224,6 +235,13 @@ export type ProjectGridProps = {
   projects?: Project[];
   /** Horizontal page inset wrapper. Default `true`. */
   usePageInset?: boolean;
+  /** Reuse project-page enter motion for cards. Default `false`. */
+  animateCardsOnMount?: boolean;
+  /**
+   * Title then staggered cards when this block scrolls into view (e.g. home).
+   * Prefer this OR `animateCardsOnMount`, not both.
+   */
+  animateOnScroll?: boolean;
 };
 
 export function ProjectGrid({
@@ -232,10 +250,21 @@ export function ProjectGrid({
   indicatorColor = "orange",
   projects,
   usePageInset = true,
+  animateCardsOnMount = false,
+  animateOnScroll = false,
 }: ProjectGridProps = {}) {
   const gridTitleId = useId();
   const visibleTitle = showTitle && Boolean(title?.trim());
   const displayedProjects = projects?.length ? projects : visibleProjects;
+
+  const { ref: scrollRevealRef, isVisible: isProjectGridRevealed } =
+    useScrollRevealElement<HTMLDivElement>({
+      enabled: animateOnScroll,
+      ...scrollRevealTriggerEarlier,
+    });
+
+  const mountAnimated = animateCardsOnMount && !animateOnScroll;
+  const scrollAnimated = animateOnScroll;
 
   const gridRef = useRef<HTMLUListElement>(null);
   const cursorWrapRef = useRef<HTMLDivElement>(null);
@@ -321,9 +350,41 @@ export function ProjectGrid({
     .filter(Boolean)
     .join(" ");
 
+  const titleScrollEnterClass = [
+    styles.scrollRevealSegment,
+    !isProjectGridRevealed ? enterStyles.revealPending : "",
+    isProjectGridRevealed ? enterStyles.fadeInUp : "",
+    isProjectGridRevealed ? enterStyles.offset0 : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const pageInsetClass = [usePageInset ? styles.pageInset : ""]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={[usePageInset ? styles.pageInset : ""].filter(Boolean).join(" ")}>
-      {visibleTitle ? (
+    <div
+      ref={scrollAnimated ? scrollRevealRef : undefined}
+      className={pageInsetClass}
+    >
+      {scrollAnimated ? (
+        <div className={titleScrollEnterClass}>
+          {visibleTitle ? (
+            <h2
+              id={gridTitleId}
+              className={`${sectionHeadingStyles.heading} ${styles.title} project-grid-title`}
+              style={sectionHeadingIndicatorStyle(indicatorColor)}
+            >
+              {title?.trim()}
+            </h2>
+          ) : (
+            <h2 id={gridTitleId} className="sr-only">
+              Projects
+            </h2>
+          )}
+        </div>
+      ) : visibleTitle ? (
         <h2
           id={gridTitleId}
           className={`${sectionHeadingStyles.heading} ${styles.title} project-grid-title`}
@@ -344,8 +405,30 @@ export function ProjectGrid({
         onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
         onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}
       >
-        {displayedProjects.map((project) => (
-          <li key={project.slug} className={styles.gridItem}>
+        {displayedProjects.map((project, index) => (
+          <li
+            key={project.slug}
+            className={[
+              styles.gridItem,
+              scrollAnimated && !isProjectGridRevealed ? enterStyles.revealPending : "",
+              (scrollAnimated && isProjectGridRevealed) || mountAnimated
+                ? enterStyles.enterMedia
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            style={
+              scrollAnimated && isProjectGridRevealed
+                ? ({
+                    ["--enter-delay" as string]: `${SCROLL_REVEAL_AFTER_TITLE_S + index * CARD_ENTER_STAGGER_S}s`,
+                  } as CSSProperties)
+                : mountAnimated
+                  ? ({
+                      ["--enter-delay" as string]: `${index * CARD_ENTER_STAGGER_S}s`,
+                    } as CSSProperties)
+                  : undefined
+            }
+          >
             <ProjectCard project={project} />
           </li>
         ))}
