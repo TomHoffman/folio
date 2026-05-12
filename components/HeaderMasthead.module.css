@@ -5,7 +5,6 @@
   margin-left: 0;
   margin-right: 0;
   margin-bottom: 0;
-  transition-property: margin-top;
 }
 
 @media (min-width: 768px) {
@@ -56,12 +55,16 @@
 
 .masthead {
   width: 100%;
+}
+
+/* Inner routes: legacy drop-in (home uses `ProjectPageEnter.enterTitle` in TSX). */
+.masthead:not(.mastheadHomeDesktopOnly) {
   /* ease-out: starts moving on frame 1; ease-in-out reads as a slow start over this travel. */
   animation: masthead-drop-in 0.65s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .masthead {
+  .masthead:not(.mastheadHomeDesktopOnly) {
     animation: none;
   }
 }

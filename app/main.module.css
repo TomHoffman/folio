@@ -104,3 +104,9 @@
     margin-top: 76px;
   }
 }
+
+@media (min-width: 1024px) {
+  :global(body:has(#main-header[data-work-template="project"])) .mainProjectInner {
+    margin-top: 280px;
+  }
+}

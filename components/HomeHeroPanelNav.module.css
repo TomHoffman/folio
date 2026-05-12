@@ -1,0 +1,126 @@
+.themeBarWrap {
+  width: 100%;
+}
+
+.themeBar {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-height: 60px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 1.25rem;
+  margin: 0;
+  border: none;
+  border-radius: 20px;
+  background: var(--hero-grid-inactive-panel);
+  color: var(--hero-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
+}
+
+:global(html.dark) .themeBar {
+  background: #36525d;
+  color: #c1e0ed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :global(html.dark) .themeBar:hover {
+    background-color: #486a77;
+  }
+}
+
+.themeBar:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+}
+
+.themeIcon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.themeLabel {
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.navRow {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  margin: 0;
+  text-decoration: none;
+  color: #9ec7d8;
+  transition: color 0.2s ease-in-out;
+}
+
+:global(html:not(.dark)) .navRow {
+  color: var(--color-muted);
+}
+
+.navRowActive {
+  color: #ffffff;
+}
+
+:global(html:not(.dark)) .navRowActive {
+  color: var(--color-foreground);
+}
+
+.navRow:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.navLabel {
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.navDot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .navRow:hover {
+    color: #c1e0ed;
+  }
+
+  :global(html:not(.dark)) .navRow:hover {
+    color: var(--color-foreground);
+  }
+
+  .navRowActive:hover {
+    color: #ffffff;
+  }
+
+  :global(html:not(.dark)) .navRowActive:hover {
+    color: var(--color-foreground);
+  }
+}

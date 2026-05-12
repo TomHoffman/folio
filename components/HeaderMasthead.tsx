@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { CSSProperties } from "react";
+import enterStyles from "./ProjectPageEnter.module.css";
 import styles from "./HeaderMasthead.module.css";
 
 function MastheadSvg({
@@ -70,59 +70,14 @@ function MastheadSvg({
   );
 }
 
-/** Same easing as project page enter (ProjectPageEnter.module.css). */
-const MASTHEAD_EASE = "cubic-bezier(0.22, 1, 0.32, 1)";
-const MASTHEAD_MS = 880;
-
-const narrowMastheadQuery = "(max-width: 1023px)";
-
-function subscribeNarrowMasthead(onChange: () => void) {
-  const mq = window.matchMedia(narrowMastheadQuery);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function getNarrowMastheadSnapshot() {
-  return window.matchMedia(narrowMastheadQuery).matches;
-}
-
-function getNarrowMastheadServerSnapshot() {
-  return false;
-}
-
 export function HeaderMasthead() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isWorkProjectTemplate = /^\/work\/[^/]+/.test(pathname);
-  const prevPathRef = useRef(pathname);
-
-  const enteringHomeFromInner =
-    // eslint-disable-next-line react-hooks/refs -- intentional previous-pathname read for transition gating
-    prevPathRef.current !== "/" && pathname === "/";
-
-  useEffect(() => {
-    prevPathRef.current = pathname;
-  }, [pathname]);
-
-  const isNarrowMasthead = useSyncExternalStore(
-    subscribeNarrowMasthead,
-    getNarrowMastheadSnapshot,
-    getNarrowMastheadServerSnapshot,
-  );
-
-  /*
-   * Home vs inner use different DOM (full mastheadRatio vs clipped in-flow wordmark), so
-   * padding-bottom never interpolates on the same node. margin-top delta is also small below desktop
-   * (0→26px) vs desktop (0→76px). Below 1024px width: skip tween.
-   */
-  const transitionMs =
-    enteringHomeFromInner && !isNarrowMasthead ? MASTHEAD_MS : 0;
-  const transitionEase = enteringHomeFromInner ? MASTHEAD_EASE : "linear";
 
   /* Home: padding-bottom % + absolute layer (unchanged). Inner: in-flow only — .wordmarkClipInner aspect-ratio sets height; avoids a tall empty band above the project title. */
   const mastheadBoxStyle = {
     paddingBottom: `${(182 / 1790) * 100}%`,
-    transition: `padding-bottom ${transitionMs}ms ${transitionEase}`,
   };
 
   const wordmarkHome = (
@@ -141,7 +96,9 @@ export function HeaderMasthead() {
   );
 
   const mastheadMarkup = isHome ? (
-    <div className={`${styles.masthead} ${styles.mastheadHomeDesktopOnly}`}>
+    <div
+      className={`${styles.masthead} ${styles.mastheadHomeDesktopOnly} ${enterStyles.enterTitle}`}
+    >
       <div className={styles.mastheadRatio} style={mastheadBoxStyle}>
         <div className={`${styles.mastheadLayer} ${styles.mastheadLayerHome}`}>
           <div className={styles.mastheadInner}>
@@ -184,11 +141,6 @@ export function HeaderMasthead() {
       className={[styles.header, isHome ? styles.headerHome : ""]
         .filter(Boolean)
         .join(" ")}
-      style={{
-        transitionProperty: "margin-top",
-        transitionDuration: `${transitionMs}ms`,
-        transitionTimingFunction: transitionEase,
-      }}
     >
       <div className={styles.inner}>
         {isHome ? <span className="sr-only">Tom Hoffman</span> : null}

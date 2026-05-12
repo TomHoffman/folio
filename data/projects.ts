@@ -65,6 +65,8 @@ export type Project = {
   moreProjectSlugs?: string[];
   /** Omit from home grid; `/work/[slug]` returns 404 */
   hidden?: boolean;
+  /** Omit from home featured projects strip only; still in `visibleProjects` for /projects and work nav */
+  omitFromHomeFeatured?: boolean;
   /** Bump when replacing `image` / `heroImage` in place so `next/image` skips stale cache */
   assetVersion?: string;
 };
@@ -645,146 +647,6 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: "allied-irish-bank",
-    title: "Allied Irish Bank",
-    industry: "Banking and finance",
-    image: "/images/aib/aib-thumb.jpg",
-    heroImage: "/images/aib/aib-hero3.jpg",
-    heroImageSecondary: "/images/aib/aib-hero2.jpg",
-    heroImageCount: 2,
-    status: "protected",
-    cursorColor: "#811C81",
-    assetVersion: "2",
-    overview: {
-      introText:
-        "AIB is one of Ireland's main high-street banks, used by more than 3 million customers for everything from day-to-day spending to major life events. As part of a large programme to rebuild the mobile app from the ground up, I led the design of the home screen and payments experience as one of four design leads, working across research, information architecture, design system and creative direction.",
-      role: "Lead Product Designer",
-      duration: "15 months",
-      team: "AIB and Globant",
-    },
-    cardGroup: {
-      title: "Outcomes",
-      headingId: "aib-card-group-heading",
-      indicatorColor: "powderBlue",
-      columnCount: 4,
-      mobileLayout: "carousel",
-      items: [
-        {
-          type: "icon",
-          title: "A modern banking experience",
-          body: "Delivered an app that competes with challenger banks on experience while meeting the complexity of a legacy bank with 3 million customers.",
-          iconSrc: "/svg/icons/phone.svg",
-        },
-        {
-          type: "icon",
-          title: "Validated with real customers",
-          body: "Three interaction models tested with customers in London and Dublin, with the strongest approach informing the final design.",
-          iconSrc: "/svg/icons/testing.svg",
-        },
-        {
-          type: "icon",
-          title: "Built to grow",
-          body: "A flexible design system gave the team a foundation to deliver new features consistently across a complex, multi-squad programme.",
-          iconSrc: "/svg/icons/scale.svg",
-        },
-        {
-          type: "icon",
-          title: "From discovery to launch",
-          body: "The first release let customers apply for products directly in the app for the first time, with a roadmap in place for new features.",
-          iconSrc: "/svg/icons/route.svg",
-        },
-      ],
-    },
-    imageBlocks: [
-      {
-        contained: true,
-        mobileLayout: "column",
-        rows: [
-          {
-            rowHeight: "medium",
-            cells: [
-              {
-                src: "/images/aib/making-payment.jpg",
-                alt: "Making a payment in the AIB app",
-              },
-              {
-                src: "/images/aib/application.jpg",
-                alt: "Application flow in the AIB app",
-              },
-            ],
-          },
-          {
-            rowHeight: "full-width",
-            cells: [
-              {
-                alt: "",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        title: "Designed for everyday use",
-        description:
-          "The legacy app showed all accounts on a single dashboard, regardless of how differently people manage them. Splitting content into product spaces meant we could prioritise daily tasks with other features within reach.",
-        headingId: "aib-image-block-everyday-heading",
-        indicatorColor: "powderBlue",
-        contained: true,
-        mobileContained: false,
-        mobileLayout: "mobile-carousel",
-        rows: [
-          {
-            rowHeight: "tall",
-            cells: [
-              {
-                src: "/images/aib/phone.png",
-                alt: "AIB app on phone",
-                fit: "contain",
-                bgColor: "#f0f0f0",
-              },
-              {
-                src: "/images/aib/phone.png",
-                alt: "AIB app on phone",
-                fit: "contain",
-                bgColor: "#f0f0f0",
-              },
-              {
-                src: "/images/aib/phone.png",
-                alt: "AIB app on phone",
-                fit: "contain",
-                bgColor: "#f0f0f0",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    focusLayerBlocks: [
-      {
-        title: "Validating with customers",
-        description:
-          "Three interaction models were tested with customers in London and Dublin to understand the best way to structure the home screen for a varied customer base.",
-        headingId: "aib-focus-layer-validating-heading",
-        indicatorColor: "powderBlue",
-        visualVariant: "empty",
-        items: [
-          {
-            title: "Single screen dashboard",
-            body: "Customisable dashboard that gives an overview of all your accounts.",
-          },
-          {
-            title: "Time-based spaces",
-            body: "Custom dashboard spaces organised by time for everyday, coming up and looking ahead.",
-          },
-          {
-            title: "Goal-based spaces",
-            body: "Custom dashboard spaces organised by goal for everyday, grow, protect and borrow.",
-          },
-        ],
-      },
-    ],
-  },
-  {
     slug: "zeppelin-rental",
     title: "Zeppelin Rental",
     industry: "Construction",
@@ -972,6 +834,147 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "allied-irish-bank",
+    title: "Allied Irish Bank",
+    industry: "Banking and finance",
+    image: "/images/aib/aib-thumb.jpg",
+    heroImage: "/images/aib/aib-hero3.jpg",
+    heroImageSecondary: "/images/aib/aib-hero2.jpg",
+    heroImageCount: 2,
+    status: "protected",
+    cursorColor: "#811C81",
+    assetVersion: "2",
+    omitFromHomeFeatured: true,
+    overview: {
+      introText:
+        "AIB is one of Ireland's main high-street banks, used by more than 3 million customers for everything from day-to-day spending to major life events. As part of a large programme to rebuild the mobile app from the ground up, I led the design of the home screen and payments experience as one of four design leads, working across research, information architecture, design system and creative direction.",
+      role: "Lead Product Designer",
+      duration: "15 months",
+      team: "AIB and Globant",
+    },
+    cardGroup: {
+      title: "Outcomes",
+      headingId: "aib-card-group-heading",
+      indicatorColor: "powderBlue",
+      columnCount: 4,
+      mobileLayout: "carousel",
+      items: [
+        {
+          type: "icon",
+          title: "A modern banking experience",
+          body: "Delivered an app that competes with challenger banks on experience while meeting the complexity of a legacy bank with 3 million customers.",
+          iconSrc: "/svg/icons/phone.svg",
+        },
+        {
+          type: "icon",
+          title: "Validated with real customers",
+          body: "Three interaction models tested with customers in London and Dublin, with the strongest approach informing the final design.",
+          iconSrc: "/svg/icons/testing.svg",
+        },
+        {
+          type: "icon",
+          title: "Built to grow",
+          body: "A flexible design system gave the team a foundation to deliver new features consistently across a complex, multi-squad programme.",
+          iconSrc: "/svg/icons/scale.svg",
+        },
+        {
+          type: "icon",
+          title: "From discovery to launch",
+          body: "The first release let customers apply for products directly in the app for the first time, with a roadmap in place for new features.",
+          iconSrc: "/svg/icons/route.svg",
+        },
+      ],
+    },
+    imageBlocks: [
+      {
+        contained: true,
+        mobileLayout: "column",
+        rows: [
+          {
+            rowHeight: "medium",
+            cells: [
+              {
+                src: "/images/aib/making-payment.jpg",
+                alt: "Making a payment in the AIB app",
+              },
+              {
+                src: "/images/aib/application.jpg",
+                alt: "Application flow in the AIB app",
+              },
+            ],
+          },
+          {
+            rowHeight: "full-width",
+            cells: [
+              {
+                alt: "",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Designed for everyday use",
+        description:
+          "The legacy app showed all accounts on a single dashboard, regardless of how differently people manage them. Splitting content into product spaces meant we could prioritise daily tasks with other features within reach.",
+        headingId: "aib-image-block-everyday-heading",
+        indicatorColor: "powderBlue",
+        contained: true,
+        mobileContained: false,
+        mobileLayout: "mobile-carousel",
+        rows: [
+          {
+            rowHeight: "tall",
+            cells: [
+              {
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
+              },
+              {
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
+              },
+              {
+                src: "/images/aib/phone.png",
+                alt: "AIB app on phone",
+                fit: "contain",
+                bgColor: "#f0f0f0",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    focusLayerBlocks: [
+      {
+        title: "Validating with customers",
+        description:
+          "Three interaction models were tested with customers in London and Dublin to understand the best way to structure the home screen for a varied customer base.",
+        headingId: "aib-focus-layer-validating-heading",
+        indicatorColor: "powderBlue",
+        visualVariant: "empty",
+        items: [
+          {
+            title: "Single screen dashboard",
+            body: "Customisable dashboard that gives an overview of all your accounts.",
+          },
+          {
+            title: "Time-based spaces",
+            body: "Custom dashboard spaces organised by time for everyday, coming up and looking ahead.",
+          },
+          {
+            title: "Goal-based spaces",
+            body: "Custom dashboard spaces organised by goal for everyday, grow, protect and borrow.",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "british-heart-foundation",
     title: "British Heart Foundation",
     industry: "Healthcare",
@@ -995,6 +998,11 @@ export const projects: Project[] = [
 
 /** Projects shown on the home grid (excludes `hidden`). */
 export const visibleProjects = projects.filter((p) => !p.hidden);
+
+/** Home featured projects strip — same as `visibleProjects` but drops `omitFromHomeFeatured`. */
+export const visibleProjectsForHomeFeatured = projects.filter(
+  (p) => !p.hidden && !p.omitFromHomeFeatured,
+);
 
 export function getProjectBySlug(slug: string): Project | undefined {
   const p = projects.find((pr) => pr.slug === slug);

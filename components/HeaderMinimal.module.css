@@ -1,4 +1,4 @@
-/* In-flow header (scrolls with page). */
+/* Default: in-flow (home, projects index, etc.). */
 .root {
   position: relative;
   z-index: 10;
@@ -6,6 +6,45 @@
   max-width: 100%;
   box-sizing: border-box;
   background-color: var(--color-background);
+}
+
+/*
+ * Work project (`/work/[slug]`): mobile — sticky + scroll-direction slide;
+ * tablet+ — fixed, always visible (transform overridden below).
+ */
+.root[data-work-template="project"] {
+  position: sticky;
+  top: 0;
+  will-change: transform;
+  transition: transform 0.3s ease-in-out;
+}
+
+.root[data-work-template="project"][data-dir="up"] {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.root[data-work-template="project"][data-dir="down"] {
+  transform: translateY(calc(-100% - 1px));
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .root[data-work-template="project"] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-work-template="project"] {
+    transition: none;
+  }
 }
 
 .inner {
@@ -17,14 +56,19 @@
   gap: 1rem;
   min-height: 1.5rem;
   font-size: clamp(0.6875rem, 0.45rem + 1.25vw, 1rem);
-  padding-left: calc(3% + 0.5em);
-  padding-right: calc(3% + 0.5em);
+  padding-left: calc(3% + 0.2em);
+  padding-right: calc(3% + 0.2em);
   padding-bottom: 1.5em;
 }
 
 /* Home + `/projects`: no extra band under the nav (pathname-driven — avoids a frame where `body:has(main[…])` lags after SPA navigation). */
 .inner.innerHomeProjectsNav {
   padding-bottom: 0;
+}
+
+/* Home: primary nav lives in the hero panel; keep the header row compact. */
+.inner.innerHomeNoNav {
+  justify-content: flex-start;
 }
 
 .lead {
@@ -63,7 +107,19 @@
   background-color: transparent;
   color: var(--color-masthead);
   text-decoration: none;
+  transition: none;
+}
+
+/* Smaller disc than the hit box so adjacent hovers do not visually overlap. */
+.headerBack::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background-color: transparent;
   transition: background-color 0.25s ease-in-out;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .headerBackDisabled {
@@ -73,11 +129,11 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .headerBack:hover {
+  .headerBack:hover::before {
     background-color: #122a35;
   }
 
-  .headerBack.headerBackDisabled:hover {
+  .headerBack.headerBackDisabled:hover::before {
     background-color: transparent;
   }
 }
@@ -89,6 +145,8 @@
 
 .headerBack svg {
   display: block;
+  position: relative;
+  z-index: 1;
   width: 40px;
   height: 40px;
 }
@@ -96,7 +154,7 @@
 /* `/work/[slug]` template: rule under nav matches project content width (`--page-gutter-x`). */
 .innerWorkProject {
   padding-top: 2em;
-  padding-bottom: 0.65em;
+  padding-bottom: 1em;
   position: relative;
 }
 

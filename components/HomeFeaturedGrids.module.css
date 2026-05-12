@@ -1,0 +1,6 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  scroll-margin-top: 2rem;
+}

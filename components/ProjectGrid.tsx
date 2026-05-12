@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -18,10 +18,6 @@ import {
   type SectionHeadingIndicatorColor,
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
-import {
-  readFolioNavLayoutSnapshot,
-  subscribeFolioNavLayout,
-} from "@/components/folioNavLayoutSnapshot";
 import enterStyles from "./ProjectPageEnter.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ProjectGrid.module.css";
@@ -137,7 +133,13 @@ function ProjectStatusPill({
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({
+  project,
+  className,
+}: {
+  project: Project;
+  className?: string;
+}) {
   const cardInner = (
     <>
       {project.image ? (
@@ -222,7 +224,7 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       href={href}
-      className={styles.card}
+      className={[styles.card, className].filter(Boolean).join(" ")}
       style={project.slug === "licel" ? { backgroundColor: "#16343f" } : undefined}
       data-project-slug={project.slug}
       aria-label={ariaLabel}
@@ -248,15 +250,54 @@ export type ProjectGridProps = {
   /**
    * Title then staggered cards when this block scrolls into view (e.g. home).
    * Prefer this OR `animateCardsOnMount`, not both.
+   *
+   * With `scrollRevealControlled`, visibility is driven by `scrollRevealVisible` (e.g. a parent
+   * section observer) instead of this grid’s own intersection observer.
    */
   animateOnScroll?: boolean;
+  /** Use with `animateOnScroll` when a parent owns scroll-into-view for the whole section. */
+  scrollRevealControlled?: boolean;
+  /** Required when `scrollRevealControlled` — whether the section is in view. */
+  scrollRevealVisible?: boolean;
+  /**
+   * When `animateOnScroll` + `scrollRevealControlled`, set `false` to keep cards hidden until the
+   * section is visible, then show them without fade-up stagger.
+   */
+  scrollRevealAnimateCards?: boolean;
   /** Cap how many cards render (e.g. home featured list). */
   maxProjects?: number;
   /**
-   * Desktop (≥1024px): 6-column mosaic — 5 cards as 2+3 with equal row heights, 4 as 2+2, etc.
-   * Use with `maxProjects` for the home featured block.
+   * From 768px up: three equal columns in one row (e.g. home featured second row). Below that,
+   * the default single-column `.grid` applies so those cards stack vertically on mobile.
+   * Ignored when `tabletLayout` is `homeFeaturedCombined`.
    */
-  desktopHomeFeaturedGrid?: boolean;
+  gridColumnsFromTablet?: 2 | 3;
+  /**
+   * Tablet/desktop layout for the card grid. `homeFeaturedCombined` = one grid (2 + 3 columns)
+   * for the home featured strip so the custom cursor spans all cards without a gap between grids.
+   */
+  tabletLayout?: "default" | "homeFeaturedCombined";
+  /**
+   * When `animateOnScroll`, only cards with `index <= scrollRevealEnterMediaMaxIndex` use the
+   * staggered `enterMedia` animation; higher indices reveal instantly with the section (e.g. row 2
+   * on the combined home featured grid).
+   */
+  scrollRevealEnterMediaMaxIndex?: number;
+  /**
+   * When `animateOnScroll`, added to each card’s index for stagger delay. Use a non-zero value
+   * only if you want this grid’s cards to animate *after* another grid’s sequence (serial). For
+   * parallel rows (same wave), keep the default `0` so each grid uses its own card indices only.
+   */
+  scrollRevealCardIndexOffset?: number;
+  /** Extra class on the outer wrapper (e.g. spacing between stacked home rows). */
+  className?: string;
+  /** Extra class on each project card link (e.g. home featured row-2 height match). */
+  projectCardClassName?: string;
+  /**
+   * When set with `projectCardClassName`, only cards with `index >= projectCardClassNameFromIndex`
+   * receive that class (e.g. row-2 height match on the combined home featured grid).
+   */
+  projectCardClassNameFromIndex?: number;
 };
 
 export function ProjectGrid({
@@ -268,8 +309,18 @@ export function ProjectGrid({
   animateCardsOnMount = false,
   animateOnScroll = false,
   maxProjects,
-  desktopHomeFeaturedGrid = false,
+  gridColumnsFromTablet = 2,
+  tabletLayout = "default",
+  scrollRevealCardIndexOffset = 0,
+  scrollRevealControlled = false,
+  scrollRevealVisible,
+  scrollRevealAnimateCards = true,
+  scrollRevealEnterMediaMaxIndex,
+  className,
+  projectCardClassName,
+  projectCardClassNameFromIndex,
 }: ProjectGridProps = {}) {
+  const pathname = usePathname();
   const gridTitleId = useId();
   const visibleTitle = showTitle && Boolean(title?.trim());
   const displayedProjects = useMemo(() => {
@@ -277,11 +328,19 @@ export function ProjectGrid({
     return maxProjects != null ? base.slice(0, maxProjects) : base;
   }, [projects, maxProjects]);
 
-  const { ref: scrollRevealRef, isVisible: isProjectGridRevealed } =
+  const internalScrollRevealEnabled =
+    animateOnScroll && !scrollRevealControlled;
+
+  const { ref: scrollRevealRef, isVisible: hookScrollRevealed } =
     useScrollRevealElement<HTMLDivElement>({
-      enabled: animateOnScroll,
+      enabled: internalScrollRevealEnabled,
       ...scrollRevealTriggerEarlier,
+      layoutResetKey: internalScrollRevealEnabled ? pathname : undefined,
     });
+
+  const isProjectGridRevealed = scrollRevealControlled
+    ? Boolean(scrollRevealVisible)
+    : hookScrollRevealed;
 
   const mountAnimated = animateCardsOnMount && !animateOnScroll;
   const scrollAnimated = animateOnScroll;
@@ -295,35 +354,6 @@ export function ProjectGrid({
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
   const [customCursorEnabled, setCustomCursorEnabled] = useState(false);
-  const [gridRemountKey, setGridRemountKey] = useState(0);
-  const lastFeaturedRemountNavEpochRef = useRef(0);
-
-  /**
-   * Desktop featured mosaic: remount after navigations **to** `/` from another route.
-   * Subscribe in `useLayoutEffect` (runs before `NavigationScrollReset`’s layout effect) so
-   * when `recordFolioNavLayoutSnapshot` fires we still get a callback; `record` defers listeners
-   * with `queueMicrotask` so `setState` is not nested inside `useLayoutEffect` (React forbids
-   * `flushSync` there).
-   */
-  useLayoutEffect(() => {
-    if (!desktopHomeFeaturedGrid) return undefined;
-
-    const unsubscribe = subscribeFolioNavLayout(() => {
-      const { epoch, previousPathname, pathname: toPath } =
-        readFolioNavLayoutSnapshot();
-      if (toPath !== "/") return;
-      if (!previousPathname || previousPathname === "/") return;
-      if (lastFeaturedRemountNavEpochRef.current === epoch) return;
-      lastFeaturedRemountNavEpochRef.current = epoch;
-
-      setGridRemountKey((k) => k + 1);
-    });
-
-    return () => {
-      unsubscribe();
-      lastFeaturedRemountNavEpochRef.current = 0;
-    };
-  }, [desktopHomeFeaturedGrid]);
 
   useEffect(() => {
     const sync = () => setCustomCursorEnabled(shouldEnableCustomCursor());
@@ -399,7 +429,10 @@ export function ProjectGrid({
 
   const gridClass = [
     styles.grid,
-    desktopHomeFeaturedGrid ? styles.gridHomeFeatured : "",
+    tabletLayout === "homeFeaturedCombined" ? styles.gridHomeFeaturedCombined : "",
+    tabletLayout === "default" && gridColumnsFromTablet === 3
+      ? styles.gridFromTabletThree
+      : "",
     customCursorEnabled && pointerProject ? styles.gridCursorHide : "",
   ]
     .filter(Boolean)
@@ -414,42 +447,52 @@ export function ProjectGrid({
     .filter(Boolean)
     .join(" ");
 
-  const pageInsetClass = [usePageInset ? styles.pageInset : ""]
+  const pageInsetClass = [usePageInset ? styles.pageInset : "", className ?? ""]
     .filter(Boolean)
     .join(" ");
 
-  const featuredCountStr = desktopHomeFeaturedGrid
-    ? String(displayedProjects.length)
-    : undefined;
+  const projectCardList = displayedProjects.map((project, index) => {
+    const indexGetsScrollEnter =
+      Boolean(scrollRevealAnimateCards) &&
+      (scrollRevealEnterMediaMaxIndex === undefined ||
+        index <= scrollRevealEnterMediaMaxIndex);
 
-  const projectCardList = displayedProjects.map((project, index) => (
-    <li key={project.slug} className={styles.gridItem}>
-      <div
-        className={[
-          styles.gridItemMotionWrap,
-          scrollAnimated && !isProjectGridRevealed ? enterStyles.revealPending : "",
-          (scrollAnimated && isProjectGridRevealed) || mountAnimated
-            ? enterStyles.enterMedia
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={
-          scrollAnimated && isProjectGridRevealed
-            ? ({
-                ["--enter-delay" as string]: `${SCROLL_REVEAL_AFTER_TITLE_S + index * CARD_ENTER_STAGGER_S}s`,
-              } as CSSProperties)
-            : mountAnimated
+    const cardExtraClass =
+      projectCardClassName &&
+      (projectCardClassNameFromIndex === undefined ||
+        index >= projectCardClassNameFromIndex)
+        ? projectCardClassName
+        : undefined;
+
+    return (
+      <li key={project.slug} className={styles.gridItem}>
+        <div
+          className={[
+            styles.gridItemMotionWrap,
+            scrollAnimated && !isProjectGridRevealed ? enterStyles.revealPending : "",
+            (scrollAnimated && isProjectGridRevealed && indexGetsScrollEnter) || mountAnimated
+              ? enterStyles.enterMedia
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          style={
+            scrollAnimated && isProjectGridRevealed && indexGetsScrollEnter
               ? ({
-                  ["--enter-delay" as string]: `${index * CARD_ENTER_STAGGER_S}s`,
+                  ["--enter-delay" as string]: `${SCROLL_REVEAL_AFTER_TITLE_S + (scrollRevealCardIndexOffset + index) * CARD_ENTER_STAGGER_S}s`,
                 } as CSSProperties)
-              : undefined
-        }
-      >
-        <ProjectCard project={project} />
-      </div>
-    </li>
-  ));
+              : mountAnimated
+                ? ({
+                    ["--enter-delay" as string]: `${index * CARD_ENTER_STAGGER_S}s`,
+                  } as CSSProperties)
+                : undefined
+          }
+        >
+          <ProjectCard project={project} className={cardExtraClass} />
+        </div>
+      </li>
+    );
+  });
 
   const projectGridUl = (
     <ul
@@ -466,7 +509,7 @@ export function ProjectGrid({
 
   return (
     <div
-      ref={scrollAnimated ? scrollRevealRef : undefined}
+      ref={scrollAnimated && internalScrollRevealEnabled ? scrollRevealRef : undefined}
       className={pageInsetClass}
     >
       {scrollAnimated ? (
@@ -498,17 +541,7 @@ export function ProjectGrid({
           Projects
         </h2>
       )}
-      {desktopHomeFeaturedGrid ? (
-        <div
-          key={gridRemountKey}
-          className={styles.featuredMosaicFrame}
-          data-featured-count={featuredCountStr}
-        >
-          {projectGridUl}
-        </div>
-      ) : (
-        projectGridUl
-      )}
+      {projectGridUl}
 
       {customCursorEnabled ? (
         <div
