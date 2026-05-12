@@ -8,7 +8,11 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <main className={`${mainStyles.main} ${mainStyles.mainHome}`} key="route-projects">
+    <main
+      data-page="projects"
+      className={`${mainStyles.main} ${mainStyles.mainHome}`}
+      key="route-projects"
+    >
       <ProjectGrid
         showTitle={false}
         indicatorColor="secondary"

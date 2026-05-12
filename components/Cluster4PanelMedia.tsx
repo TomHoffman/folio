@@ -52,16 +52,20 @@ function Cluster4RotatingPanelImage({
     return () => window.clearInterval(id);
   }, [cardId, list.length, intervalMs]);
 
-  const src = list[index] ?? "";
-
   return (
     <div className={wrapClassName}>
-      <img
-        key={`${index}-${src}`}
-        src={src}
-        alt=""
-        className={imgClassName}
-      />
+      <div className={styles.cluster4RotatingStack}>
+        {list.map((url, i) => (
+          <img
+            key={`${i}-${url || "slot"}`}
+            src={url}
+            alt=""
+            className={`${imgClassName} ${
+              i === index ? styles.cluster4RotatingImageActive : ""
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

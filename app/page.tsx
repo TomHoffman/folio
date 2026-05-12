@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { HomepageHero } from "@/components/HomepageHero";
 import { LogoGrid } from "@/components/LogoGrid";
 import { ProjectGrid } from "@/components/ProjectGrid";
@@ -6,7 +5,11 @@ import mainStyles from "./main.module.css";
 
 export default function HomePage() {
   return (
-    <main className={`${mainStyles.main} ${mainStyles.mainHome}`} key="route-home">
+    <main
+      data-page="home"
+      className={`${mainStyles.main} ${mainStyles.mainHome}`}
+      key="route-home"
+    >
       <HomepageHero />
       <LogoGrid
         title="Clients"
@@ -21,9 +24,6 @@ export default function HomePage() {
         maxProjects={5}
         desktopHomeFeaturedGrid
       />
-      <p className={mainStyles.mainHomeFooterLink}>
-        <Link href="/ds">DS — component playground</Link>
-      </p>
     </main>
   );
 }

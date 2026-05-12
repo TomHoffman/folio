@@ -173,6 +173,15 @@ body {
   overflow-anchor: none;
 }
 
+/*
+ * Home + projects: same header nav row treatment as home — no extra padding under the menu;
+ * vertical gap to the first block comes from `main.mainHome` margin (`app/main.module.css`).
+ */
+body:has(main[data-page="home"]) [data-header-nav-row],
+body:has(main[data-page="projects"]) [data-header-nav-row] {
+  padding-bottom: 0;
+}
+
 img,
 video {
   display: block;

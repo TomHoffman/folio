@@ -1,43 +1,11 @@
-/* In-flow header: keeps normal page spacing at top. */
+/* In-flow header (scrolls with page). */
 .root {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 10;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding-top: 1rem;
   background-color: var(--color-background);
-  will-change: transform;
-  transition: transform 0.3s ease-in-out;
-}
-
-.root[data-dir="up"] {
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.root[data-dir="down"] {
-  transform: translateY(calc(-100% - 1px));
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root {
-    transition: none;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .root {
-    padding-top: 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .root {
-    padding-top: 40px;
-  }
 }
 
 .inner {
@@ -52,6 +20,11 @@
   padding-left: calc(3% + 0.5em);
   padding-right: calc(3% + 0.5em);
   padding-bottom: 1.5em;
+}
+
+/* Home + `/projects`: no extra band under the nav (pathname-driven — avoids a frame where `body:has(main[…])` lags after SPA navigation). */
+.inner.innerHomeProjectsNav {
+  padding-bottom: 0;
 }
 
 .lead {
@@ -118,4 +91,29 @@
   display: block;
   width: 40px;
   height: 40px;
+}
+
+/* `/work/[slug]` template: rule under nav matches project content width (`--page-gutter-x`). */
+.innerWorkProject {
+  padding-top: 2em;
+  padding-bottom: 0.65em;
+  position: relative;
+}
+
+.innerWorkProject::after {
+  content: "";
+  position: absolute;
+  left: var(--page-gutter-x);
+  right: var(--page-gutter-x);
+  bottom: 0;
+  height: 1px;
+  background-color: color-mix(in srgb, var(--color-masthead-dim) 32%, transparent);
+}
+
+:global(html.dark) .innerWorkProject::after {
+  background-color: color-mix(in srgb, var(--color-masthead-dim) 22%, transparent);
+}
+
+.innerWorkProject .projectNav {
+  transform: none;
 }

@@ -1,7 +1,7 @@
 .nav {
   font-size: 16px; /* 1em context for link labels via 1.25em */
   margin: 0;
-  padding: 0;
+  padding: 6em 0.5em 0 0;
 }
 
 @media (min-width: 768px) {
@@ -32,6 +32,7 @@
   font-size: 1.25em;
   font-weight: 400;
   line-height: 1.2;
+  letter-spacing: 4%;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--color-nav-inactive);
@@ -53,10 +54,9 @@
   top: 50%;
   margin-right: 0.5em;
   transform: translateY(-50%);
-  /* Out of flow so label position matches inactive state; size matches `SectionHeading` dot. */
-  font-size: var(--section-heading-font-size);
-  width: 0.5em;
-  height: 0.5em;
+  /* Out of flow so label position matches inactive state. */
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background-color: var(--color-text-primary);
 }
@@ -72,6 +72,7 @@
   font-size: 1.25em;
   font-weight: 400;
   line-height: 1.2;
+  letter-spacing: 4%;
   text-transform: uppercase;
   color: var(--color-nav-inactive);
   transition: color 0.2s ease;
@@ -105,4 +106,9 @@
   .staticItem.linkActive:hover {
     color: var(--color-text-primary);
   }
+}
+
+/* Work project header: drop the large top offset that aligns nav with the home masthead. */
+:global(header[data-work-template="project"]) .nav {
+  padding: 0 0.5em 0 0;
 }

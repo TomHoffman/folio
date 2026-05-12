@@ -56,12 +56,13 @@ export function useScrollReveal({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (entry.isIntersecting) {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
           setIsVisible(true);
           if (once) observer.disconnect();
-        } else if (!once) {
+          return;
+        }
+        if (!once) {
           setIsVisible(false);
         }
       },
@@ -69,7 +70,38 @@ export function useScrollReveal({
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    /** IO often skips the first callback when the node is already visible (e.g. back navigation). */
+    const flushPending = () => {
+      const pending = observer.takeRecords();
+      if (pending.length === 0) return;
+      for (const entry of pending) {
+        if (!entry.isIntersecting) continue;
+        setIsVisible(true);
+        if (once) observer.disconnect();
+        return;
+      }
+      if (!once) {
+        setIsVisible(false);
+      }
+    };
+
+    flushPending();
+    let cancelled = false;
+    const rafId = requestAnimationFrame(() => {
+      if (cancelled) return;
+      flushPending();
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        flushPending();
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
   }, [enabled, once, threshold, rootMargin]);
 
   return { ref, isVisible };

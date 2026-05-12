@@ -18,9 +18,9 @@
   gap: 0;
 }
 
-/* Home hero should sit directly under the header divider. */
+/* Home / projects: gap between header nav row and first block (`data-page` + `app/globals.css`). */
 .main.mainHome {
-  margin-top: 2.5em;
+  margin-top: 1.5em;
 }
 
 @media (min-width: 768px) {
@@ -75,13 +75,6 @@
   }
 }
 
-/* Home keeps zero top gap at all breakpoints. */
-@media (min-width: 1024px) {
-  .main.mainHome {
-    margin-top: 6em;
-  }
-}
-
 @media (min-width: 768px) {
   .mainProjectInner {
     margin-top: 100px;
@@ -99,23 +92,15 @@
   }
 }
 
-/* Home: text link to `/ds` component playground */
-.mainHomeFooterLink {
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0;
-  padding: 2rem var(--page-gutter-x) 2.5rem;
-  text-align: center;
-  font-size: 0.875rem;
-  font-weight: 400;
+/*
+ * Work project template: condensed header — pull the project stack up under the nav rule.
+ */
+:global(body:has(#main-header[data-work-template="project"])) .mainProjectInner {
+  margin-top: 52px;
 }
 
-.mainHomeFooterLink a {
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.mainHomeFooterLink a:hover {
-  color: var(--color-text-primary);
+@media (min-width: 768px) {
+  :global(body:has(#main-header[data-work-template="project"])) .mainProjectInner {
+    margin-top: 76px;
+  }
 }

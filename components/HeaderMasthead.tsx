@@ -93,6 +93,7 @@ function getNarrowMastheadServerSnapshot() {
 export function HeaderMasthead() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isWorkProjectTemplate = /^\/work\/[^/]+/.test(pathname);
   const prevPathRef = useRef(pathname);
 
   const enteringHomeFromInner =
@@ -135,7 +136,7 @@ export function HeaderMasthead() {
     <MastheadSvg
       className={styles.wordmarkSvg}
       pathFill="var(--color-masthead-dim)"
-      svgStyle={{ opacity: 0.1 }}
+      svgStyle={{ opacity: isWorkProjectTemplate ? 0 : 0.1 }}
     />
   );
 
@@ -154,7 +155,14 @@ export function HeaderMasthead() {
       </div>
     </div>
   ) : (
-    <div className={styles.masthead}>
+    <div
+      className={[
+        styles.masthead,
+        isWorkProjectTemplate ? styles.mastheadWorkCollapsed : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className={styles.mastheadInnerRoute}>
         <div className={styles.mastheadRowOuter}>
           <div className={styles.mastheadRow}>
@@ -172,7 +180,7 @@ export function HeaderMasthead() {
   );
 
   return (
-    <header
+    <div
       className={[styles.header, isHome ? styles.headerHome : ""]
         .filter(Boolean)
         .join(" ")}
@@ -186,6 +194,6 @@ export function HeaderMasthead() {
         {isHome ? <span className="sr-only">Tom Hoffman</span> : null}
         {mastheadMarkup}
       </div>
-    </header>
+    </div>
   );
 }

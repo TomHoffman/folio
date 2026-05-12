@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -17,6 +18,10 @@ import {
   type SectionHeadingIndicatorColor,
   sectionHeadingIndicatorStyle,
 } from "@/lib/sectionHeadingIndicator";
+import {
+  readFolioNavLayoutSnapshot,
+  subscribeFolioNavLayout,
+} from "@/components/folioNavLayoutSnapshot";
 import enterStyles from "./ProjectPageEnter.module.css";
 import sectionHeadingStyles from "./SectionHeading.module.css";
 import styles from "./ProjectGrid.module.css";
@@ -290,6 +295,35 @@ export function ProjectGrid({
   const pointerSlugRef = useRef<string | null>(null);
   const [cursorCrossGeneration, setCursorCrossGeneration] = useState(0);
   const [customCursorEnabled, setCustomCursorEnabled] = useState(false);
+  const [gridRemountKey, setGridRemountKey] = useState(0);
+  const lastFeaturedRemountNavEpochRef = useRef(0);
+
+  /**
+   * Desktop featured mosaic: remount after navigations **to** `/` from another route.
+   * Subscribe in `useLayoutEffect` (runs before `NavigationScrollReset`’s layout effect) so
+   * when `recordFolioNavLayoutSnapshot` fires we still get a callback; `record` defers listeners
+   * with `queueMicrotask` so `setState` is not nested inside `useLayoutEffect` (React forbids
+   * `flushSync` there).
+   */
+  useLayoutEffect(() => {
+    if (!desktopHomeFeaturedGrid) return undefined;
+
+    const unsubscribe = subscribeFolioNavLayout(() => {
+      const { epoch, previousPathname, pathname: toPath } =
+        readFolioNavLayoutSnapshot();
+      if (toPath !== "/") return;
+      if (!previousPathname || previousPathname === "/") return;
+      if (lastFeaturedRemountNavEpochRef.current === epoch) return;
+      lastFeaturedRemountNavEpochRef.current = epoch;
+
+      setGridRemountKey((k) => k + 1);
+    });
+
+    return () => {
+      unsubscribe();
+      lastFeaturedRemountNavEpochRef.current = 0;
+    };
+  }, [desktopHomeFeaturedGrid]);
 
   useEffect(() => {
     const sync = () => setCustomCursorEnabled(shouldEnableCustomCursor());
@@ -384,6 +418,52 @@ export function ProjectGrid({
     .filter(Boolean)
     .join(" ");
 
+  const featuredCountStr = desktopHomeFeaturedGrid
+    ? String(displayedProjects.length)
+    : undefined;
+
+  const projectCardList = displayedProjects.map((project, index) => (
+    <li key={project.slug} className={styles.gridItem}>
+      <div
+        className={[
+          styles.gridItemMotionWrap,
+          scrollAnimated && !isProjectGridRevealed ? enterStyles.revealPending : "",
+          (scrollAnimated && isProjectGridRevealed) || mountAnimated
+            ? enterStyles.enterMedia
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={
+          scrollAnimated && isProjectGridRevealed
+            ? ({
+                ["--enter-delay" as string]: `${SCROLL_REVEAL_AFTER_TITLE_S + index * CARD_ENTER_STAGGER_S}s`,
+              } as CSSProperties)
+            : mountAnimated
+              ? ({
+                  ["--enter-delay" as string]: `${index * CARD_ENTER_STAGGER_S}s`,
+                } as CSSProperties)
+              : undefined
+        }
+      >
+        <ProjectCard project={project} />
+      </div>
+    </li>
+  ));
+
+  const projectGridUl = (
+    <ul
+      ref={gridRef}
+      className={gridClass}
+      aria-labelledby={gridTitleId}
+      onMouseEnter={customCursorEnabled ? onGridMouseEnter : undefined}
+      onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
+      onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}
+    >
+      {projectCardList}
+    </ul>
+  );
+
   return (
     <div
       ref={scrollAnimated ? scrollRevealRef : undefined}
@@ -418,45 +498,17 @@ export function ProjectGrid({
           Projects
         </h2>
       )}
-      <ul
-        ref={gridRef}
-        className={gridClass}
-        data-featured-count={
-          desktopHomeFeaturedGrid ? String(displayedProjects.length) : undefined
-        }
-        aria-labelledby={gridTitleId}
-        onMouseEnter={customCursorEnabled ? onGridMouseEnter : undefined}
-        onMouseMove={customCursorEnabled ? onGridMouseMove : undefined}
-        onMouseLeave={customCursorEnabled ? onGridMouseLeave : undefined}
-      >
-        {displayedProjects.map((project, index) => (
-          <li
-            key={project.slug}
-            className={[
-              styles.gridItem,
-              scrollAnimated && !isProjectGridRevealed ? enterStyles.revealPending : "",
-              (scrollAnimated && isProjectGridRevealed) || mountAnimated
-                ? enterStyles.enterMedia
-                : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            style={
-              scrollAnimated && isProjectGridRevealed
-                ? ({
-                    ["--enter-delay" as string]: `${SCROLL_REVEAL_AFTER_TITLE_S + index * CARD_ENTER_STAGGER_S}s`,
-                  } as CSSProperties)
-                : mountAnimated
-                  ? ({
-                      ["--enter-delay" as string]: `${index * CARD_ENTER_STAGGER_S}s`,
-                    } as CSSProperties)
-                  : undefined
-            }
-          >
-            <ProjectCard project={project} />
-          </li>
-        ))}
-      </ul>
+      {desktopHomeFeaturedGrid ? (
+        <div
+          key={gridRemountKey}
+          className={styles.featuredMosaicFrame}
+          data-featured-count={featuredCountStr}
+        >
+          {projectGridUl}
+        </div>
+      ) : (
+        projectGridUl
+      )}
 
       {customCursorEnabled ? (
         <div
