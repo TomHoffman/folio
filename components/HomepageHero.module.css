@@ -9,8 +9,10 @@
   --hero-square: clamp(148px, 22vw, 248px);
   --cluster4-mobile-panel-w: min(300px, 85vw);
   --cluster4-mobile-panel-h: 380px;
-  --cluster4-desktop-col: 320px;
+  --cluster4-desktop-col: 350px;
   --cluster4-desktop-row: 400px;
+  --cluster4-desktop-wide-sidebar: 280px;
+  --cluster4-desktop-wide-image-bleed: 0px;
   box-sizing: border-box;
   width: 100%;
   padding-bottom: 3em;
@@ -335,7 +337,7 @@
   background: #e2dfd9;
   padding: 8px;
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 :global(html.dark) .contactMobile {
@@ -556,6 +558,22 @@
   cursor: none;
 }
 
+.cluster4DesktopGridCursorHide .cluster4DesktopCard[data-active="true"] {
+  cursor: default;
+}
+
+.cluster4DesktopGridCursorHide
+  .cluster4DesktopCard[data-active="true"]
+  .cluster4PanelNavBtn {
+  cursor: pointer;
+}
+
+.cluster4DesktopGrid.cluster4PanelNavCursorHide
+  .cluster4DesktopCard[data-active="true"]
+  .cluster4PanelNavBtn {
+  cursor: none;
+}
+
 .cluster4DesktopCursorWrap {
   pointer-events: none;
   /* `row1` uses `enterMedia` (transform). Fixed positioning would be vs that ancestor, not the
@@ -606,7 +624,7 @@
   padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
   min-height: 0;
   color: var(--hero-text-primary);
   font-size: 14px;
@@ -616,16 +634,21 @@
 .cluster4DesktopCardWide {
   flex-direction: row;
   align-items: stretch;
-  gap: 8px;
+  gap: 6px;
 }
 
 .cluster4DesktopCardWide .cluster4PanelImage {
-  flex: 0 0 310px;
+  flex: 1 1 0;
+  min-width: 0;
   height: 100%;
 }
 
-.cluster4DesktopCardWide .cluster4PanelTextWide {
-  align-self: flex-end;
+.cluster4DesktopCardAccent:not(:is(button)) {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .cluster4DesktopCard:is(button) {
@@ -841,12 +864,141 @@
   text-align: left;
 }
 
+.cluster4PanelSidebar {
+  flex: 0 0 var(--cluster4-desktop-wide-sidebar, 280px);
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.cluster4PanelSidebar .cluster4PanelNav {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 8px 8px 0;
+}
+
+.cluster4PanelSidebar .cluster4PanelTextBlock {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
+.cluster4PanelFooter {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.cluster4PanelTextHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cluster4PanelTextBlock {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px;
+  text-align: left;
+}
+
+.cluster4PanelTitleRow {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+}
+
+.cluster4PanelTitleDot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.cluster4PanelTitle {
+  margin: 0;
+  color: var(--hero-text-secondary);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+}
+
+.cluster4PanelNav {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.cluster4PanelNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cluster4PanelNavBtnIcon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: var(--hero-text-secondary);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  transition: background-color 0.25s ease-in-out;
+}
+
+.cluster4PanelNavBtnIconLeft {
+  mask-image: url("/svg/icons/arrow-left.svg");
+  -webkit-mask-image: url("/svg/icons/arrow-left.svg");
+}
+
+.cluster4PanelNavBtnIconRight {
+  mask-image: url("/svg/icons/arrow-right.svg");
+  -webkit-mask-image: url("/svg/icons/arrow-right.svg");
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cluster4PanelNavBtn:hover .cluster4PanelNavBtnIcon {
+    background-color: #d6e5ec;
+  }
+}
+
+.cluster4PanelNavBtn:focus-visible {
+  outline: 2px solid var(--color-masthead-dim);
+  outline-offset: 2px;
+}
+
+.cluster4PanelNavBtn:focus-visible .cluster4PanelNavBtnIcon {
+  background-color: #d6e5ec;
+}
+
 .cluster4PanelBody {
   margin: 0;
   color: var(--hero-text-primary);
   font-size: 14px;
   line-height: 1.4;
   letter-spacing: 0.02em;
+}
+
+.cluster4PanelTextBlock .cluster4PanelBody {
+  margin-top: 0.2em;
 }
 
 .cluster4MobileIndicators {
@@ -932,6 +1084,79 @@
   }
 }
 
+/* Tablet landscape: bento tracks sized for wide tiles without clipping. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hero {
+    --cluster4-desktop-col: clamp(312px, 26.4vw, 360px);
+  }
+}
+
+/* Large tablet / small desktop: wide card layout with tighter column + sidebar. */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .hero {
+    --cluster4-desktop-col: clamp(336px, 28.8vw, 382px);
+    --cluster4-desktop-wide-sidebar: 302px;
+  }
+
+  .cluster4DesktopCardWide {
+    width: min(100%, calc(2 * var(--cluster4-desktop-col) + 8px));
+    max-width: calc(2 * var(--cluster4-desktop-col) + 8px);
+  }
+}
+
+/* Tablet only: shorter cluster1 via a reduced cluster2 hero panel. */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .row1 {
+    min-height: clamp(380px, 48vw, 640px);
+  }
+
+  .panelHero {
+    min-height: 168px;
+  }
+
+  .panelHeroBody {
+    padding: 1.15em 1.25em 1.25em;
+  }
+}
+
+/* Full desktop: full-size wide card + optional image bleed to the left. */
+@media (min-width: 1440px) {
+  .hero {
+    --cluster4-desktop-col: 350px;
+    --cluster4-desktop-wide-sidebar: 280px;
+    --cluster4-desktop-wide-image-bleed: 32px;
+  }
+
+  .cluster4DesktopCardWide .cluster4RotatingStack {
+    inset: auto;
+    top: 0;
+    bottom: 0;
+    left: calc(-1 * var(--cluster4-desktop-wide-image-bleed));
+    width: calc(100% + var(--cluster4-desktop-wide-image-bleed));
+    height: 100%;
+  }
+
+  .cluster4DesktopCardWide .cluster4PanelImage > .cluster4PanelImageAsset,
+  .cluster4DesktopCardWide .cluster4PanelImage > video {
+    width: calc(100% + var(--cluster4-desktop-wide-image-bleed));
+    height: 100%;
+    margin-left: calc(-1 * var(--cluster4-desktop-wide-image-bleed));
+    object-fit: cover;
+  }
+
+  .row1 {
+    min-height: clamp(460px, 55vw, 820px);
+  }
+
+  .panelHero {
+    min-height: 220px;
+  }
+
+  .panelHeroBody {
+    padding: 1.5em;
+  }
+}
+
 /* Tablet landscape and up switches to desktop structure. */
 @media (min-width: 1024px) {
   .hero {
@@ -941,7 +1166,6 @@
   .row1 {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: stretch;
-    min-height: clamp(460px, 55vw, 820px);
   }
 
   .row2 {
@@ -998,7 +1222,6 @@
 
   .panelHero {
     aspect-ratio: auto;
-    min-height: 220px;
     height: 100%;
   }
 

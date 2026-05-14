@@ -19,7 +19,13 @@ import {
 } from "@/components/HomeHeroPanelNav";
 import enterStyles from "@/components/ProjectPageEnter.module.css";
 import projectGridStyles from "@/components/ProjectGrid.module.css";
-import { getHomeHeroGridCardById, HOME_HERO_GRID_CARD_IDS } from "@/data/homeHeroGridCards";
+import {
+  getDesktopBentoCardIdForSlot,
+  getHomeHeroGridAccentDotColor,
+  getHomeHeroGridCardById,
+  HOME_HERO_GRID_CARD_IDS,
+} from "@/data/homeHeroGridCards";
+import type { HomeHeroGridCard } from "@/data/homeHeroGridCards";
 import styles from "./HomepageHero.module.css";
 
 function getCurrentTimeLabel() {
@@ -59,14 +65,17 @@ const DESKTOP_BENTO_ROW_SPANS: ReadonlyArray<ReadonlyArray<1 | 2>> = [
 
 const DESKTOP_BENTO_INITIAL_ACTIVE = { row: 3, card: 2 } as const;
 
-/** Horizontal pan nudge (px) for desktop bento — only at very wide widths so tablet landscape is not clipped. */
+/** Extra pan at full desktop only (≥1440px) — stacks offset + nudge; negative = further left. */
+const DESKTOP_BENTO_PAN_OFFSET_X = -40;
 const DESKTOP_BENTO_PAN_NUDGE_X = -100;
 /** Wide 2-column tiles start here (matches layout breakpoint intent). */
 const DESKTOP_WIDE_LAYOUT_MQ = "(min-width: 1280px)";
 /** Extra left pan only here — above typical tablet landscape (e.g. iPad Pro ~1366 CSS px). */
 const DESKTOP_BENTO_PAN_NUDGE_MQ = "(min-width: 1440px)";
 
-/** Match `ProjectGrid` custom cursor — fine pointer + hover only. */
+/** Desktop active-panel prev/next arrows — disabled for now. */
+const DESKTOP_PANEL_NAV_ENABLED = false;
+
 function shouldEnableDesktopGridCursor(): boolean {
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(pointer: coarse)").matches) return false;
@@ -108,6 +117,28 @@ function shuffleArray<T>(items: readonly T[]): T[] {
 }
 
 type DesktopBentoSlot = { row: number; card: number };
+
+function allDesktopBentoSlots(
+  rowSpansGrid: ReadonlyArray<ReadonlyArray<1 | 2>>,
+): DesktopBentoSlot[] {
+  return rowSpansGrid.flatMap((spans, row) =>
+    spans.map((_, card) => ({ row, card })),
+  );
+}
+
+function desktopBentoSlotsEqual(a: DesktopBentoSlot, b: DesktopBentoSlot): boolean {
+  return a.row === b.row && a.card === b.card;
+}
+
+function pickRandomDesktopBentoSlot(
+  current: DesktopBentoSlot,
+  rowSpansGrid: ReadonlyArray<ReadonlyArray<1 | 2>>,
+): DesktopBentoSlot {
+  const slots = allDesktopBentoSlots(rowSpansGrid);
+  const otherSlots = slots.filter((slot) => !desktopBentoSlotsEqual(slot, current));
+  const pool = otherSlots.length > 0 ? otherSlots : slots;
+  return pool[Math.floor(Math.random() * pool.length)] ?? current;
+}
 
 /**
  * Pick an initial active card away from outer edges so first-load panning can center it.
@@ -248,6 +279,115 @@ function clockwiseAdjacentPulseDelayIndex(
   return null;
 }
 
+function Cluster4DesktopActivePanel({
+  card,
+  isWide,
+  isBlueTheme,
+  onPrev,
+  onNext,
+}: {
+  card: HomeHeroGridCard;
+  isWide: boolean;
+  isBlueTheme: boolean;
+  onPrev: (event: ReactMouseEvent<HTMLButtonElement>) => void;
+  onNext: (event: ReactMouseEvent<HTMLButtonElement>) => void;
+}) {
+  const imageWrapClassName = `${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`;
+  const bodyStyle =
+    card.body != null && card.body !== ""
+      ? card.textMaxChars != null
+        ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
+        : isWide
+          ? undefined
+          : ({ maxWidth: "250px" } as CSSProperties)
+      : undefined;
+
+  const nav = DESKTOP_PANEL_NAV_ENABLED ? (
+    <div className={styles.cluster4PanelNav}>
+      <button
+        type="button"
+        className={styles.cluster4PanelNavBtn}
+        onClick={onPrev}
+        aria-label="Previous panel"
+      >
+        <span
+          className={`${styles.cluster4PanelNavBtnIcon} ${styles.cluster4PanelNavBtnIconLeft}`}
+          aria-hidden
+        />
+      </button>
+      <button
+        type="button"
+        className={styles.cluster4PanelNavBtn}
+        onClick={onNext}
+        aria-label="Next panel"
+      >
+        <span
+          className={`${styles.cluster4PanelNavBtnIcon} ${styles.cluster4PanelNavBtnIconRight}`}
+          aria-hidden
+        />
+      </button>
+    </div>
+  ) : null;
+
+  const titleRow = (
+    <div className={styles.cluster4PanelTitleRow}>
+      <span
+        className={styles.cluster4PanelTitleDot}
+        style={{ backgroundColor: getHomeHeroGridAccentDotColor(card.accentDot) }}
+        aria-hidden
+      />
+      <p className={styles.cluster4PanelTitle}>{card.label}</p>
+    </div>
+  );
+
+  const textBlock = (
+    <div className={styles.cluster4PanelTextBlock}>
+      {isWide || !DESKTOP_PANEL_NAV_ENABLED ? (
+        titleRow
+      ) : (
+        <div className={styles.cluster4PanelTextHeader}>
+          {titleRow}
+          {nav}
+        </div>
+      )}
+      {card.body ? (
+        <p className={styles.cluster4PanelBody} style={bodyStyle}>
+          {card.body}
+        </p>
+      ) : null}
+    </div>
+  );
+
+  if (isWide) {
+    return (
+      <>
+        <Cluster4PanelMedia
+          cardId={card.id}
+          media={card.media}
+          wrapClassName={imageWrapClassName}
+          assetClassName={styles.cluster4PanelImageAsset}
+        />
+        <div className={styles.cluster4PanelSidebar}>
+          {nav}
+          {textBlock}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Cluster4PanelMedia
+        cardId={card.id}
+        media={card.media}
+        wrapClassName={imageWrapClassName}
+        assetClassName={styles.cluster4PanelImageAsset}
+      />
+      <div className={styles.cluster4PanelFooter}>{textBlock}</div>
+    </>
+  );
+}
+
 export function HomepageHero() {
   const [timeLabel, setTimeLabel] = useState("00:00");
   const [minuteProgress, setMinuteProgress] = useState(0);
@@ -262,7 +402,8 @@ export function HomepageHero() {
   const mobileGridRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoViewportRef = useRef<HTMLDivElement | null>(null);
   const desktopBentoInnerRef = useRef<HTMLDivElement | null>(null);
-  const desktopBentoActivePanelRef = useRef<HTMLButtonElement | null>(null);
+  const desktopBentoActivePanelRef = useRef<HTMLDivElement | null>(null);
+  const desktopBentoHistoryRef = useRef<DesktopBentoSlot[]>([]);
   const cluster2Ref = useRef<HTMLDivElement | null>(null);
   const [desktopBentoPan, setDesktopBentoPan] = useState({ x: 0, y: 0 });
   const [desktopBentoActive, setDesktopBentoActive] = useState<{
@@ -271,6 +412,7 @@ export function HomepageHero() {
   }>(() => ({ ...DESKTOP_BENTO_INITIAL_ACTIVE }));
 
   const desktopGridCursorWrapRef = useRef<HTMLDivElement | null>(null);
+  const desktopPanelNavCursorWrapRef = useRef<HTMLDivElement | null>(null);
   const desktopGridPointerInsideRef = useRef(false);
   const lastDesktopGridPointerRef = useRef({ x: 0, y: 0 });
   const themeBarCursorViewportRef = useRef<HTMLDivElement | null>(null);
@@ -285,6 +427,10 @@ export function HomepageHero() {
   const [desktopGridCustomCursorEnabled, setDesktopGridCustomCursorEnabled] =
     useState(false);
   const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
+  const [desktopGridHoveringActiveCard, setDesktopGridHoveringActiveCard] =
+    useState(false);
+  const [desktopPanelNavCursorVisible, setDesktopPanelNavCursorVisible] =
+    useState(false);
   const [themeBarCursorVisible, setThemeBarCursorVisible] = useState(false);
   const [panelHeroNavCursorVisible, setPanelHeroNavCursorVisible] = useState(false);
   const [desktopCursorCrossGeneration, setDesktopCursorCrossGeneration] = useState(0);
@@ -502,6 +648,33 @@ export function HomepageHero() {
     setCluster4DesktopPanBoot(false);
   };
 
+  const navigateDesktopBentoTo = useCallback((next: DesktopBentoSlot) => {
+    setDesktopBentoActive((current) => {
+      if (desktopBentoSlotsEqual(current, next)) return current;
+      desktopBentoHistoryRef.current = [...desktopBentoHistoryRef.current, current];
+      return next;
+    });
+  }, []);
+
+  const onDesktopPanelPrev = useCallback((event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const history = desktopBentoHistoryRef.current;
+    if (history.length === 0) return;
+    const previous = history[history.length - 1];
+    desktopBentoHistoryRef.current = history.slice(0, -1);
+    setDesktopBentoActive(previous);
+  }, []);
+
+  const onDesktopPanelNext = useCallback((event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setDesktopBentoActive((current) => {
+      const next = pickRandomDesktopBentoSlot(current, DESKTOP_BENTO_ROW_SPANS);
+      if (desktopBentoSlotsEqual(current, next)) return current;
+      desktopBentoHistoryRef.current = [...desktopBentoHistoryRef.current, current];
+      return next;
+    });
+  }, []);
+
   const syncMobileGridPan = useCallback(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
     if (!mq.matches) {
@@ -565,7 +738,11 @@ export function HomepageHero() {
 
     const { x: acx, y: acy } = activePanelCenterInInner(activeEl, inner);
     const idealTx =
-      vw / 2 - acx + (desktopBentoPanNudge ? DESKTOP_BENTO_PAN_NUDGE_X : 0);
+      vw / 2 -
+      acx +
+      (desktopBentoPanNudge
+        ? DESKTOP_BENTO_PAN_OFFSET_X + DESKTOP_BENTO_PAN_NUDGE_X
+        : 0);
 
     const cluster2El = cluster2Ref.current;
     const vpRect = vp.getBoundingClientRect();
@@ -573,11 +750,12 @@ export function HomepageHero() {
     const activeBottomInner = acy + activeHalfH;
 
     let idealTy: number;
-    if (desktopWideEnabled && cluster2El) {
+    if (desktopBentoPanNudge && desktopWideEnabled && cluster2El) {
+      /* Full desktop: align active panel bottom with cluster2 (avoids top clip at wide widths). */
       const c2Bottom = cluster2El.getBoundingClientRect().bottom;
       idealTy = c2Bottom - vpRect.top - activeBottomInner;
     } else {
-      /* Tablet/desktop: center active panel within cluster4 viewport. */
+      /* Tablet: keep active panel vertically centred in the cluster4 viewport. */
       idealTy = vh / 2 - acy;
     }
 
@@ -616,6 +794,18 @@ export function HomepageHero() {
     wrap.style.top = `${clientY - rect.top + DESKTOP_GRID_CURSOR_OFFSET_Y}px`;
   }, []);
 
+  const commitDesktopPanelNavCursorPosition = useCallback(
+    (clientX: number, clientY: number) => {
+      const wrap = desktopPanelNavCursorWrapRef.current;
+      const vp = desktopBentoViewportRef.current;
+      if (!wrap || !vp) return;
+      const rect = vp.getBoundingClientRect();
+      wrap.style.left = `${clientX - rect.left + CLUSTER2_DESKTOP_CURSOR_OFFSET_X}px`;
+      wrap.style.top = `${clientY - rect.top + CLUSTER2_DESKTOP_CURSOR_OFFSET_Y}px`;
+    },
+    [],
+  );
+
   const commitThemeBarCursorPosition = useCallback((clientX: number, clientY: number) => {
     lastThemeBarPointerRef.current = { x: clientX, y: clientY };
     const wrap = themeBarCursorWrapRef.current;
@@ -651,14 +841,20 @@ export function HomepageHero() {
         const { x, y } = lastPanelHeroNavPointerRef.current;
         commitPanelHeroNavCursorPosition(x, y);
       }
+      if (desktopPanelNavCursorVisible) {
+        const { x, y } = lastDesktopGridPointerRef.current;
+        commitDesktopPanelNavCursorPosition(x, y);
+      }
     };
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
   }, [
     desktopGridCustomCursorEnabled,
     commitDesktopGridCursorPosition,
+    commitDesktopPanelNavCursorPosition,
     commitThemeBarCursorPosition,
     commitPanelHeroNavCursorPosition,
+    desktopPanelNavCursorVisible,
   ]);
 
   useLayoutEffect(() => {
@@ -675,6 +871,10 @@ export function HomepageHero() {
       const { x, y } = lastPanelHeroNavPointerRef.current;
       commitPanelHeroNavCursorPosition(x, y);
     }
+    if (desktopPanelNavCursorVisible) {
+      const { x, y } = lastDesktopGridPointerRef.current;
+      commitDesktopPanelNavCursorPosition(x, y);
+    }
   }, [
     desktopBentoPan.x,
     desktopBentoPan.y,
@@ -682,8 +882,10 @@ export function HomepageHero() {
     cluster4PanUnlocked,
     desktopGridCustomCursorEnabled,
     commitDesktopGridCursorPosition,
+    commitDesktopPanelNavCursorPosition,
     commitThemeBarCursorPosition,
     commitPanelHeroNavCursorPosition,
+    desktopPanelNavCursorVisible,
   ]);
 
   const onDesktopGridMouseEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
@@ -696,11 +898,21 @@ export function HomepageHero() {
   const onDesktopGridMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!desktopGridCustomCursorEnabled) return;
     commitDesktopGridCursorPosition(e.clientX, e.clientY);
-    const nextKey =
+    const hoveredCard =
       e.target instanceof Element
-        ? (e.target.closest("[data-bento-key]") as HTMLElement | null)?.dataset.bentoKey ??
-          null
+        ? (e.target.closest("[data-bento-key]") as HTMLElement | null)
         : null;
+    const nextKey = hoveredCard?.dataset.bentoKey ?? null;
+    const isOverActiveCard = hoveredCard?.dataset.active === "true";
+    const isOverPanelNav =
+      isOverActiveCard &&
+      e.target instanceof Element &&
+      e.target.closest(`.${styles.cluster4PanelNavBtn}`) != null;
+    setDesktopGridHoveringActiveCard(isOverActiveCard);
+    setDesktopPanelNavCursorVisible(isOverPanelNav);
+    if (isOverPanelNav) {
+      commitDesktopPanelNavCursorPosition(e.clientX, e.clientY);
+    }
     const prevKey = desktopHoveredBentoKeyRef.current;
     if (prevKey !== null && nextKey !== null && prevKey !== nextKey) {
       setDesktopCursorCrossGeneration((v) => v + 1);
@@ -711,6 +923,8 @@ export function HomepageHero() {
   const onDesktopGridMouseLeave = () => {
     desktopGridPointerInsideRef.current = false;
     desktopHoveredBentoKeyRef.current = null;
+    setDesktopGridHoveringActiveCard(false);
+    setDesktopPanelNavCursorVisible(false);
     setDesktopGridCursorVisible(false);
   };
 
@@ -1161,18 +1375,22 @@ export function HomepageHero() {
                             wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
                             assetClassName={styles.cluster4PanelImageAsset}
                           />
-                          <div className={styles.cluster4PanelText}>
-                            <p
-                              className={styles.cluster4PanelBody}
-                              style={
-                                card.textMaxChars
-                                  ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
-                                  : undefined
-                              }
-                            >
-                              {card.body}
-                            </p>
-                          </div>
+                          {card.body ? (
+                            <div className={styles.cluster4PanelText}>
+                              <p
+                                className={styles.cluster4PanelBody}
+                                style={
+                                  card.textMaxChars
+                                    ? ({
+                                        maxWidth: `${card.textMaxChars}ch`,
+                                      } as CSSProperties)
+                                    : undefined
+                                }
+                              >
+                                {card.body}
+                              </p>
+                            </div>
+                          ) : null}
                         </>
                       ) : showMobileHintsOnLoad &&
                         cluster4IntroUnlocked &&
@@ -1208,6 +1426,9 @@ export function HomepageHero() {
               desktopGridCustomCursorEnabled && desktopGridCursorVisible
                 ? styles.cluster4DesktopGridCursorHide
                 : "",
+              desktopGridCustomCursorEnabled && desktopPanelNavCursorVisible
+                ? styles.cluster4PanelNavCursorHide
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -1239,8 +1460,11 @@ export function HomepageHero() {
               {DESKTOP_BENTO_ROW_SPANS.flatMap((spans, rowIdx) =>
                 spans.map((colSpan, cardIdx) => {
                   const flatIdx = rowIdx * spans.length + cardIdx;
-                  const cardId =
-                    mobileCarouselCards[flatIdx % mobileCarouselCards.length] ?? "";
+                  const cardId = getDesktopBentoCardIdForSlot(
+                    flatIdx,
+                    colSpan,
+                    mobileCarouselCards,
+                  );
                   const card = getHomeHeroGridCardById(cardId);
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
@@ -1251,106 +1475,115 @@ export function HomepageHero() {
                   );
                   const isWide = desktopWideEnabled && colSpan === 2;
                   const isBlueTheme = isActive && card.theme === "blue";
+                  const cardClassName = [
+                    styles.cluster4DesktopCard,
+                    isWide ? styles.cluster4DesktopCardWide : "",
+                    isActive ? styles.cluster4DesktopCardAccent : "",
+                    isBlueTheme ? styles.cluster4CardThemeBlue : "",
+                    showOneTimePanelPulse && pulseDelayIndex != null
+                      ? styles.cluster4DesktopCardInactive
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+                  const cardStyle = {
+                    gridColumn: `span ${isWide ? 2 : 1}`,
+                    ...(pulseDelayIndex != null
+                      ? { "--cluster4-pulse-delay": `${pulseDelayIndex * 0.08}s` }
+                      : {}),
+                  } as CSSProperties;
+
+                  if (isActive) {
+                    return (
+                      <div
+                        key={`desktop-bento-${rowIdx}-${cardIdx}`}
+                        ref={desktopBentoActivePanelRef}
+                        data-bento-key={`${rowIdx}-${cardIdx}`}
+                        className={cardClassName}
+                        style={cardStyle}
+                        data-active="true"
+                        aria-label={card.label}
+                      >
+                        <Cluster4DesktopActivePanel
+                          card={card}
+                          isWide={isWide}
+                          isBlueTheme={isBlueTheme}
+                          onPrev={onDesktopPanelPrev}
+                          onNext={onDesktopPanelNext}
+                        />
+                      </div>
+                    );
+                  }
+
                   return (
                     <button
                       key={`desktop-bento-${rowIdx}-${cardIdx}`}
                       type="button"
-                      ref={isActive ? desktopBentoActivePanelRef : undefined}
                       data-bento-key={`${rowIdx}-${cardIdx}`}
-                      className={`${styles.cluster4DesktopCard}${isWide ? ` ${styles.cluster4DesktopCardWide}` : ""}${isActive ? ` ${styles.cluster4DesktopCardAccent}` : ""}${isBlueTheme ? ` ${styles.cluster4CardThemeBlue}` : ""}${showOneTimePanelPulse && pulseDelayIndex != null ? ` ${styles.cluster4DesktopCardInactive}` : ""}`}
-                      style={
-                        {
-                          gridColumn: `span ${isWide ? 2 : 1}`,
-                          ...(pulseDelayIndex != null
-                            ? { "--cluster4-pulse-delay": `${pulseDelayIndex * 0.08}s` }
-                            : {}),
-                        } as CSSProperties
-                      }
-                      data-active={isActive ? "true" : undefined}
-                      aria-current={isActive ? "true" : undefined}
+                      className={cardClassName}
+                      style={cardStyle}
                       aria-label={card.label}
-                      onClick={() => setDesktopBentoActive({ row: rowIdx, card: cardIdx })}
-                    >
-                      {isActive ? (
-                        isWide ? (
-                          <>
-                            <Cluster4PanelMedia
-                              cardId={card.id}
-                              media={card.media}
-                              wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
-                              assetClassName={styles.cluster4PanelImageAsset}
-                            />
-                            <div className={styles.cluster4PanelTextWide}>
-                              <p
-                                className={styles.cluster4PanelBody}
-                                style={
-                                  card.textMaxChars
-                                    ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
-                                    : undefined
-                                }
-                              >
-                                {card.body}
-                              </p>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <Cluster4PanelMedia
-                              cardId={card.id}
-                              media={card.media}
-                              wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
-                              assetClassName={styles.cluster4PanelImageAsset}
-                            />
-                            <div className={styles.cluster4PanelText}>
-                              <p
-                                className={styles.cluster4PanelBody}
-                                style={
-                                  card.textMaxChars
-                                    ? ({ maxWidth: `${card.textMaxChars}ch` } as CSSProperties)
-                                    : undefined
-                                }
-                              >
-                                {card.body}
-                              </p>
-                            </div>
-                          </>
-                        )
-                      ) : null}
-                    </button>
+                      onClick={() => navigateDesktopBentoTo({ row: rowIdx, card: cardIdx })}
+                    />
                   );
                 }),
               )}
             </div>
             {desktopGridCustomCursorEnabled ? (
-              <div
-                ref={desktopGridCursorWrapRef}
-                className={styles.cluster4DesktopCursorWrap}
-                style={
-                  {
-                    left: 0,
-                    top: 0,
-                    transform: "translate(-50%, -50%)",
-                    opacity: desktopGridCursorVisible ? 1 : 0,
-                  } as CSSProperties
-                }
-                aria-hidden
-              >
+              <>
                 <div
-                  key={desktopCursorCrossGeneration}
-                  className={styles.cluster4DesktopCursorBubble}
+                  ref={desktopGridCursorWrapRef}
+                  className={styles.cluster4DesktopCursorWrap}
                   style={
                     {
-                      backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
-                      animation:
-                        desktopCursorCrossGeneration > 0
-                          ? "project-cursor-cross 0.5s ease-in-out"
-                          : "none",
+                      left: 0,
+                      top: 0,
+                      transform: "translate(-50%, -50%)",
+                      opacity:
+                        desktopGridCursorVisible && !desktopGridHoveringActiveCard
+                          ? 1
+                          : 0,
                     } as CSSProperties
                   }
+                  aria-hidden
                 >
-                  
+                  <div
+                    key={desktopCursorCrossGeneration}
+                    className={styles.cluster4DesktopCursorBubble}
+                    style={
+                      {
+                        backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                        animation:
+                          desktopCursorCrossGeneration > 0
+                            ? "project-cursor-cross 0.5s ease-in-out"
+                            : "none",
+                      } as CSSProperties
+                    }
+                  />
                 </div>
-              </div>
+                <div
+                  ref={desktopPanelNavCursorWrapRef}
+                  className={styles.cluster2DesktopCursorWrap}
+                  style={
+                    {
+                      left: 0,
+                      top: 0,
+                      transform: "translate(-50%, -50%)",
+                      opacity: desktopPanelNavCursorVisible ? 1 : 0,
+                    } as CSSProperties
+                  }
+                  aria-hidden
+                >
+                  <div
+                    className={styles.cluster2DesktopCursorBubble}
+                    style={
+                      {
+                        backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                      } as CSSProperties
+                    }
+                  />
+                </div>
+              </>
             ) : null}
           </div>
         </div>

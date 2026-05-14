@@ -7,21 +7,14 @@
   margin-bottom: 0;
 }
 
-@media (min-width: 768px) {
-  .header {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-}
-
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
   .header {
     margin-left: 3rem;
     margin-right: 3rem;
   }
 }
 
-/* Home: top offset before wordmark; horizontal inset from `min-width: 1024px` up. */
+/* Home: top offset before wordmark; horizontal inset from full desktop up. */
 .headerHome {
   margin-top: 60px;
   padding-left: 0;
@@ -34,7 +27,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
   .headerHome {
     padding-left: 5px;
     padding-right: 10px;
