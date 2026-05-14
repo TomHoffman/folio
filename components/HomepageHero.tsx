@@ -76,6 +76,8 @@ function shouldEnableDesktopGridCursor(): boolean {
 
 const DESKTOP_GRID_CURSOR_OFFSET_X = 6;
 const DESKTOP_GRID_CURSOR_OFFSET_Y = 6;
+const CLUSTER2_DESKTOP_CURSOR_OFFSET_X = 3;
+const CLUSTER2_DESKTOP_CURSOR_OFFSET_Y = 3;
 /** Desktop bento cursor — white fill alpha (Project grid uses 0.9). */
 const DESKTOP_GRID_CURSOR_BG_ALPHA = 0.7;
 
@@ -271,10 +273,20 @@ export function HomepageHero() {
   const desktopGridCursorWrapRef = useRef<HTMLDivElement | null>(null);
   const desktopGridPointerInsideRef = useRef(false);
   const lastDesktopGridPointerRef = useRef({ x: 0, y: 0 });
+  const themeBarCursorViewportRef = useRef<HTMLDivElement | null>(null);
+  const themeBarCursorWrapRef = useRef<HTMLDivElement | null>(null);
+  const themeBarPointerInsideRef = useRef(false);
+  const lastThemeBarPointerRef = useRef({ x: 0, y: 0 });
+  const panelHeroNavCursorViewportRef = useRef<HTMLDivElement | null>(null);
+  const panelHeroNavCursorWrapRef = useRef<HTMLDivElement | null>(null);
+  const panelHeroNavPointerInsideRef = useRef(false);
+  const lastPanelHeroNavPointerRef = useRef({ x: 0, y: 0 });
   const desktopHoveredBentoKeyRef = useRef<string | null>(null);
   const [desktopGridCustomCursorEnabled, setDesktopGridCustomCursorEnabled] =
     useState(false);
   const [desktopGridCursorVisible, setDesktopGridCursorVisible] = useState(false);
+  const [themeBarCursorVisible, setThemeBarCursorVisible] = useState(false);
+  const [panelHeroNavCursorVisible, setPanelHeroNavCursorVisible] = useState(false);
   const [desktopCursorCrossGeneration, setDesktopCursorCrossGeneration] = useState(0);
   const [desktopWideEnabled, setDesktopWideEnabled] = useState(false);
   const [desktopBentoPanNudge, setDesktopBentoPanNudge] = useState(false);
@@ -604,21 +616,65 @@ export function HomepageHero() {
     wrap.style.top = `${clientY - rect.top + DESKTOP_GRID_CURSOR_OFFSET_Y}px`;
   }, []);
 
+  const commitThemeBarCursorPosition = useCallback((clientX: number, clientY: number) => {
+    lastThemeBarPointerRef.current = { x: clientX, y: clientY };
+    const wrap = themeBarCursorWrapRef.current;
+    const vp = themeBarCursorViewportRef.current;
+    if (!wrap || !vp) return;
+    const rect = vp.getBoundingClientRect();
+    wrap.style.left = `${clientX - rect.left + CLUSTER2_DESKTOP_CURSOR_OFFSET_X}px`;
+    wrap.style.top = `${clientY - rect.top + CLUSTER2_DESKTOP_CURSOR_OFFSET_Y}px`;
+  }, []);
+
+  const commitPanelHeroNavCursorPosition = useCallback((clientX: number, clientY: number) => {
+    lastPanelHeroNavPointerRef.current = { x: clientX, y: clientY };
+    const wrap = panelHeroNavCursorWrapRef.current;
+    const vp = panelHeroNavCursorViewportRef.current;
+    if (!wrap || !vp) return;
+    const rect = vp.getBoundingClientRect();
+    wrap.style.left = `${clientX - rect.left + CLUSTER2_DESKTOP_CURSOR_OFFSET_X}px`;
+    wrap.style.top = `${clientY - rect.top + CLUSTER2_DESKTOP_CURSOR_OFFSET_Y}px`;
+  }, []);
+
   useEffect(() => {
     if (!desktopGridCustomCursorEnabled) return;
     const onScroll = () => {
-      if (!desktopGridPointerInsideRef.current) return;
-      const { x, y } = lastDesktopGridPointerRef.current;
-      commitDesktopGridCursorPosition(x, y);
+      if (desktopGridPointerInsideRef.current) {
+        const { x, y } = lastDesktopGridPointerRef.current;
+        commitDesktopGridCursorPosition(x, y);
+      }
+      if (themeBarPointerInsideRef.current) {
+        const { x, y } = lastThemeBarPointerRef.current;
+        commitThemeBarCursorPosition(x, y);
+      }
+      if (panelHeroNavPointerInsideRef.current) {
+        const { x, y } = lastPanelHeroNavPointerRef.current;
+        commitPanelHeroNavCursorPosition(x, y);
+      }
     };
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, [desktopGridCustomCursorEnabled, commitDesktopGridCursorPosition]);
+  }, [
+    desktopGridCustomCursorEnabled,
+    commitDesktopGridCursorPosition,
+    commitThemeBarCursorPosition,
+    commitPanelHeroNavCursorPosition,
+  ]);
 
   useLayoutEffect(() => {
-    if (!desktopGridCustomCursorEnabled || !desktopGridPointerInsideRef.current) return;
-    const { x, y } = lastDesktopGridPointerRef.current;
-    commitDesktopGridCursorPosition(x, y);
+    if (!desktopGridCustomCursorEnabled) return;
+    if (desktopGridPointerInsideRef.current) {
+      const { x, y } = lastDesktopGridPointerRef.current;
+      commitDesktopGridCursorPosition(x, y);
+    }
+    if (themeBarPointerInsideRef.current) {
+      const { x, y } = lastThemeBarPointerRef.current;
+      commitThemeBarCursorPosition(x, y);
+    }
+    if (panelHeroNavPointerInsideRef.current) {
+      const { x, y } = lastPanelHeroNavPointerRef.current;
+      commitPanelHeroNavCursorPosition(x, y);
+    }
   }, [
     desktopBentoPan.x,
     desktopBentoPan.y,
@@ -626,6 +682,8 @@ export function HomepageHero() {
     cluster4PanUnlocked,
     desktopGridCustomCursorEnabled,
     commitDesktopGridCursorPosition,
+    commitThemeBarCursorPosition,
+    commitPanelHeroNavCursorPosition,
   ]);
 
   const onDesktopGridMouseEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
@@ -654,6 +712,40 @@ export function HomepageHero() {
     desktopGridPointerInsideRef.current = false;
     desktopHoveredBentoKeyRef.current = null;
     setDesktopGridCursorVisible(false);
+  };
+
+  const onThemeBarCursorMouseEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    themeBarPointerInsideRef.current = true;
+    setThemeBarCursorVisible(true);
+    commitThemeBarCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onThemeBarCursorMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    commitThemeBarCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onThemeBarCursorMouseLeave = () => {
+    themeBarPointerInsideRef.current = false;
+    setThemeBarCursorVisible(false);
+  };
+
+  const onPanelHeroNavCursorMouseEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    panelHeroNavPointerInsideRef.current = true;
+    setPanelHeroNavCursorVisible(true);
+    commitPanelHeroNavCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onPanelHeroNavCursorMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!desktopGridCustomCursorEnabled) return;
+    commitPanelHeroNavCursorPosition(e.clientX, e.clientY);
+  };
+
+  const onPanelHeroNavCursorMouseLeave = () => {
+    panelHeroNavPointerInsideRef.current = false;
+    setPanelHeroNavCursorVisible(false);
   };
 
   useLayoutEffect(() => {
@@ -816,9 +908,105 @@ export function HomepageHero() {
         <div className={styles.cluster1}>
           <div ref={cluster2Ref} className={styles.cluster2}>
             <div className={styles.panelHero}>
-              <HomeHeroPanelThemeBar />
+              <div
+                ref={themeBarCursorViewportRef}
+                className={[
+                  styles.panelHeroThemeBarCursorViewport,
+                  desktopGridCustomCursorEnabled && themeBarCursorVisible
+                    ? styles.panelHeroThemeBarCursorHide
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onMouseEnter={
+                  desktopGridCustomCursorEnabled ? onThemeBarCursorMouseEnter : undefined
+                }
+                onMouseMove={
+                  desktopGridCustomCursorEnabled ? onThemeBarCursorMouseMove : undefined
+                }
+                onMouseLeave={
+                  desktopGridCustomCursorEnabled ? onThemeBarCursorMouseLeave : undefined
+                }
+              >
+                <HomeHeroPanelThemeBar />
+                {desktopGridCustomCursorEnabled ? (
+                  <div
+                    ref={themeBarCursorWrapRef}
+                    className={styles.cluster2DesktopCursorWrap}
+                    style={
+                      {
+                        left: 0,
+                        top: 0,
+                        transform: "translate(-50%, -50%)",
+                        opacity: themeBarCursorVisible ? 1 : 0,
+                      } as CSSProperties
+                    }
+                    aria-hidden
+                  >
+                    <div
+                      className={styles.cluster2DesktopCursorBubble}
+                      style={
+                        {
+                          backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                        } as CSSProperties
+                      }
+                    />
+                  </div>
+                ) : null}
+              </div>
               <div className={styles.panelHeroBody}>
-                <HomeHeroPanelNavLinks />
+                <div
+                  ref={panelHeroNavCursorViewportRef}
+                  className={[
+                    styles.panelHeroNavCursorViewport,
+                    desktopGridCustomCursorEnabled && panelHeroNavCursorVisible
+                      ? styles.panelHeroNavCursorHide
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onMouseEnter={
+                    desktopGridCustomCursorEnabled
+                      ? onPanelHeroNavCursorMouseEnter
+                      : undefined
+                  }
+                  onMouseMove={
+                    desktopGridCustomCursorEnabled
+                      ? onPanelHeroNavCursorMouseMove
+                      : undefined
+                  }
+                  onMouseLeave={
+                    desktopGridCustomCursorEnabled
+                      ? onPanelHeroNavCursorMouseLeave
+                      : undefined
+                  }
+                >
+                  <HomeHeroPanelNavLinks />
+                  {desktopGridCustomCursorEnabled ? (
+                    <div
+                      ref={panelHeroNavCursorWrapRef}
+                      className={styles.cluster2DesktopCursorWrap}
+                      style={
+                        {
+                          left: 0,
+                          top: 0,
+                          transform: "translate(-50%, -50%)",
+                          opacity: panelHeroNavCursorVisible ? 1 : 0,
+                        } as CSSProperties
+                      }
+                      aria-hidden
+                    >
+                      <div
+                        className={styles.cluster2DesktopCursorBubble}
+                        style={
+                          {
+                            backgroundColor: `rgba(255, 255, 255, ${DESKTOP_GRID_CURSOR_BG_ALPHA})`,
+                          } as CSSProperties
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
             <div className={styles.availabilityContact}>
@@ -1170,14 +1358,30 @@ export function HomepageHero() {
 
       <div className={styles.row2}>
         <div className={styles.row2Inner}>
-          <p className={styles.row2Text}>
-            Hello. Quam minus voluptas sint ea nulla a magni quia qui non maxime
-            rem facere odit explicabo. Magni quaerat inventore hic maxime
-            veniam. Culpa mollitia rerum rerum modi repellat. Id dolores eos
-            excepturi. Perspiciatis vero nobis autem. Quam minus voluptas sint
-            ea nulla a magni quia qui non maxime rem facere odit explicabo.
-            Magni quaerat.
-          </p>
+          <h2 className={styles.row2Title}>Hello.</h2>
+          <div className={styles.row2Bottom}>
+            <p className={styles.row2Text}>
+              Quam minus voluptas sint ea nulla a magni quia qui non maxime
+              rem facere odit explicabo. Magni quaerat inventore hic maxime
+              veniam. Culpa mollitia rerum rerum modi repellat. Id dolores eos
+              excepturi. Perspiciatis vero nobis autem. Quam minus voluptas sint
+              ea nulla a magni quia qui non maxime rem facere odit explicabo.
+              Magni quaerat.
+            </p>
+            <a
+              href="mailto:t.hoffman@me.com"
+              className={styles.row2AvailabilityContact}
+              aria-label="Email Tom Hoffman — available for new projects"
+            >
+              <span className={styles.row2Availability}>
+                <span className={styles.row2AvailabilityDot} aria-hidden />
+                <span>Available for new projects</span>
+              </span>
+              <span className={styles.row2AvailabilityAction} aria-hidden>
+                <span className={styles.row2AvailabilityActionIcon} />
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     </section>

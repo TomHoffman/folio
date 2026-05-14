@@ -72,6 +72,7 @@ export function HomeHeroPanelThemeBar() {
       <button
         ref={buttonRef}
         type="button"
+        data-hero-theme-toggle
         className={styles.themeBar}
         aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       >
@@ -88,7 +89,7 @@ export function HomeHeroPanelNavLinks() {
   const homeActive = pathname === "/";
 
   return (
-    <nav className={styles.nav} aria-label="Primary">
+    <nav className={styles.nav} data-hero-panel-nav aria-label="Primary">
       <Link
         href="/"
         className={[styles.navRow, homeActive ? styles.navRowActive : ""]

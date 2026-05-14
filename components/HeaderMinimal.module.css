@@ -71,6 +71,13 @@
   justify-content: flex-start;
 }
 
+/* Home only, small screens: empty nav row — avoid a fixed band under the wordmark (desktop keeps `.inner` min-height). */
+@media (max-width: 1023px) {
+  .inner.innerHomeProjectsNav.innerHomeNoNav {
+    min-height: 0;
+  }
+}
+
 .lead {
   flex-shrink: 0;
   display: flex;

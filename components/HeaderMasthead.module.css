@@ -21,11 +21,17 @@
   }
 }
 
-/* Home only: horizontal inset from tablet up; top offset before wordmark. */
+/* Home: top offset before wordmark; horizontal inset from `min-width: 1024px` up. */
 .headerHome {
   margin-top: 60px;
   padding-left: 0;
   padding-right: 0;
+}
+
+@media (max-width: 1023px) {
+  .headerHome {
+    margin-top: 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -69,17 +75,7 @@
   }
 }
 
-/* Home full wordmark + home header offset: desktop only. */
-@media (max-width: 1023px) {
-  .mastheadHomeDesktopOnly {
-    display: none;
-  }
-
-  .headerHome {
-    margin-top: 0;
-  }
-}
-
+/* Home full wordmark: `mastheadHomeDesktopOnly` keeps home out of the inner-route drop-in rule. */
 /* Inner routes: in-flow wordmark only — no extra padding under it before <main>. */
 .mastheadInnerRoute {
   width: 100%;
@@ -131,6 +127,12 @@
 
 .mastheadLayerHome {
   padding-bottom: 0.5rem;
+}
+
+@media (max-width: 1023px) {
+  .mastheadLayerHome {
+    padding-bottom: 0.25rem;
+  }
 }
 
 .mastheadInner {
