@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HeaderMasthead } from "./HeaderMasthead";
 import { HeaderProjectNav } from "./HeaderProjectNav";
 import { HeaderNav } from "./HeaderNav";
+import { isHomeHeroPath } from "@/lib/routes";
 import styles from "./HeaderMinimal.module.css";
 
 /** `/work/:slug` and nested routes (e.g. access gate), not `/work` index. */
@@ -23,8 +24,8 @@ export function HeaderMinimal() {
   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
 
   const homeOrProjectsHeaderBand =
-    pathname === "/" || pathname === "/projects";
-  const showHeaderPrimaryNav = pathname !== "/";
+    isHomeHeroPath(pathname) || pathname === "/projects";
+  const showHeaderPrimaryNav = !isHomeHeroPath(pathname);
 
   useLayoutEffect(() => {
     lastScrollYRef.current = typeof window !== "undefined" ? window.scrollY : 0;
@@ -81,7 +82,7 @@ export function HeaderMinimal() {
         !workProjectTemplate && homeOrProjectsHeaderBand
           ? styles.innerHomeProjectsNav
           : "",
-        !workProjectTemplate && pathname === "/" ? styles.innerHomeNoNav : "",
+        !workProjectTemplate && isHomeHeroPath(pathname) ? styles.innerHomeNoNav : "",
       ]
         .filter(Boolean)
         .join(" ")}

@@ -1,0 +1,15 @@
+.header {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--home-alt-header-padding-top, 1.5rem) var(--page-gutter-x) 0;
+}
+
+.availability {
+  margin-left: 2em;
+}
+

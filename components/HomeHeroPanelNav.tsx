@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HOME_FEATURED_PROJECTS_ANCHOR_ID } from "@/components/HomeFeaturedGrids";
+import { HOME_ALT_PATH } from "@/lib/routes";
 import {
   FOLIO_THEME_CHANGE_EVENT,
   readIsDarkFromDom,
@@ -86,20 +87,24 @@ export function HomeHeroPanelThemeBar() {
 
 export function HomeHeroPanelNavLinks() {
   const pathname = usePathname();
-  const homeActive = pathname === "/";
+  const aboutActive = pathname === HOME_ALT_PATH;
+  const projectsHref =
+    pathname === HOME_ALT_PATH
+      ? `/#${HOME_FEATURED_PROJECTS_ANCHOR_ID}`
+      : `#${HOME_FEATURED_PROJECTS_ANCHOR_ID}`;
 
   return (
     <nav className={styles.nav} data-hero-panel-nav aria-label="Primary">
       <Link
-        href="/"
-        className={[styles.navRow, homeActive ? styles.navRowActive : ""]
+        href={HOME_ALT_PATH}
+        className={[styles.navRow, aboutActive ? styles.navRowActive : ""]
           .filter(Boolean)
           .join(" ")}
       >
         <span className={styles.navLabel}>About</span>
-        {homeActive ? <span className={styles.navDot} aria-hidden /> : null}
+        {aboutActive ? <span className={styles.navDot} aria-hidden /> : null}
       </Link>
-      <a href={`#${HOME_FEATURED_PROJECTS_ANCHOR_ID}`} className={styles.navRow}>
+      <a href={projectsHref} className={styles.navRow}>
         <span className={styles.navLabel}>Projects</span>
       </a>
       <a href={CONTACT_MAILTO} className={styles.navRow}>

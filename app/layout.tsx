@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Script from "next/script";
-import { Footer } from "@/components/Footer";
-import { HeaderMinimal } from "@/components/HeaderMinimal";
-import { NavigationScrollReset } from "@/components/NavigationScrollReset";
+import { SiteChrome } from "@/components/SiteChrome";
 import { ThemeDocumentSync } from "@/components/ThemeDocumentSync";
 import layoutStyles from "./layout.module.css";
 import "./globals.css";
@@ -56,9 +54,7 @@ export default function RootLayout({
           }}
         />
         <ThemeDocumentSync />
-        <HeaderMinimal />
-        <NavigationScrollReset>{children}</NavigationScrollReset>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

@@ -1,0 +1,26 @@
+.root {
+  /*
+   * Shared with HomeAltHeader + HomepageHero row1 (cluster4-only) so vh sizing
+   * subtracts the availability header band.
+   */
+  --home-alt-header-padding-top: 1.5rem;
+  --home-alt-header-content: 3rem;
+  --home-alt-row1-margin-top: 1em;
+  --home-alt-header-block: calc(
+    var(--home-alt-header-padding-top) + var(--home-alt-header-content)
+  );
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100dvh;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 1024px) {
+  .root {
+    --home-alt-header-padding-top: 2.5rem;
+  }
+}

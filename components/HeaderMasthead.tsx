@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
+import { isHomeHeroPath } from "@/lib/routes";
 import enterStyles from "./ProjectPageEnter.module.css";
 import styles from "./HeaderMasthead.module.css";
 
@@ -72,7 +73,7 @@ function MastheadSvg({
 
 export function HeaderMasthead() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const isHome = isHomeHeroPath(pathname);
   const isWorkProjectTemplate = /^\/work\/[^/]+/.test(pathname);
 
   /* Home: padding-bottom % + absolute layer (unchanged). Inner: in-flow only — .wordmarkClipInner aspect-ratio sets height; avoids a tall empty band above the project title. */

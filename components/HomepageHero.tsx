@@ -13,6 +13,7 @@ import {
   type TransitionEvent as ReactTransitionEvent,
 } from "react";
 import { Cluster4PanelMedia } from "@/components/Cluster4PanelMedia";
+import { AvailabilityContact } from "@/components/AvailabilityContact";
 import {
   HomeHeroPanelNavLinks,
   HomeHeroPanelThemeBar,
@@ -388,7 +389,14 @@ function Cluster4DesktopActivePanel({
   );
 }
 
-export function HomepageHero() {
+export type HomepageHeroVariant = "full" | "cluster4Only";
+
+type HomepageHeroProps = {
+  variant?: HomepageHeroVariant;
+};
+
+export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
+  const cluster4Only = variant === "cluster4Only";
   const [timeLabel, setTimeLabel] = useState("00:00");
   const [minuteProgress, setMinuteProgress] = useState(0);
   const [mobileCluster4Index, setMobileCluster4Index] = useState(0);
@@ -750,17 +758,23 @@ export function HomepageHero() {
     const activeBottomInner = acy + activeHalfH;
 
     let idealTy: number;
-    if (desktopBentoPanNudge && desktopWideEnabled && cluster2El) {
+    if (
+      !cluster4Only &&
+      desktopBentoPanNudge &&
+      desktopWideEnabled &&
+      cluster2El
+    ) {
       /* Full desktop: align active panel bottom with cluster2 (avoids top clip at wide widths). */
       const c2Bottom = cluster2El.getBoundingClientRect().bottom;
       idealTy = c2Bottom - vpRect.top - activeBottomInner;
     } else {
-      /* Tablet: keep active panel vertically centred in the cluster4 viewport. */
+      /* Tablet / cluster4-only: keep active panel vertically centred in the cluster4 viewport. */
       idealTy = vh / 2 - acy;
     }
 
     setDesktopBentoPan(clampDesktopBentoPan(idealTx, idealTy, innerW, innerH, vw, vh));
   }, [
+    cluster4Only,
     cluster4PanUnlocked,
     desktopBentoActive.row,
     desktopBentoActive.card,
@@ -972,7 +986,7 @@ export function HomepageHero() {
     const c2 = cluster2Ref.current;
     if (vp) ro.observe(vp);
     if (inner) ro.observe(inner);
-    if (c2) ro.observe(c2);
+    if (c2 && !cluster4Only) ro.observe(c2);
 
     mq.addEventListener("change", syncDesktopBentoPan);
     window.addEventListener("resize", syncDesktopBentoPan);
@@ -984,7 +998,7 @@ export function HomepageHero() {
       window.removeEventListener("scroll", onScroll, { capture: true });
       ro.disconnect();
     };
-  }, [syncDesktopBentoPan]);
+  }, [cluster4Only, syncDesktopBentoPan]);
 
   useEffect(() => {
     if (!cluster4PanUnlocked) return;
@@ -1107,8 +1121,14 @@ export function HomepageHero() {
 
   return (
     <section
-      className={`${projectGridStyles.pageInset} ${styles.hero}`}
-      aria-label="Homepage hero"
+      className={[
+        projectGridStyles.pageInset,
+        styles.hero,
+        cluster4Only ? styles.heroCluster4Only : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label={cluster4Only ? "Project panels" : "Homepage hero"}
       style={
         {
           ["--hero-cluster4-pan-boot-ms" as string]: `${HOME_HERO_CLUSTER4_PAN_BOOT_MS}ms`,
@@ -1116,9 +1136,16 @@ export function HomepageHero() {
       }
     >
       <div
-        className={`${styles.row1} ${enterStyles.enterMedia}`}
+        className={[
+          styles.row1,
+          enterStyles.enterMedia,
+          cluster4Only ? styles.row1Cluster4Only : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         onAnimationEnd={onHeroRow1EnterAnimationEnd}
       >
+        {!cluster4Only ? (
         <div className={styles.cluster1}>
           <div ref={cluster2Ref} className={styles.cluster2}>
             <div className={styles.panelHero}>
@@ -1305,6 +1332,7 @@ export function HomepageHero() {
             </div>
           </div>
         </div>
+        ) : null}
 
         <div className={styles.cluster4}>
           <div className={styles.cluster4MobileCarousel}>
@@ -1589,6 +1617,7 @@ export function HomepageHero() {
         </div>
       </div>
 
+      {!cluster4Only ? (
       <div className={styles.row2}>
         <div className={styles.row2Inner}>
           <h2 className={styles.row2Title}>Hello.</h2>
@@ -1601,22 +1630,11 @@ export function HomepageHero() {
               ea nulla a magni quia qui non maxime rem facere odit explicabo.
               Magni quaerat.
             </p>
-            <a
-              href="mailto:t.hoffman@me.com"
-              className={styles.row2AvailabilityContact}
-              aria-label="Email Tom Hoffman — available for new projects"
-            >
-              <span className={styles.row2Availability}>
-                <span className={styles.row2AvailabilityDot} aria-hidden />
-                <span>Available for new projects</span>
-              </span>
-              <span className={styles.row2AvailabilityAction} aria-hidden>
-                <span className={styles.row2AvailabilityActionIcon} />
-              </span>
-            </a>
+            <AvailabilityContact className={styles.row2AvailabilityContact} />
           </div>
         </div>
       </div>
+      ) : null}
     </section>
   );
 }

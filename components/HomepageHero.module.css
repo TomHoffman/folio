@@ -26,6 +26,26 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--hero-gap);
+  margin-top: 1em;
+}
+
+/* Home alt: row1 is cluster4 only — full-width grid / bento. */
+.heroCluster4Only {
+  padding-bottom: 2em;
+}
+
+.heroCluster4Only .row1Cluster4Only {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "cluster4";
+  min-height: calc(
+    100dvh - var(--home-alt-header-block, 0px) - var(--home-alt-row1-margin-top, 0px)
+  );
+}
+
+.heroCluster4Only .cluster4 {
+  grid-area: cluster4;
+  width: 100%;
+  min-width: 0;
 }
 
 .row2 {
@@ -64,128 +84,7 @@
 }
 
 .row2AvailabilityContact {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 8px;
   margin-top: 32px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  font: inherit;
-}
-
-.row2Availability {
-  box-sizing: border-box;
-  min-height: 48px;
-  border-radius: 88px;
-  background: #244350;
-  padding: 8px 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--hero-text-primary);
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  transition: background-color 0.25s ease-in-out;
-}
-
-.row2AvailabilityDot {
-  position: relative;
-  isolation: isolate;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex: 0 0 auto;
-  background: #f1d32c;
-}
-
-.row2AvailabilityDot::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: #fff9d6;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 0.2;
-  pointer-events: none;
-  animation: row2AvailabilityDotBeacon 1.5s ease-in-out infinite;
-}
-
-@keyframes row2AvailabilityDotBeacon {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.2;
-  }
-
-  100% {
-    transform: translate(-50%, -50%) scale(3);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .row2AvailabilityDot::before {
-    animation: none;
-    opacity: 0;
-  }
-}
-
-.row2AvailabilityAction {
-  box-sizing: border-box;
-  display: block;
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  line-height: 0;
-}
-
-.row2AvailabilityActionIcon {
-  display: block;
-  width: 48px;
-  height: 48px;
-  background-color: #c1e0ed;
-  mask-image: url("/svg/icons/availability-external.svg");
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-image: url("/svg/icons/availability-external.svg");
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  transition: background-color 0.25s ease-in-out;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .row2AvailabilityContact:hover .row2Availability {
-    background: #2d505f;
-  }
-
-  .row2AvailabilityContact:hover .row2AvailabilityActionIcon {
-    background-color: #ddf5ff;
-  }
-}
-
-.row2AvailabilityContact:focus-visible {
-  outline: 2px solid var(--color-masthead-dim);
-  outline-offset: 4px;
-  border-radius: 88px;
-}
-
-.row2AvailabilityContact:focus-visible .row2Availability {
-  background: #2d505f;
-}
-
-.row2AvailabilityContact:focus-visible .row2AvailabilityActionIcon {
-  background-color: #ddf5ff;
 }
 
 .row2Text {
@@ -1163,6 +1062,14 @@
     padding-bottom: 6em;
   }
 
+  .heroCluster4Only {
+    padding-bottom: 3em;
+  }
+
+  .heroCluster4Only .row1Cluster4Only {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .row1 {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: stretch;
@@ -1172,7 +1079,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    min-height: 600px;
+    min-height: 450px;
   }
 
   .row2Inner {
