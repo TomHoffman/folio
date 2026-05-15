@@ -1213,7 +1213,7 @@
     height: max-content;
     display: grid;
     grid-template-columns: repeat(22, var(--cluster4-desktop-col));
-    grid-template-rows: repeat(12, var(--cluster4-desktop-row));
+    grid-template-rows: repeat(13, var(--cluster4-desktop-row));
     gap: 8px;
     box-sizing: border-box;
     transform-origin: 0 0;

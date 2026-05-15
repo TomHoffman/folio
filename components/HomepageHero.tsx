@@ -21,10 +21,12 @@ import {
 import enterStyles from "@/components/ProjectPageEnter.module.css";
 import projectGridStyles from "@/components/ProjectGrid.module.css";
 import {
-  getDesktopBentoCardIdForSlot,
+  buildHomeAltCardOrder,
+  getDesktopBentoSlotCard,
   getHomeHeroGridAccentDotColor,
   getHomeHeroGridCardById,
   HOME_HERO_GRID_CARD_IDS,
+  pickHomeAltDesktopStartSlot,
 } from "@/data/homeHeroGridCards";
 import type { HomeHeroGridCard } from "@/data/homeHeroGridCards";
 import styles from "./HomepageHero.module.css";
@@ -44,10 +46,9 @@ function getMinuteProgressPercent() {
 const MOBILE_GRID_COLS = 6;
 const MOBILE_GRID_ROWS = 6;
 const MOBILE_GRID_CELLS = MOBILE_GRID_COLS * MOBILE_GRID_ROWS;
-
 /**
  * Figma `5189:215821` — one band = 11 col-units × 7 tiles (more desktop-wide than prior 10-col band).
- * Horizontally doubled → 22 tracks; block duplicated vertically → 12 rows (see DESKTOP_BENTO_ROW_SPANS).
+ * Horizontally doubled → 22 tracks; block duplicated vertically + first row at end (see DESKTOP_BENTO_ROW_SPANS).
  */
 const DESKTOP_BENTO_BASE_ROW_SPANS = [
   [1, 2, 2, 1, 2, 2, 1],
@@ -58,13 +59,29 @@ const DESKTOP_BENTO_BASE_ROW_SPANS = [
   [1, 1, 2, 2, 1, 2, 2],
 ] as const;
 
-/** 2× each row horizontally + 2× the block vertically: 12 rows × 22 col track. */
+const DESKTOP_BENTO_FIRST_ROW_DOUBLED: ReadonlyArray<1 | 2> = [
+  ...DESKTOP_BENTO_BASE_ROW_SPANS[0],
+  ...DESKTOP_BENTO_BASE_ROW_SPANS[0],
+];
+
+/** 2× each row horizontally + 2× the block vertically + first row at end (narrow corners). */
 const DESKTOP_BENTO_ROW_SPANS: ReadonlyArray<ReadonlyArray<1 | 2>> = [
   ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),
   ...DESKTOP_BENTO_BASE_ROW_SPANS.map((r) => [...r, ...r] as (1 | 2)[]),
+  DESKTOP_BENTO_FIRST_ROW_DOUBLED,
 ];
 
 const DESKTOP_BENTO_INITIAL_ACTIVE = { row: 3, card: 2 } as const;
+
+/** `/home-alt` starts near grid center so the user can pan in all directions before hitting edges. */
+const INFINITE_MOBILE_CENTER = {
+  row: Math.floor(MOBILE_GRID_ROWS / 2),
+  col: Math.floor(MOBILE_GRID_COLS / 2),
+};
+const INFINITE_DESKTOP_CENTER = {
+  row: Math.floor(DESKTOP_BENTO_ROW_SPANS.length / 2),
+  card: Math.floor((DESKTOP_BENTO_ROW_SPANS[0]?.length ?? 14) / 2),
+};
 
 /** Extra pan at full desktop only (≥1440px) — stacks offset + nudge; negative = further left. */
 const DESKTOP_BENTO_PAN_OFFSET_X = -40;
@@ -397,6 +414,7 @@ type HomepageHeroProps = {
 
 export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
   const cluster4Only = variant === "cluster4Only";
+  const infiniteGrid = cluster4Only;
   const [timeLabel, setTimeLabel] = useState("00:00");
   const [minuteProgress, setMinuteProgress] = useState(0);
   const [mobileCluster4Index, setMobileCluster4Index] = useState(0);
@@ -464,10 +482,9 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
   }, [mobileCarouselCards]);
   const mobileGridCards = useMemo(
     () =>
-      Array.from(
-        { length: MOBILE_GRID_CELLS },
-        (_, idx) => mobileCarouselCards[idx % mobileCarouselCards.length] ?? "",
-      ),
+      Array.from({ length: MOBILE_GRID_CELLS }, (_, idx) => {
+        return mobileCarouselCards[idx % mobileCarouselCards.length] ?? "";
+      }),
     [mobileCarouselCards],
   );
 
@@ -499,6 +516,22 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
   }, []);
 
   useEffect(() => {
+    if (infiniteGrid) {
+      const mobileCenterFlatIdx =
+        INFINITE_MOBILE_CENTER.row * MOBILE_GRID_COLS + INFINITE_MOBILE_CENTER.col;
+      const homeAltOrder = buildHomeAltCardOrder(mobileCenterFlatIdx);
+      setMobileCarouselCards(homeAltOrder);
+      setMobileGridActive({ ...INFINITE_MOBILE_CENTER });
+      setDesktopBentoActive(
+        pickHomeAltDesktopStartSlot(
+          homeAltOrder,
+          DESKTOP_BENTO_ROW_SPANS,
+          INFINITE_DESKTOP_CENTER,
+        ),
+      );
+      return;
+    }
+
     setMobileCarouselCards(shuffleArray(HOME_HERO_GRID_CARD_IDS));
 
     setMobileGridActive({ row: 0, col: 0 });
@@ -513,7 +546,7 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
       Math.random() * DESKTOP_BENTO_ROW_SPANS[randomDesktopRow].length,
     );
     setDesktopBentoActive({ row: randomDesktopRow, card: randomDesktopCol });
-  }, []);
+  }, [infiniteGrid]);
 
   useEffect(() => {
     const sync = () => setDesktopGridCustomCursorEnabled(shouldEnableDesktopGridCursor());
@@ -1356,15 +1389,16 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
                   const card = getHomeHeroGridCardById(cardId);
                   const row = Math.floor(idx / MOBILE_GRID_COLS);
                   const col = idx % MOBILE_GRID_COLS;
-                  const isActive = row === mobileGridActive.row && col === mobileGridActive.col;
+                  const isActive =
+                    row === mobileGridActive.row && col === mobileGridActive.col;
                   const dRow = Math.abs(row - mobileGridActive.row);
                   const dCol = Math.abs(col - mobileGridActive.col);
                   const isBlueTheme = isActive && card.theme === "blue";
                   const isNeighbor = Math.max(dRow, dCol) === 1;
-                  const neighborHint = mobileNeighborHintPlacement(
-                    mobileGridActive,
-                    { row, col },
-                  );
+                  const neighborHint = mobileNeighborHintPlacement(mobileGridActive, {
+                    row,
+                    col,
+                  });
                   const neighborHintDelayIndex = mobileNeighborHintDelayIndex(
                     mobileGridActive,
                     { row, col },
@@ -1398,6 +1432,7 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
                       {isActive ? (
                         <>
                           <Cluster4PanelMedia
+                            key={card.id}
                             cardId={card.id}
                             media={card.media}
                             wrapClassName={`${styles.cluster4PanelImage}${isBlueTheme ? ` ${styles.cluster4PanelImageThemeBlue}` : ""}`}
@@ -1487,13 +1522,16 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
             >
               {DESKTOP_BENTO_ROW_SPANS.flatMap((spans, rowIdx) =>
                 spans.map((colSpan, cardIdx) => {
-                  const flatIdx = rowIdx * spans.length + cardIdx;
-                  const cardId = getDesktopBentoCardIdForSlot(
+                  const flatIdx =
+                    rowIdx * DESKTOP_BENTO_ROW_SPANS[rowIdx].length + cardIdx;
+                  const card = getDesktopBentoSlotCard(
+                    rowIdx,
+                    cardIdx,
                     flatIdx,
                     colSpan,
                     mobileCarouselCards,
+                    DESKTOP_BENTO_ROW_SPANS,
                   );
-                  const card = getHomeHeroGridCardById(cardId);
                   const isActive =
                     rowIdx === desktopBentoActive.row &&
                     cardIdx === desktopBentoActive.card;
@@ -1533,6 +1571,7 @@ export function HomepageHero({ variant = "full" }: HomepageHeroProps) {
                         aria-label={card.label}
                       >
                         <Cluster4DesktopActivePanel
+                          key={card.id}
                           card={card}
                           isWide={isWide}
                           isBlueTheme={isBlueTheme}

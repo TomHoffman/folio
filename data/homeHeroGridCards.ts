@@ -23,10 +23,15 @@ export type HomeHeroGridCardRiveMedia = {
   stateMachines?: string | string[];
 };
 
+export type HomeHeroGridCardEmptyMedia = {
+  kind: "none";
+};
+
 export type HomeHeroGridCardMedia =
   | HomeHeroGridCardImageMedia
   | HomeHeroGridCardVideoMedia
-  | HomeHeroGridCardRiveMedia;
+  | HomeHeroGridCardRiveMedia
+  | HomeHeroGridCardEmptyMedia;
 
 export type HomeHeroGridDesktopSpan = "standard" | "wide" | "both";
 
@@ -79,40 +84,87 @@ export type HomeHeroGridCard = {
 
 export const HOME_HERO_GRID_IMAGE_ROTATION_MS_DEFAULT = 2000;
 
-export const homeHeroGridCards: HomeHeroGridCard[] = [
-  {
-    id: "non-profit",
-    label: "Non-profit",
-    body:
-      "I’ve worked with some of the world’s biggest non-profits on projects ranging from design systems, websites and donation flows.",
-    textMaxChars: 23,
-    desktopSpan: "wide",
-    accentDot: "apricot",
-    theme: "default",
-    media: {
-      kind: "image",
-      sources: [
-        "/images/home/hero-grid/bhf-phone.jpg",
-        "/images/home/hero-grid/bhf-laptop.jpg",
-      ],
-    },
-  },
-  {
-    id: "hero-example-rive",
-    label: "Rive (example)",
-    desktopSpan: "standard",
-    accentDot: "sky",
-    theme: "default",
-    media: {
-      kind: "rive",
-      src: "/rive/home-hero-example.riv",
-    },
-  },
+const HERO_GRID_PLACEHOLDER_IMAGES = [
+  "/images/home/hero-grid/bhf-phone.jpg",
+  "/images/home/hero-grid/bhf-laptop.jpg",
+  "/images/home/hero-grid/licel-authenticator.jpg",
+  "/images/home/hero-grid/licel-menu.jpg",
+] as const;
+
+const HERO_GRID_ACCENT_CYCLE: HomeHeroGridAccentDot[] = [
+  "apricot",
+  "sky",
+  "mint",
+  "lavender",
+  "coral",
+  "rose",
 ];
+
+/** `/home-alt` always opens on this card (see `buildHomeAltCardOrder`). */
+export const HOME_ALT_START_CARD_ID = "card-1";
+
+/** Shared desktop bento corner tile — all four outer corners use this card. */
+export const HOME_HERO_GRID_CORNER_CARD_ID = "grid-corner";
+
+export const HOME_HERO_GRID_CORNER_CARD: HomeHeroGridCard = {
+  id: HOME_HERO_GRID_CORNER_CARD_ID,
+  label: "You've reached the end",
+  desktopSpan: "standard",
+  theme: "default",
+  media: { kind: "none" },
+};
+
+export const homeHeroGridCards: HomeHeroGridCard[] = Array.from(
+  { length: 20 },
+  (_, index) => {
+    const n = index + 1;
+    return {
+      id: `card-${n}`,
+      label: n === 1 ? "Hello," : `Card ${n}`,
+      desktopSpan: "both",
+      accentDot: HERO_GRID_ACCENT_CYCLE[index % HERO_GRID_ACCENT_CYCLE.length],
+      theme: "default",
+      media: {
+        kind: "image",
+        sources: HERO_GRID_PLACEHOLDER_IMAGES[index % HERO_GRID_PLACEHOLDER_IMAGES.length],
+      },
+    } satisfies HomeHeroGridCard;
+  },
+);
 
 export const HOME_HERO_GRID_CARD_IDS = homeHeroGridCards.map((card) => card.id);
 
-const homeHeroGridCardMap = new Map(homeHeroGridCards.map((card) => [card.id, card]));
+const homeHeroGridCardMap = new Map<string, HomeHeroGridCard>([
+  ...homeHeroGridCards.map((card) => [card.id, card] as const),
+  [HOME_HERO_GRID_CORNER_CARD.id, HOME_HERO_GRID_CORNER_CARD],
+]);
+
+export function isDesktopBentoCornerSlot(
+  row: number,
+  card: number,
+  rowSpans: ReadonlyArray<ReadonlyArray<1 | 2>>,
+): boolean {
+  const lastRow = rowSpans.length - 1;
+  if (row !== 0 && row !== lastRow) return false;
+  const lastCard = (rowSpans[row]?.length ?? 0) - 1;
+  if (lastCard < 0) return false;
+  return card === 0 || card === lastCard;
+}
+
+export function getDesktopBentoSlotCard(
+  row: number,
+  card: number,
+  flatIdx: number,
+  colSpan: 1 | 2,
+  orderedCardIds: readonly string[],
+  rowSpans: ReadonlyArray<ReadonlyArray<1 | 2>>,
+): HomeHeroGridCard {
+  if (isDesktopBentoCornerSlot(row, card, rowSpans)) {
+    return HOME_HERO_GRID_CORNER_CARD;
+  }
+  const id = getDesktopBentoCardIdForSlot(flatIdx, colSpan, orderedCardIds);
+  return getHomeHeroGridCardById(id);
+}
 
 export function getHomeHeroGridCardById(id: string): HomeHeroGridCard {
   return homeHeroGridCardMap.get(id) ?? homeHeroGridCards[0];
@@ -139,7 +191,40 @@ export function isHomeHeroGridCardEligibleForDesktopBentoSlot(
   return span === "standard" || span === "both";
 }
 
-/** Card ids eligible for a desktop bento slot given its column span. */
+/** Fixed card order so `mobileCenterFlatIdx` shows `HOME_ALT_START_CARD_ID`. */
+export function buildHomeAltCardOrder(mobileCenterFlatIdx: number): string[] {
+  const ids = [...HOME_HERO_GRID_CARD_IDS];
+  const targetIdx = mobileCenterFlatIdx % ids.length;
+  const startIdx = ids.indexOf(HOME_ALT_START_CARD_ID);
+  if (startIdx < 0) return ids;
+  const rotateBy = (startIdx - targetIdx + ids.length) % ids.length;
+  return [...ids.slice(rotateBy), ...ids.slice(0, rotateBy)];
+}
+
+export function pickHomeAltDesktopStartSlot(
+  orderedCardIds: readonly string[],
+  rowSpans: ReadonlyArray<ReadonlyArray<1 | 2>>,
+  prefer: { row: number; card: number },
+): { row: number; card: number } {
+  let best = prefer;
+  let bestDist = Number.POSITIVE_INFINITY;
+
+  rowSpans.forEach((spans, row) => {
+    spans.forEach((colSpan, card) => {
+      const flatIdx = row * spans.length + card;
+      const id = getDesktopBentoCardIdForSlot(flatIdx, colSpan, orderedCardIds);
+      if (id !== HOME_ALT_START_CARD_ID) return;
+      const dist = Math.abs(row - prefer.row) + Math.abs(card - prefer.card);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = { row, card };
+      }
+    });
+  });
+
+  return best;
+}
+
 export function getDesktopBentoCardIdForSlot(
   flatIdx: number,
   colSpan: 1 | 2,

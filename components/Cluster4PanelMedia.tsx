@@ -149,6 +149,8 @@ export function Cluster4PanelMedia({
       );
     case "rive":
       return <Cluster4PanelRiveLazy media={media} wrapClassName={wrapClassName} />;
+    case "none":
+      return <div className={wrapClassName} aria-hidden />;
     default:
       return null;
   }
